@@ -3,7 +3,6 @@ package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipid
 import java.util.logging.Logger;
 
 import org.jmol.util.Elements;
-import org.openscience.jmol.app.jmolpanel.AtomSetChooser;
 
 import com.google.common.collect.Range;
 
@@ -16,9 +15,6 @@ import net.sf.mzmine.desktop.Desktop;
 import net.sf.mzmine.desktop.impl.HeadLessDesktop;
 import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidIdentities.GPLipidIdentity1Chain;
-import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidIdentities.GPLipidIdentity2Chains;
-import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidIdentities.GPLipidIdentity3Chains;
-import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidIdentities.GPLipidIdentity4Chains;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 import net.sf.mzmine.taskcontrol.AbstractTask;
@@ -93,7 +89,7 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 
 		// Calculate how many possible lipids we will try
 
-		totalSteps = ((maxChainLength + 1)* (maxDoubleBonds + 1))* selectedLipids.length;
+		totalSteps = ((maxChainLength + 1)* (maxDoubleBonds + 1)*(maxOxidationValue+1))* selectedLipids.length;
 
 		// Try all combinations of fatty acid lengths and double bonds
 		for (GPLipidType lipidType : selectedLipids) {
