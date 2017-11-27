@@ -135,10 +135,11 @@ public class GPLipidSearchTask extends AbstractTask {
 							continue;
 						}
 						if(lipidType.getNumberOfChains() == 1) {
+							int oxidationValue = 0;
 							// Prepare a lipid instance
 							GPLipidIdentity1Chain lipid1Chain = new GPLipidIdentity1Chain(
 									lipidType, fattyAcid1Length,
-									fattyAcid1DoubleBonds);
+									fattyAcid1DoubleBonds, oxidationValue);
 
 							// Find all rows that match this lipid
 							findPossibleGPL1Chain(lipid1Chain, rows);

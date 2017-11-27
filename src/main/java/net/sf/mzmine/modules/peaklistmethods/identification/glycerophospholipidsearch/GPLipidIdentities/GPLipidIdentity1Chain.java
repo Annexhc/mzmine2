@@ -8,62 +8,67 @@ import net.sf.mzmine.util.FormulaUtils;
 
 public class GPLipidIdentity1Chain extends SimplePeakIdentity {
 
-    private final double mass;
+	private final double mass;
 
-    public GPLipidIdentity1Chain(final GPLipidType lipidType,
-	    final int fattyAcid1Length, final int fattyAcid1DoubleBonds) {
+	public GPLipidIdentity1Chain(final GPLipidType lipidType,
+			final int fattyAcid1Length, final int fattyAcid1DoubleBonds, final int oxidationValue) {
 
-	this(lipidType.getAbbr() + '(' + fattyAcid1Length + ':'
-		+ fattyAcid1DoubleBonds + ')', lipidType.getFormula()
-		+ calculateFattyAcidFormula(fattyAcid1Length,
-			fattyAcid1DoubleBonds));
-    }
-
-    private GPLipidIdentity1Chain(final String name, final String formula) {
-
-	super(name);
-	mass = FormulaUtils.calculateExactMass(formula);
-	setPropertyValue(PROPERTY_FORMULA, formula);
-	setPropertyValue(PROPERTY_METHOD, "Glycerophospholipid search");
-    }
-
-    /**
-     * Calculate fatty acid formula.
-     *
-     * @param fattyAcidLength
-     *            acid length.
-     * @param fattyAcidDoubleBonds
-     *            double bond count.
-     * @return fatty acid formula.
-     */
-    private static String calculateFattyAcidFormula(final int fattyAcidLength,
-	    final int fattyAcidDoubleBonds) {
-
-	String fattyAcid1Formula = "H";
-	if (fattyAcidLength > 0) {
-
-	    final int numberOfHydrogens = fattyAcidLength * 2
-		    - fattyAcidDoubleBonds * 2 - 1;
-	    fattyAcid1Formula = "C" + fattyAcidLength + 'H' + numberOfHydrogens
-		    + 'O';
+		this(lipidType.getAbbr() + '(' + fattyAcid1Length + ':'
+				+ fattyAcid1DoubleBonds + ')', lipidType.getFormula()
+				+ calculateFattyAcidFormula(fattyAcid1Length,
+						fattyAcid1DoubleBonds), oxidationValue);
 	}
-	return fattyAcid1Formula;
-    }
 
-    /**
-     * Get the mass.
-     *
-     * @return the mass.
-     */
-    public double getMass() {
+	private GPLipidIdentity1Chain(final String name, final String formula, final int oxidationValue) {
+		super(name);
+		mass = FormulaUtils.calculateExactMass(formula);
+		if(oxidationValue == 0) {
+			setPropertyValue(PROPERTY_NAME, name);
+		}
+		if(oxidationValue > 0) {
+			setPropertyValue(PROPERTY_NAME, name+" + "+oxidationValue+"O");
+		}
+		setPropertyValue(PROPERTY_FORMULA, formula);
+		setPropertyValue(PROPERTY_METHOD, "Glycerophospholipid search");
+	}
 
-	return mass;
-    }
+	/**
+	 * Calculate fatty acid formula.
+	 *
+	 * @param fattyAcidLength
+	 *            acid length.
+	 * @param fattyAcidDoubleBonds
+	 *            double bond count.
+	 * @return fatty acid formula.
+	 */
+	private static String calculateFattyAcidFormula(final int fattyAcidLength,
+			final int fattyAcidDoubleBonds) {
 
-    @Override
-    public @Nonnull Object clone() {
+		String fattyAcid1Formula = "H";
+		if (fattyAcidLength > 0) {
 
-	return new GPLipidIdentity1Chain(getName(),
-		getPropertyValue(PROPERTY_FORMULA));
-    }
+			final int numberOfHydrogens = fattyAcidLength * 2
+					- fattyAcidDoubleBonds * 2 - 1;
+			fattyAcid1Formula = "C" + fattyAcidLength + 'H' + numberOfHydrogens
+					+ 'O';
+		}
+		return fattyAcid1Formula;
+	}
+
+	/**
+	 * Get the mass.
+	 *
+	 * @return the mass.
+	 */
+	public double getMass() {
+
+		return mass;
+	}
+
+	@Override
+	public @Nonnull Object clone() {
+
+		return new GPLipidIdentity1Chain(getName(),
+				getPropertyValue(PROPERTY_FORMULA), 0);
+	}
 }

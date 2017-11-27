@@ -2,6 +2,9 @@ package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipid
 
 import java.util.logging.Logger;
 
+import org.jmol.util.Elements;
+import org.openscience.jmol.app.jmolpanel.AtomSetChooser;
+
 import com.google.common.collect.Range;
 
 import net.sf.mzmine.datamodel.IonizationType;
@@ -29,7 +32,7 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 	private PeakList peakList;
 
 	private GPLipidType[] selectedLipids;
-	private int minChainLength, maxChainLength, maxDoubleBonds;
+	private int minChainLength, maxChainLength, maxDoubleBonds, maxOxidationValue;
 	private MZTolerance mzTolerance;
 	private IonizationType ionizationType;
 
@@ -49,7 +52,9 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 		maxChainLength = parameters.getParameter(
 				GPLipidSearchParameters.maxChainLength).getValue();
 		maxDoubleBonds = parameters.getParameter(
-				GPLipidSearchParameters.maxDoubleBonds).getValue();
+				GPLipidSearchParameters.maxOxidationValue).getValue();
+		maxOxidationValue = parameters.getParameter(
+				GPLipidSearchParameters.maxOxidationValue).getValue();
 		mzTolerance = parameters.getParameter(
 				GPLipidSearchParameters.mzTolerance).getValue();
 		selectedLipids = parameters.getParameter(
@@ -94,35 +99,36 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 		for (GPLipidType lipidType : selectedLipids) {
 			for (int fattyAcid1Length = 0; fattyAcid1Length <= maxChainLength; fattyAcid1Length++) {
 				for (int fattyAcid1DoubleBonds = 0; fattyAcid1DoubleBonds <= maxDoubleBonds; fattyAcid1DoubleBonds++) {
+					for (int oxidationValue = 0; oxidationValue <= maxOxidationValue; oxidationValue++) {
 
-					// Task canceled?
-					if (isCanceled())
-						return;
+						// Task canceled?
+						if (isCanceled())
+							return;
 
-					// If we have non-zero fatty acid, which is shorter
-					// than minimal length, skip this lipid
-					if (((fattyAcid1Length > 0) && (fattyAcid1Length < minChainLength))){
-						finishedSteps++;
-						continue;
-					}
+						// If we have non-zero fatty acid, which is shorter
+						// than minimal length, skip this lipid
+						if (((fattyAcid1Length > 0) && (fattyAcid1Length < minChainLength))){
+							finishedSteps++;
+							continue;
+						}
 
-					// If we have more double bonds than carbons, it
-					// doesn't make sense, so let's skip such lipids
-					if (((fattyAcid1DoubleBonds > 0) && (fattyAcid1DoubleBonds > fattyAcid1Length - 1))) {
-						finishedSteps++;
-						continue;
-					}
-					
+						// If we have more double bonds than carbons, it
+						// doesn't make sense, so let's skip such lipids
+						if (((fattyAcid1DoubleBonds > 0) && (fattyAcid1DoubleBonds > fattyAcid1Length - 1))) {
+							finishedSteps++;
+							continue;
+						}
+
 						// Prepare a lipid instance
-						GPLipidIdentity1Chain lipid1Chain = new GPLipidIdentity1Chain(
+						GPLipidIdentity1Chain lipidChain = new GPLipidIdentity1Chain(
 								lipidType, fattyAcid1Length,
-								fattyAcid1DoubleBonds);
+								fattyAcid1DoubleBonds, oxidationValue);
 
 						// Find all rows that match this lipid
-						findPossibleGPL1Chain(lipid1Chain, rows);
+						findPossibleGPL1Chain(lipidChain, rows, oxidationValue);
 
 						finishedSteps++;
-					
+					}
 				}
 			}
 			// Add task description to peakList
@@ -138,6 +144,7 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 			setStatus(TaskStatus.FINISHED);
 
 			logger.info("Finished glycerophospholipid search in " + peakList);
+
 		}
 
 
@@ -149,11 +156,11 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 	 * @param mainPeak
 	 * @param possibleFragment
 	 */
-	private void findPossibleGPL1Chain(GPLipidIdentity1Chain lipid, PeakListRow rows[]) {
+	private void findPossibleGPL1Chain(GPLipidIdentity1Chain lipid, PeakListRow rows[], int oxidationValue) {
 
 		final double lipidIonMass = lipid.getMass()
-				+ ionizationType.getAddedMass();
-
+				+ ionizationType.getAddedMass()
+				+ oxidationValue*Elements.getAtomicMass(8);
 		logger.finest("Searching for lipid " + lipid.getDescription() + ", "
 				+ lipidIonMass + " m/z");
 
@@ -172,90 +179,6 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 				MZmineCore.getProjectManager().getCurrentProject()
 				.notifyObjectChanged(rows[rowIndex], false);
 			}
-		}
-
-	}
-
-	private void findPossibleGPL2Chains(GPLipidIdentity2Chains lipid, PeakListRow rows[]) {
-
-		final double lipidIonMass = lipid.getMass()
-				+ ionizationType.getAddedMass();
-
-		logger.finest("Searching for lipid " + lipid.getDescription() + ", "
-				+ lipidIonMass + " m/z");
-
-		for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-
-			if (isCanceled())
-				return;
-
-			Range<Double> mzTolRange = mzTolerance
-					.getToleranceRange(rows[rowIndex].getAverageMZ());
-
-			if (mzTolRange.contains(lipidIonMass)) {
-				rows[rowIndex].addPeakIdentity(lipid, false);
-
-				// Notify the GUI about the change in the project
-				MZmineCore.getProjectManager().getCurrentProject()
-				.notifyObjectChanged(rows[rowIndex], false);
-			}
-
-		}
-
-	}
-
-	private void findPossibleGPL3Chains(GPLipidIdentity3Chains lipid, PeakListRow rows[]) {
-
-		final double lipidIonMass = lipid.getMass()
-				+ ionizationType.getAddedMass();
-
-		logger.finest("Searching for lipid " + lipid.getDescription() + ", "
-				+ lipidIonMass + " m/z");
-
-		for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-
-			if (isCanceled())
-				return;
-
-			Range<Double> mzTolRange = mzTolerance
-					.getToleranceRange(rows[rowIndex].getAverageMZ());
-
-			if (mzTolRange.contains(lipidIonMass)) {
-				rows[rowIndex].addPeakIdentity(lipid, false);
-
-				// Notify the GUI about the change in the project
-				MZmineCore.getProjectManager().getCurrentProject()
-				.notifyObjectChanged(rows[rowIndex], false);
-			}
-
-		}
-
-	}
-
-	private void findPossibleGPL4Chains(GPLipidIdentity4Chains lipid, PeakListRow rows[]) {
-
-		final double lipidIonMass = lipid.getMass()
-				+ ionizationType.getAddedMass();
-
-		logger.finest("Searching for lipid " + lipid.getDescription() + ", "
-				+ lipidIonMass + " m/z");
-
-		for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-
-			if (isCanceled())
-				return;
-
-			Range<Double> mzTolRange = mzTolerance
-					.getToleranceRange(rows[rowIndex].getAverageMZ());
-
-			if (mzTolRange.contains(lipidIonMass)) {
-				rows[rowIndex].addPeakIdentity(lipid, false);
-
-				// Notify the GUI about the change in the project
-				MZmineCore.getProjectManager().getCurrentProject()
-				.notifyObjectChanged(rows[rowIndex], false);
-			}
-
 		}
 
 	}

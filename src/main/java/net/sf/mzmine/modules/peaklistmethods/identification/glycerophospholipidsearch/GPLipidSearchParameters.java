@@ -48,6 +48,10 @@ public class GPLipidSearchParameters extends SimpleParameterSet {
 	    "Maximum number of double bonds",
 	    "Maximum number of double bonds in all fatty acid chains");
     
+    public static final IntegerParameter maxOxidationValue = new IntegerParameter(
+    	    "Maximum number of added oxygens [M+Ox]",
+    	    "Maximum number of added oxygens [M+Ox]");
+    
     public static final MZToleranceParameter mzTolerance = new MZToleranceParameter();
 
     public static final ComboParameter<IonizationType> ionizationMethod = new ComboParameter<IonizationType>(
@@ -57,7 +61,7 @@ public class GPLipidSearchParameters extends SimpleParameterSet {
 
     public GPLipidSearchParameters() {
 	super(new Parameter[] { peakLists, lipidTypes, minChainLength,
-		maxChainLength, maxDoubleBonds, mzTolerance, ionizationMethod });
+		maxChainLength, maxDoubleBonds, maxOxidationValue, mzTolerance, ionizationMethod });
     }
 
 }
