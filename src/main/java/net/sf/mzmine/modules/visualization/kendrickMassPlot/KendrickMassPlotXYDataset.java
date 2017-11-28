@@ -59,6 +59,10 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset{
 			else if(xAxisKMBase.equals("KMD (CH2)")) {
 				xValues[i] = (((int)selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase)+1)-selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase));
 			}
+			//plot Kendrick mass defect (KMD) as x Axis to the base of O
+			else if(xAxisKMBase.equals("KMD (O)")) {
+				xValues[i] = (((int)selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase)+1)-selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase));
+			}
 		}
 
 		//Calc yValues
@@ -72,6 +76,10 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset{
 			else if(yAxisKMBase.equals("KMD (CH2)")) {
 				yValues[i] = ((int)(selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase);
 			}
+			//plot Kendrick mass defect (KMD) as y Axis to the base of H
+			else if(yAxisKMBase.equals("KMD (O)")) {
+				yValues[i] = ((int)(selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase);
+			}
 		}
 	}
 
@@ -83,6 +91,9 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset{
 			}
 			else if(xAxisKMBase.equals("KMD (H)")) {
 				xAxisKMFactor = (1/1.007825037);
+			}
+			else if(xAxisKMBase.equals("KMD (O)")) {
+				xAxisKMFactor = (16/15.994915);
 			}
 			else {
 				xAxisKMFactor = 0;
@@ -99,6 +110,9 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset{
 			}
 			else if(yAxisKMBase.equals("KMD (H)")) {
 				yAxisKMFactor = (1/1.007825037);
+			}
+			else if(yAxisKMBase.equals("KMD (O)")) {
+				yAxisKMFactor = (16/15.994915);
 			}
 			else {
 				yAxisKMFactor = 0;
@@ -134,6 +148,14 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset{
 	@Override
 	public Comparable<?> getSeriesKey(int series) {
 		return getRowKey(series);
+	}
+
+	public double[] getxValues() {
+		return xValues;
+	}
+
+	public double[] getyValues() {
+		return yValues;
 	}
 
 }

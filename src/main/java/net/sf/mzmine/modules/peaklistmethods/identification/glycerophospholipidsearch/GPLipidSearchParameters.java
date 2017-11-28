@@ -49,8 +49,8 @@ public class GPLipidSearchParameters extends SimpleParameterSet {
 	    "Maximum number of double bonds in all fatty acid chains");
     
     public static final IntegerParameter maxOxidationValue = new IntegerParameter(
-    	    "Maximum number of added oxygens [M+Ox]",
-    	    "Maximum number of added oxygens [M+Ox]");
+    	    "Maximum number of additional oxygen due to oxidation [M+xO]",
+    	    "Maximum number of additional oxygen due to oxidation [M+xO]");
     
     public static final MZToleranceParameter mzTolerance = new MZToleranceParameter();
 

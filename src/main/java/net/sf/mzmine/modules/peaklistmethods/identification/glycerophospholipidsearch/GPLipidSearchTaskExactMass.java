@@ -48,7 +48,7 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
 		maxChainLength = parameters.getParameter(
 				GPLipidSearchParameters.maxChainLength).getValue();
 		maxDoubleBonds = parameters.getParameter(
-				GPLipidSearchParameters.maxOxidationValue).getValue();
+				GPLipidSearchParameters.maxDoubleBonds).getValue();
 		maxOxidationValue = parameters.getParameter(
 				GPLipidSearchParameters.maxOxidationValue).getValue();
 		mzTolerance = parameters.getParameter(

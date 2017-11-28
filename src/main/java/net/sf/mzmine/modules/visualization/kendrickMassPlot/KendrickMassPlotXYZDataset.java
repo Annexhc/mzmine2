@@ -6,6 +6,7 @@ import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.parameters.ParameterSet;
+import net.sf.mzmine.util.logging.clock.DebugTimer;
 
 class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 
@@ -17,9 +18,10 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 	private PeakListRow selectedRows[];
 	private String yAxisKMBase;
 	private String xAxisKMBase;
-	private String zAxis;
+	private String zAxisKMBase;
 	private double xAxisKMFactor = -1;
 	private double yAxisKMFactor = -1;
+	private double zAxisKMFactor = -1;
 	private double[] xValues;
 	private double[] yValues;
 	private double[] zValues;
@@ -33,15 +35,16 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 		this.selectedRows = parameters
 				.getParameter(KendrickMassPlotParameters.selectedRows).getMatchingRows(peakList);
 
-		this.yAxisKMBase = parameters
-				.getParameter(KendrickMassPlotParameters.yAxisValues).getValue();
-
 		this.xAxisKMBase = parameters
 				.getParameter(KendrickMassPlotParameters.xAxisValues).getValue();
 
-		this.zAxis = parameters
+		this.yAxisKMBase = parameters
+				.getParameter(KendrickMassPlotParameters.yAxisValues).getValue();
+
+		this.zAxisKMBase = parameters
 				.getParameter(KendrickMassPlotParameters.zAxisValues).getValue();
 
+		DebugTimer debug = new DebugTimer();
 		//Calc xValues
 		xValues = new double[selectedRows.length];
 		for (int i = 0; i < selectedRows.length; i++) {
@@ -61,7 +64,12 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 			else if(xAxisKMBase.equals("KMD (CH2)")) {
 				xValues[i] = (((int)selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase)+1)-selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase));
 			}
+			//plot Kendrick mass defect (KMD) as x Axis to the base of O
+			else if(xAxisKMBase.equals("KMD (O)")) {
+				xValues[i] = (((int)selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase)+1)-selectedRows[i].getAverageMZ()*getxAxisKMFactor(xAxisKMBase));
+			}
 		}
+		debug.printTimeAndSetCurrent("xval");
 
 		//Calc yValues
 		yValues = new double[selectedRows.length];
@@ -74,30 +82,58 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 			else if(yAxisKMBase.equals("KMD (CH2)")) {
 				yValues[i] = ((int)(selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase);
 			}
+			//plot Kendrick mass defect (KMD) as y Axis to the base of H
+			else if(yAxisKMBase.equals("KMD (O)")) {
+				yValues[i] = ((int)(selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getyAxisKMFactor(yAxisKMBase);
+			}
 		}
-		
+		debug.printTimeAndSetCurrent("yval");
+
 		//Calc zValues
 		zValues = new double[selectedRows.length];
 		for (int i = 0; i < selectedRows.length; i++) {
-			if(zAxis.equals("Retention time")) {
+			if(zAxisKMBase.equals("Retention time")) {
 				zValues[i] = selectedRows[i].getAverageRT();
 			}
-			else if(zAxis.equals("Intensity")) {
+			else if(zAxisKMBase.equals("Intensity")) {
 				zValues[i] = selectedRows[i].getAverageHeight();
 			}
-			else if(zAxis.equals("Area")) {
+			else if(zAxisKMBase.equals("Area")) {
 				zValues[i] = selectedRows[i].getAverageArea();
 			}
-			else if(zAxis.equals("Tailing factor")) {
+			else if(zAxisKMBase.equals("Tailing factor")) {
 				zValues[i] = selectedRows[i].getBestPeak().getTailingFactor();
 			}
-			else if(zAxis.equals("Asymmetry factor")) {
+			else if(zAxisKMBase.equals("Asymmetry factor")) {
 				zValues[i] = selectedRows[i].getBestPeak().getAsymmetryFactor();
 			}
-			else if(zAxis.equals("FWHM")) {
+			else if(zAxisKMBase.equals("FWHM")) {
 				zValues[i] = selectedRows[i].getBestPeak().getFWHM();
 			}
+
+			//plot Kendrick mass defect (KMD) as y Axis to the base of CH2
+			if(zAxisKMBase.equals("KMD (H)")) {
+				zValues[i] = ((int)(selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase);
+			}
+			//plot Kendrick mass defect (KMD) as y Axis to the base of H
+			else if(zAxisKMBase.equals("KMD (CH2)")) {
+				zValues[i] = ((int)(selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase);
+			}
+			//plot Kendrick mass defect (KMD) as y Axis to the base of H
+			else if(zAxisKMBase.equals("KMD (O)")) {
+				zValues[i] = ((int)(selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase))+1)-selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase);
+			}
+
+			if(zAxisKMBase.equals("m/z")) {
+				zValues[i] = selectedRows[i].getAverageMZ();
+			}
+			//plot Kendrick masses as x axis
+			else if(zAxisKMBase.equals("KM")) {
+				zValues[i] = selectedRows[i].getAverageMZ()*getzAxisKMFactor(zAxisKMBase);
+			}
 		}
+
+		debug.printTimeAndSetCurrent("zval");
 	}
 	//Calculate xAxis Kendrick mass factor (KM factor)
 	private double getxAxisKMFactor(String xAxisKMBase) {
@@ -107,6 +143,12 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 			}
 			else if(xAxisKMBase.equals("KMD (H)")) {
 				xAxisKMFactor = (1/1.007825037);
+			}
+			else if(xAxisKMBase.equals("KMD (O)")) {
+				xAxisKMFactor = (1/1.007825037);
+			}
+			else if(xAxisKMBase.equals("KMD (O)")) {
+				xAxisKMFactor = (16/15.994915);
 			}
 			else {
 				xAxisKMFactor = 0;
@@ -124,12 +166,35 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset{
 			else if(yAxisKMBase.equals("KMD (H)")) {
 				yAxisKMFactor = (1/1.007825037);
 			}
+			else if(yAxisKMBase.equals("KMD (O)")) {
+				yAxisKMFactor = (16/15.994915);
+			}
 			else {
 				yAxisKMFactor = 0;
 			}
 		}
 		return yAxisKMFactor;
 	}
+
+	//Calculate yAxis Kendrick mass factor (KM factor)
+	private double getzAxisKMFactor(String zAxisKMBase) {
+		if(zAxisKMFactor==-1) {
+			if(zAxisKMBase.equals("KMD (CH2)")) {
+				zAxisKMFactor = (14.000000/14.01565006);
+			}
+			else if(zAxisKMBase.equals("KMD (H)")) {
+				zAxisKMFactor = (1/1.007825037);
+			}
+			else if(zAxisKMBase.equals("KMD (O)")) {
+				zAxisKMFactor = (16/15.994915);
+			}
+			else {
+				zAxisKMFactor = 0;
+			}
+		}
+		return zAxisKMFactor;
+	}
+
 
 	@Override
 	public int getItemCount(int series) {

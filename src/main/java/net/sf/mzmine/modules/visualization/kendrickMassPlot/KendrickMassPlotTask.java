@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
@@ -16,8 +17,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.AxisLocation;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.block.BlockBorder;
-import org.jfree.chart.labels.StandardXYToolTipGenerator;
-import org.jfree.chart.labels.StandardXYZToolTipGenerator;
+import org.jfree.chart.plot.FastScatterPlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.LookupPaintScale;
@@ -32,10 +32,10 @@ import org.jfree.data.xy.XYZDataset;
 
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
-import net.sf.mzmine.modules.visualization.scatterplot.scatterplotchart.ScatterPlotToolTipGenerator;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
+import net.sf.mzmine.util.logging.clock.DebugTimer;
 
 public class KendrickMassPlotTask  extends AbstractTask{
 	/**
@@ -94,15 +94,24 @@ public class KendrickMassPlotTask  extends AbstractTask{
 		// Task canceled?
 		if (isCanceled())
 			return;
+
+		// start new debug timer
+		DebugTimer debug = new DebugTimer();
+		
 		// create dataset
 		//2D, if no third dimension was selected
 		if(zAxisLabel.equals("none")) {
-			
 			logger.info("Creating new 2D chart instance");
 			appliedSteps++;
+			
 			dataset2D = new KendrickMassPlotXYDataset(parameterSet);
+			debug.printTimeAndSetCurrent("Dataset creation");
+			
 			chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel,
 					dataset2D, PlotOrientation.VERTICAL, true, true, false);
+//			chart = createFastScatterPlot(dataset2D);
+//			debug.printTimeAndSetCurrent("Plot creation");
+			
 			XYPlot plot = (XYPlot) chart.getPlot();
 			plot.setBackgroundPaint(Color.WHITE);
 			appliedSteps++;
@@ -125,23 +134,27 @@ public class KendrickMassPlotTask  extends AbstractTask{
 			renderer.setSeriesToolTipGenerator(0, tooltipGenerator);
 			plot.setRenderer(renderer);
 			appliedSteps++;
+
+			debug.printTimeAndSetCurrent("2D plot finished");
 		}
 		//3D, if a third dimension was selected
 		else{
 			logger.info("Creating new 3D chart instance");
 			appliedSteps++;
 			dataset3D = new KendrickMassPlotXYZDataset(parameterSet);
+			debug.printTimeAndSetCurrent("3D plot");
+			
 			double[] copyZValues = new double[dataset3D.getItemCount(0)];
 			for (int i = 0; i < dataset3D.getItemCount(0); i++) {
 				copyZValues[i] = dataset3D.getZValue(0, i);
 			}
-			
 			Arrays.sort(copyZValues);
 			double min = copyZValues[0];
 			double max = copyZValues[copyZValues.length-1];
-
+			debug.printTimeAndSetCurrent("3D sorting+paint scale ");
 			chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel,
 					dataset3D, PlotOrientation.VERTICAL, true, true, false);
+			debug.printTimeAndSetCurrent("3D chart finished");
 			XYBlockRenderer renderer = new XYBlockRenderer();
 			Paint[] contourColors = null;
 			LookupPaintScale scale = null;
@@ -156,7 +169,6 @@ public class KendrickMassPlotTask  extends AbstractTask{
 				scale.add(value, contourColors[i]);
 				scaleValues[i] = value;
 				value = value + delta;
-
 			}
 			XYPlot plot = chart.getXYPlot();
 			appliedSteps++;
@@ -199,25 +211,22 @@ public class KendrickMassPlotTask  extends AbstractTask{
 			legend.getAxis().setTickLabelFont(legendFont);
 			chart.addSubtitle(legend);
 			appliedSteps++;
+			
+			debug.printTimeAndSetCurrent("3D plot finished");
 		}
 		
 		chart.setBackgroundPaint(Color.white);
 
 		//Create Frame
 		JFrame frame = new JFrame();
-		frame.setVisible(true);
 		// create chart JPanel
 		ChartPanel chartPanel = new ChartPanel(chart);
 		frame.add(chartPanel, BorderLayout.CENTER);
-		// disable maximum size (we don't want scaling)
-		chartPanel.setMaximumDrawWidth(Integer.MAX_VALUE);
-		chartPanel.setMaximumDrawHeight(Integer.MAX_VALUE);
 
 		// set title properties
 		TextTitle chartTitle = chart.getTitle();
 		chartTitle.setMargin(5, 0, 0, 0);
 		chartTitle.setFont(titleFont);
-
 		LegendTitle legend = chart.getLegend();
 		legend.setItemFont(legendFont);
 		legend.setBorder(0, 0, 0, 0);
@@ -231,11 +240,35 @@ public class KendrickMassPlotTask  extends AbstractTask{
 		JMenuBar menuBar = new JMenuBar();
 		menuBar.add(new WindowsMenu());
 		frame.setJMenuBar(menuBar);
+
+		debug.printTimeAndSetCurrent("Frame finished");
+		frame.setVisible(true);
 		frame.pack();
+		debug.printTimeAndSetCurrent("Visible and pack finished");
 		setStatus(TaskStatus.FINISHED);
 		logger.info("Finished creating Kendrick mass plot of " + peakList);
 
 	}
 
 
+	private JFreeChart createFastScatterPlot(XYDataset dataset) {
+		final NumberAxis domainAxis = new NumberAxis("X");
+        domainAxis.setAutoRangeIncludesZero(false);
+        final NumberAxis rangeAxis = new NumberAxis("Y");
+        rangeAxis.setAutoRangeIncludesZero(false);
+        
+        float[][] data = new float[2][dataset.getItemCount(0)];
+        for (int i = 0; i < dataset.getItemCount(0); i++) {
+			data[0][i] = (float) dataset.getXValue(0, i);
+			data[1][i] = (float) dataset.getYValue(0, i);
+		}
+        final FastScatterPlot plot = new FastScatterPlot(data, domainAxis, rangeAxis);
+        final JFreeChart chart = new JFreeChart("Fast Scatter Plot", plot);
+//        chart.setLegend(null);
+
+        // force aliasing of the rendered content..
+        chart.getRenderingHints().put
+            (RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        return chart;
+	}
 }

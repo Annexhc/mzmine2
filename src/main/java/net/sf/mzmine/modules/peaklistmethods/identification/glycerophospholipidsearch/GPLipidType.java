@@ -28,8 +28,8 @@ public enum GPLipidType {
 	CL("Cardiolipine", "CL", "C9H15O16P2", 4),//
 	DAG("Diacyglycerol", "DAG", "C5H6O5", 2),//
 	TAG("Triacyglycerol", "TAG", "C3H5O6", 3),//
-	MGDG("Monogalactosyldiacylglycerol", "MGDG", "C10H16O10",2),//
-	DGDG("Digalactosyldiacylglycerol", "DGDG", "C15H26O15", 2),//
+	MGDG("Monogalactosyldiacylglycerol", "MGDG", "C10H16O7",2),//
+	DGDG("Digalactosyldiacylglycerol", "DGDG", "C15H26O12", 2),//
 	MEL("MEL A", "4MEL-A", "???",2);
 
 	private final String name, abbr, formula;
