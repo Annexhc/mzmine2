@@ -27,6 +27,8 @@ public enum IonizationType {
     POTASSIUM("[M+K]+", "K", 38.96316, PolarityType.POSITIVE), //
     SODIUM("[M+Na]+", "Na", 22.98922, PolarityType.POSITIVE), //
     AMMONIUM("[M+NH4]+", "NH4", 18.03383, PolarityType.POSITIVE), //
+    FORMATE("[M+HCO2]-","HCO2", 44.99820, PolarityType.NEGATIVE),
+    ACETATE("[M+CH3COO]-","CH3COO", 59.01385, PolarityType.NEGATIVE),//
     CARBONATE("[M+CO3]-", "CO3", 59.98529, PolarityType.NEGATIVE), //
     PHOSPHATE("[M+H2PO4]-", "H2PO4", 96.96962, PolarityType.NEGATIVE);
 
