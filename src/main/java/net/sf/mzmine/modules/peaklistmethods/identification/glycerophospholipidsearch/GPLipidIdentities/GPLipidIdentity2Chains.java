@@ -67,8 +67,7 @@ public class GPLipidIdentity2Chains extends SimplePeakIdentity {
 
 	    final int numberOfHydrogens = fattyAcidLength * 2
 		    - fattyAcidDoubleBonds * 2 - 1;
-	    fattyAcid1Formula = "C" + fattyAcidLength + 'H' + numberOfHydrogens
-		    + 'O';
+	    fattyAcid1Formula = "C" + fattyAcidLength + 'H' + numberOfHydrogens;
 	}
 	return fattyAcid1Formula;
     }

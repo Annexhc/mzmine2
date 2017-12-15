@@ -19,14 +19,21 @@
 
 package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch;
 
+import java.awt.Checkbox;
+
 import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
+import net.sf.mzmine.parameters.parametertypes.BooleanParameter;
 import net.sf.mzmine.parameters.parametertypes.ComboParameter;
+import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.MultiChoiceParameter;
+import net.sf.mzmine.parameters.parametertypes.ranges.RTRangeParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
+import net.sf.mzmine.parameters.parametertypes.tolerances.RTTolerance;
+import net.sf.mzmine.parameters.parametertypes.tolerances.RTToleranceParameter;
 
 public class GPLipidSearchParameters extends SimpleParameterSet {
 
@@ -59,9 +66,25 @@ public class GPLipidSearchParameters extends SimpleParameterSet {
 	    "Type of ion used to calculate the ionized mass",
 	    IonizationType.values());
 
+    public static final BooleanParameter searchForIsotopes = new BooleanParameter(
+            "Search for 13C isotopes",
+            "Search for 13C isotopes");
+    
+    public static final RTToleranceParameter isotopeRetentionTimeTolerance = new RTToleranceParameter(
+            "Isotope RT tolerance",
+            "Set the RT tolerance in min to search for lipid 13C isotopes");
+    
+    public static final IntegerParameter relativeIsotopeIntensityTolerance = new IntegerParameter(
+            "Relative intensity tolerance of 13C isotope [%]",
+            "Relative intensity tolerance of 13C isotope compared to calculated 13C feature intensity"
+            + "of predicted lipid");
+            
+    
     public GPLipidSearchParameters() {
 	super(new Parameter[] { peakLists, lipidTypes, minChainLength,
-		maxChainLength, maxDoubleBonds, maxOxidationValue, mzTolerance, ionizationMethod });
+		maxChainLength, maxDoubleBonds, maxOxidationValue,
+		mzTolerance, ionizationMethod, searchForIsotopes,
+		isotopeRetentionTimeTolerance, relativeIsotopeIntensityTolerance});
     }
 
 }
