@@ -2,11 +2,6 @@ package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipid
 
 import javax.annotation.Nonnull;
 
-import org.openscience.cdk.formula.MolecularFormulaGenerator;
-import org.openscience.cdk.interfaces.IAtomContainer;
-import org.openscience.cdk.silent.AtomContainer;
-import org.openscience.cdk.silent.MolecularFormula;
-
 import net.sf.mzmine.datamodel.impl.SimplePeakIdentity;
 import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidType;
 import net.sf.mzmine.util.FormulaUtils;
@@ -57,6 +52,7 @@ public class GPLipidIdentity1Chain extends SimplePeakIdentity {
             final int numberOfHydrogens = fattyAcidLength * 2
                     - fattyAcidDoubleBonds * 2 - 1;
             fattyAcid1Formula = "C" + fattyAcidLength + 'H' + numberOfHydrogens;
+          
         }
         return fattyAcid1Formula;
     }
@@ -67,7 +63,6 @@ public class GPLipidIdentity1Chain extends SimplePeakIdentity {
      * @return the mass.
      */
     public double getMass() {
-
         return mass;
     }
     
@@ -77,13 +72,11 @@ public class GPLipidIdentity1Chain extends SimplePeakIdentity {
      * @return the formula.
      */
     public String getFormula() {
-
         return sumFormula;
     }
-
+   
     @Override
     public @Nonnull Object clone() {
-
         return new GPLipidIdentity1Chain(getName(),
                 getPropertyValue(PROPERTY_FORMULA), 0);
     }

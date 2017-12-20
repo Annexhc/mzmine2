@@ -19,8 +19,6 @@
 
 package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch;
 
-import java.awt.Checkbox;
-
 import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
@@ -29,10 +27,8 @@ import net.sf.mzmine.parameters.parametertypes.ComboParameter;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.MultiChoiceParameter;
-import net.sf.mzmine.parameters.parametertypes.ranges.RTRangeParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
-import net.sf.mzmine.parameters.parametertypes.tolerances.RTTolerance;
 import net.sf.mzmine.parameters.parametertypes.tolerances.RTToleranceParameter;
 
 public class GPLipidSearchParameters extends SimpleParameterSet {
@@ -78,13 +74,22 @@ public class GPLipidSearchParameters extends SimpleParameterSet {
             "Relative intensity tolerance of 13C isotope [%]",
             "Relative intensity tolerance of 13C isotope compared to calculated 13C feature intensity"
             + "of predicted lipid");
+    
+    public static final BooleanParameter searchForFAinMSMS = new BooleanParameter(
+            "Search for fatty acids in MS/MS spectra",
+            "Search for fatty acids in MS/MS spectra");
+    
+    public static final DoubleParameter noiseLevel = new DoubleParameter(
+            "Noise level for MS/MS scans",
+            "Intensities less than this value are interpreted as noise.");
             
     
     public GPLipidSearchParameters() {
 	super(new Parameter[] { peakLists, lipidTypes, minChainLength,
 		maxChainLength, maxDoubleBonds, maxOxidationValue,
 		mzTolerance, ionizationMethod, searchForIsotopes,
-		isotopeRetentionTimeTolerance, relativeIsotopeIntensityTolerance});
+		isotopeRetentionTimeTolerance, relativeIsotopeIntensityTolerance,
+		searchForFAinMSMS, noiseLevel});
     }
 
 }
