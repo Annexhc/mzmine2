@@ -22,6 +22,8 @@ package net.sf.mzmine.datamodel;
 public enum IonizationType {
 
     NO_IONIZATION("No ionization", "", 0, PolarityType.NEUTRAL), //
+    POSITIVE("[M]+", "+", -0.00054857990946, PolarityType.POSITIVE), //
+    NEGATIVE("[M]-", "-", 0.00054857990946, PolarityType.NEGATIVE), //
     POSITIVE_HYDROGEN("[M+H]+", "H", 1.00728, PolarityType.POSITIVE), //
     NEGATIVE_HYDROGEN("[M-H]-", "H-1", -1.00728, PolarityType.NEGATIVE), //
     POTASSIUM("[M+K]+", "K", 38.96316, PolarityType.POSITIVE), //
