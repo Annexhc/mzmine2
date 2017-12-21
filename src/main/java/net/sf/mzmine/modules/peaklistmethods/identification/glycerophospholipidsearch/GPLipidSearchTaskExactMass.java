@@ -8,13 +8,10 @@ import org.jmol.util.Elements;
 
 import com.google.common.collect.Range;
 
-import java_cup.parse_action_table;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.IonizationType;
-import net.sf.mzmine.datamodel.MassList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
-import net.sf.mzmine.datamodel.PolarityType;
 import net.sf.mzmine.datamodel.impl.SimplePeakList;
 import net.sf.mzmine.datamodel.impl.SimplePeakListAppliedMethod;
 import net.sf.mzmine.desktop.Desktop;
@@ -24,9 +21,6 @@ import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipids
 import net.sf.mzmine.modules.rawdatamethods.peakpicking.massdetection.exactmass.ExactMassDetector;
 import net.sf.mzmine.modules.rawdatamethods.peakpicking.massdetection.exactmass.ExactMassDetectorParameters;
 import net.sf.mzmine.parameters.ParameterSet;
-import net.sf.mzmine.parameters.UserParameter;
-import net.sf.mzmine.parameters.impl.SimpleParameterSet;
-import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 import net.sf.mzmine.parameters.parametertypes.tolerances.RTTolerance;
 import net.sf.mzmine.taskcontrol.AbstractTask;
