@@ -50,7 +50,7 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
     private double noiseLevelMSMS;
 
     private ParameterSet parameters;
-    
+
     /**
      * @param parameters
      * @param peakList
@@ -219,11 +219,10 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
         ExactMassDetector massDetector = new ExactMassDetector();
         ExactMassDetectorParameters parametersMSMS = new ExactMassDetectorParameters();
         parametersMSMS.noiseLevel.setValue(noiseLevelMSMS);
-        
+
         //Create array of all possible FA masses
         ArrayList<String> fattyAcidFormulas = calculateFattyAcidFormulas(4, 26,8, maxOxidationValue);
-        System.out.println(fattyAcidFormulas.size());
-       
+        ArrayList<String> fattyAcidNames = getFattyAcidNames(4, 26,8, maxOxidationValue);
         //Check if selected feature has MSMS spectra
         if(rows[rowIndex].getBestFragmentation() != null) {
             DataPoint[] massList = massDetector.getMassValues(rows[rowIndex].getBestFragmentation(), parametersMSMS);
@@ -232,21 +231,19 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
                 Range<Double> mzTolRangeMSMS = mzTolerance.getToleranceRange(massList[j].getMZ());
                 //                System.out.println(mzTolRangeMSMS.toString());
                 for (int i = 0; i < fattyAcidFormulas.size(); i++) {
-                                        System.out.println(fattyAcidFormulas.get(i)+"\t"+getFAMass(FormulaUtils.
-                                                ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1)));
                     if(mzTolRangeMSMS.contains(getFAMass(FormulaUtils.
                             ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1)))) {
                         logger.info("Found "+fattyAcidFormulas.get(i)+" with m/z "+getFAMass(FormulaUtils.
                                 ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1)));
                         //Add masses to comment
                         if(rows[rowIndex].getComment().equals(null)) {
-                            rows[rowIndex].setComment(" Fatty acid fragment: "+ fattyAcidFormulas.get(i)+
+                            rows[rowIndex].setComment(" FA "+ fattyAcidNames.get(i)+
                                     " m/z "+ NumberFormat.getInstance().format(getFAMass(FormulaUtils.
                                             ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1))));
                         }
                         else {
                             rows[rowIndex].setComment(rows[rowIndex].getComment()+"\n"+
-                                    " Fatty acid fragment: "+ fattyAcidFormulas.get(i)+
+                                    " FA "+ fattyAcidNames.get(i)+
                                     " m/z "+ NumberFormat.getInstance().format(getFAMass(FormulaUtils.
                                             ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1))));
                         }
@@ -257,19 +254,36 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
     }
 
     private ArrayList<String> calculateFattyAcidFormulas(int minfattyAcidLength, int maxfattyAcidLength, int maxNumberOfDoubleBonds, int maxOxidationValue) {
-      
+
         ArrayList<String> fattyAcidFormulas = new ArrayList<String>();
-       
-            for (int fattyAcidLength = 0; fattyAcidLength <= maxfattyAcidLength; fattyAcidLength++) {
-                for (int fattyAcidDoubleBonds = 0; fattyAcidDoubleBonds <= maxNumberOfDoubleBonds; fattyAcidDoubleBonds++) {
-                    for (int oxidationValue = 0; oxidationValue <= maxOxidationValue; oxidationValue++) {
-                        if (((fattyAcidDoubleBonds > 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
+
+        for (int fattyAcidLength = 0; fattyAcidLength <= maxfattyAcidLength; fattyAcidLength++) {
+            for (int fattyAcidDoubleBonds = 0; fattyAcidDoubleBonds <= maxNumberOfDoubleBonds; fattyAcidDoubleBonds++) {
+                for (int oxidationValue = 0; oxidationValue <= maxOxidationValue; oxidationValue++) {
+                    if (((fattyAcidDoubleBonds > 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
                         fattyAcidFormulas.add(calculateFattyAcidFormula(fattyAcidLength, fattyAcidDoubleBonds, oxidationValue));
-                        }
                     }
                 }
             }
-        
+        }
+
+        return fattyAcidFormulas;
+    }
+    
+    private ArrayList<String> getFattyAcidNames(int minfattyAcidLength, int maxfattyAcidLength, int maxNumberOfDoubleBonds, int maxOxidationValue) {
+
+        ArrayList<String> fattyAcidFormulas = new ArrayList<String>();
+
+        for (int fattyAcidLength = 0; fattyAcidLength <= maxfattyAcidLength; fattyAcidLength++) {
+            for (int fattyAcidDoubleBonds = 0; fattyAcidDoubleBonds <= maxNumberOfDoubleBonds; fattyAcidDoubleBonds++) {
+                for (int oxidationValue = 0; oxidationValue <= maxOxidationValue; oxidationValue++) {
+                    if (((fattyAcidDoubleBonds > 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
+                        fattyAcidFormulas.add(getFattyAcidName(fattyAcidLength, fattyAcidDoubleBonds, oxidationValue));
+                    }
+                }
+            }
+        }
+
         return fattyAcidFormulas;
     }
 
@@ -278,6 +292,8 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
         return fattyAcidMass;
     }
 
+
+
     private String calculateFattyAcidFormula(int fattyAcidLength, int fattyAcidDoubleBonds, int oxidationValue) {
 
         final int numberOfHydrogens = fattyAcidLength * 2
@@ -285,6 +301,10 @@ public class GPLipidSearchTaskExactMass extends AbstractTask {
         String fattyAcidFormula = "C" + fattyAcidLength + 'H' + numberOfHydrogens + 'O'+ 2;
 
         return fattyAcidFormula;
+    }
+    
+    private String getFattyAcidName(int fattyAcidLength, int fattyAcidDoubleBonds, int oxidationValue) {
+        return new String("("+fattyAcidLength+":"+fattyAcidDoubleBonds+")");
     }
 
     private void searchFor13CIsotope(PeakListRow rows[], double lipidIonMass, int rowIndex, GPLipidIdentity1Chain lipid) {
