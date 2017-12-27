@@ -1,17 +1,17 @@
-package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidIdentities;
+package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction;
 
 import javax.annotation.Nonnull;
 
 import net.sf.mzmine.datamodel.impl.SimplePeakIdentity;
-import net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch.GPLipidType;
+import net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction.LipidType;
 import net.sf.mzmine.util.FormulaUtils;
 
-public class GPLipidIdentity1Chain extends SimplePeakIdentity {
+public class LipidIdentityChain extends SimplePeakIdentity {
 
     private final double mass;
     private final String sumFormula;
 
-    public GPLipidIdentity1Chain(final GPLipidType lipidType,
+    public LipidIdentityChain(final LipidType lipidType,
             final int fattyAcid1Length, final int fattyAcid1DoubleBonds, final int oxidationValue) {
 
         this(lipidType.getAbbr() + '(' + fattyAcid1Length + ':'
@@ -20,7 +20,7 @@ public class GPLipidIdentity1Chain extends SimplePeakIdentity {
                         fattyAcid1DoubleBonds), oxidationValue);
     }
 
-    private GPLipidIdentity1Chain(final String name, final String formula, final int oxidationValue) {
+    private LipidIdentityChain(final String name, final String formula, final int oxidationValue) {
         super(name);
         mass = FormulaUtils.calculateExactMass(formula);
         sumFormula = formula;
@@ -77,7 +77,7 @@ public class GPLipidIdentity1Chain extends SimplePeakIdentity {
    
     @Override
     public @Nonnull Object clone() {
-        return new GPLipidIdentity1Chain(getName(),
+        return new LipidIdentityChain(getName(),
                 getPropertyValue(PROPERTY_FORMULA), 0);
     }
 }

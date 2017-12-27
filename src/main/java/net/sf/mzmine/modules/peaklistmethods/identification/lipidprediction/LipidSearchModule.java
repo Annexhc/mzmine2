@@ -17,7 +17,7 @@
  * Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch;
+package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction;
 
 import java.util.Collection;
 
@@ -31,7 +31,7 @@ import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.taskcontrol.Task;
 import net.sf.mzmine.util.ExitCode;
 
-public class GPLipidSearchModule implements MZmineProcessingModule {
+public class LipidSearchModule implements MZmineProcessingModule {
 
     private static final String MODULE_NAME = "Lipid prediction";
     private static final String MODULE_DESCRIPTION = "This method searches for peaks whose m/z value matches a predicted mass of lipids.";
@@ -52,11 +52,11 @@ public class GPLipidSearchModule implements MZmineProcessingModule {
             @Nonnull ParameterSet parameters, @Nonnull Collection<Task> tasks) {
 
         PeakList peakLists[] = parameters
-                .getParameter(GPLipidSearchParameters.peakLists).getValue()
+                .getParameter(LipidSearchParameters.peakLists).getValue()
                 .getMatchingPeakLists();
 
         for (PeakList peakList : peakLists) {
-            Task newTask = new GPLipidSearchTaskExactMass(parameters, peakList);
+            Task newTask = new LipidSearchTask(parameters, peakList);
             tasks.add(newTask);
         }
 
@@ -70,7 +70,7 @@ public class GPLipidSearchModule implements MZmineProcessingModule {
 
     @Override
     public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
-        return GPLipidSearchParameters.class;
+        return LipidSearchParameters.class;
     }
 
 }

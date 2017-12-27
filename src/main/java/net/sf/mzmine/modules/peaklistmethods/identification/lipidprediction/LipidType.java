@@ -17,9 +17,9 @@
  * Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch;
+package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction;
 
-public enum GPLipidType {
+public enum LipidType {
 
 	PC("Phosphatidylcholine", "PC", "C8H17NO8P", 2), //
 	PE("Phosphatidylethanolamine", "PE", "C5H11NO8P", 2), //
@@ -37,7 +37,7 @@ public enum GPLipidType {
 	private final String name, abbr, formula;
 	private final int numberOfChains;
 
-	GPLipidType(String name, String abbr, String formula, int numberOfChains) {
+	LipidType(String name, String abbr, String formula, int numberOfChains) {
 		this.name = name;
 		this.abbr = abbr;
 		this.formula = formula;

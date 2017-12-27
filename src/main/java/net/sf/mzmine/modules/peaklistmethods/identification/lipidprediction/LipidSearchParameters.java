@@ -17,7 +17,7 @@
  * Fifth Floor, Boston, MA 02110-1301 USA
  */
 
-package net.sf.mzmine.modules.peaklistmethods.identification.glycerophospholipidsearch;
+package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction;
 
 import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.parameters.Parameter;
@@ -31,13 +31,13 @@ import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.RTToleranceParameter;
 
-public class GPLipidSearchParameters extends SimpleParameterSet {
+public class LipidSearchParameters extends SimpleParameterSet {
 
     public static final PeakListsParameter peakLists = new PeakListsParameter();
 
-    public static final MultiChoiceParameter<GPLipidType> lipidTypes = new MultiChoiceParameter<GPLipidType>(
+    public static final MultiChoiceParameter<LipidType> lipidTypes = new MultiChoiceParameter<LipidType>(
 	    "Type of lipids", "Selection of glycerophospholipis to consider",
-	    GPLipidType.values());
+	    LipidType.values());
 
     public static final IntegerParameter minChainLength = new IntegerParameter(
 	    "Minimum number of Carbon in fatty acids",
@@ -84,7 +84,7 @@ public class GPLipidSearchParameters extends SimpleParameterSet {
             "Intensities less than this value are interpreted as noise.");
             
     
-    public GPLipidSearchParameters() {
+    public LipidSearchParameters() {
 	super(new Parameter[] { peakLists, lipidTypes, minChainLength,
 		maxChainLength, maxDoubleBonds, maxOxidationValue,
 		mzTolerance, ionizationMethod, searchForIsotopes,
