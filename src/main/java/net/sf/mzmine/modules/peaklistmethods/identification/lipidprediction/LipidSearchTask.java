@@ -96,7 +96,7 @@ public class LipidSearchTask extends AbstractTask {
      * @see net.sf.mzmine.taskcontrol.Task#getTaskDescription()
      */
     public String getTaskDescription() {
-        return "Identification of glycerophospholipids in " + peakList;
+        return "Prediction of lipids in " + peakList;
     }
 
     /**
@@ -106,7 +106,7 @@ public class LipidSearchTask extends AbstractTask {
 
         setStatus(TaskStatus.PROCESSING);
 
-        logger.info("Starting glycerophospholipid search in " + peakList);
+        logger.info("Starting lipid predriction in " + peakList);
 
         PeakListRow rows[] = peakList.getRows();
 
@@ -144,7 +144,7 @@ public class LipidSearchTask extends AbstractTask {
                                 fattyAcidDoubleBonds, oxidationValue);
 
                         // Find all rows that match this lipid
-                        findPossibleGPLChain(lipidChain, rows, oxidationValue);
+                        findPossibleLipid(lipidChain, rows, oxidationValue);
 
                         finishedSteps++;
                     }
@@ -162,7 +162,7 @@ public class LipidSearchTask extends AbstractTask {
 
             setStatus(TaskStatus.FINISHED);
 
-            logger.info("Finished glycerophospholipid search in " + peakList);
+            logger.info("Finished lipid prediction in " + peakList);
 
         }
 
@@ -175,7 +175,7 @@ public class LipidSearchTask extends AbstractTask {
      * @param mainPeak
      * @param possibleFragment
      */
-    private void findPossibleGPLChain(LipidIdentityChain lipid, PeakListRow rows[], int oxidationValue) {
+    private void findPossibleLipid(LipidIdentityChain lipid, PeakListRow rows[], int oxidationValue) {
 
         final double lipidIonMass = lipid.getMass()
                 + ionizationType.getAddedMass()
@@ -218,7 +218,7 @@ public class LipidSearchTask extends AbstractTask {
         FattyAcidTools fattyAcidTools = new FattyAcidTools();
         parametersMSMS.noiseLevel.setValue(noiseLevelMSMS);
 
-        //Create array of all possible FA masses
+        //Create array of all possible FA masses based on lipid annotation
         ArrayList<String> fattyAcidFormulas = fattyAcidTools.calculateFattyAcidFormulas(4, 26,8, maxOxidationValue);
         ArrayList<String> fattyAcidNames = fattyAcidTools.getFattyAcidNames(4, 26,8, maxOxidationValue);
         //Check if selected feature has MSMS spectra
@@ -227,7 +227,6 @@ public class LipidSearchTask extends AbstractTask {
             //Check if a mass in MSMS spectra fits a mass of a FA
             for (int j = 0; j < massList.length; j++) {
                 Range<Double> mzTolRangeMSMS = mzTolerance.getToleranceRange(massList[j].getMZ());
-                //                System.out.println(mzTolRangeMSMS.toString());
                 for (int i = 0; i < fattyAcidFormulas.size(); i++) {
                     if(mzTolRangeMSMS.contains(fattyAcidTools.getFAMass(FormulaUtils.
                             ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1)))) {
@@ -247,11 +246,33 @@ public class LipidSearchTask extends AbstractTask {
                         }
                     }
                 }
+
+                /**
+                 * Check for lipid class specific fragment
+                 *lipid class fragments are derived from lipid blast
+                 */
+                MSMSLipidTools msmsLipidTools = new MSMSLipidTools();
+                ArrayList<String> listOfFragments = msmsLipidTools.checkForClassSpecificFragments(mzTolRangeMSMS,
+                        rows[rowIndex].getPreferredPeakIdentity(),
+                        lipidIonMass);
+                if(listOfFragments.isEmpty() == false) {
+                    for (int i = 0; i < listOfFragments.size(); i++) {
+                        //Add masses to comment
+                        System.out.println(listOfFragments.get(i)+"\n"+listOfFragments.size());
+                        if(rows[rowIndex].getComment().equals(null)) {
+                            rows[rowIndex].setComment(" "+listOfFragments.get(i));
+                        }
+                        else {
+                            rows[rowIndex].setComment(rows[rowIndex].getComment()+";"+
+                                    " "+listOfFragments.get(i));
+                        }
+                    }
+                }
             }
         }
     }
 
-   
+
 
     private void searchFor13CIsotope(PeakListRow rows[], double lipidIonMass, int rowIndex, LipidIdentityChain lipid) {
         for (int i = 0; i < rows.length; i++) {
@@ -274,6 +295,6 @@ public class LipidSearchTask extends AbstractTask {
         }
     }
 
-   
+
 
 }
