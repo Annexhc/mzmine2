@@ -220,7 +220,7 @@ public class LipidSearchTask extends AbstractTask {
 
         //Create array of all possible FA masses based on lipid annotation
         ArrayList<String> fattyAcidFormulas = fattyAcidTools.calculateFattyAcidFormulas(4, 26,8, maxOxidationValue);
-        ArrayList<String> fattyAcidNames = fattyAcidTools.getFattyAcidNames(4, 26,8, maxOxidationValue);
+        ArrayList<String> fattyAcidNames = fattyAcidTools.getFattyAcidNames(4,26,8, maxOxidationValue);
         //Check if selected feature has MSMS spectra
         if(rows[rowIndex].getBestFragmentation() != null) {
             DataPoint[] massList = massDetector.getMassValues(rows[rowIndex].getBestFragmentation(), parametersMSMS);

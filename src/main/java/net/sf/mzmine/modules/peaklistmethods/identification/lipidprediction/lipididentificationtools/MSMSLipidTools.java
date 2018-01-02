@@ -12,7 +12,7 @@ public class MSMSLipidTools {
     public ArrayList<String> checkForClassSpecificFragments(Range<Double> mzTolRangeMSMS,
             PeakIdentity peakIdentity,
             double lipidIonMass) {
-        
+
         ArrayList<String> listOfFragments = new ArrayList<String>();
         //load a MSMS fragment library
         MSMSLibrary msmsLibrary = loadMSMSLibrary(peakIdentity);
@@ -20,10 +20,10 @@ public class MSMSLipidTools {
         FattyAcidTools fattyAcidTools = new FattyAcidTools();
         ArrayList<String> fattyAcidFormulas = fattyAcidTools.calculateFattyAcidFormulas(4, 26, 8, 0);
         ArrayList<String> fattyAcidNames = fattyAcidTools.getFattyAcidNames(4, 26, 8, 0);
+
         //Loop through possible fragments
         for (int i = 0; i < msmsLibrary.getName().length; i++) {
             //Search for [M-H] - fatty acid
-            System.out.println(msmsLibrary.getName()[i]);
             if(msmsLibrary.getName()[i].equals("[M-H]-sn1")) {
                 for (int j = 0; j < fattyAcidFormulas.size(); j++) {
                     if(mzTolRangeMSMS.contains(lipidIonMass-
@@ -54,15 +54,14 @@ public class MSMSLipidTools {
             }
             //Search for "fragments"
             if(msmsLibrary.getName()[i].contains("sn1") == false) {
-                    if(mzTolRangeMSMS.contains(FormulaUtils.calculateExactMass(
-                            msmsLibrary.getFormulaOfStaticFormula()[i]))){
-                        listOfFragments.add("Fragment: "+
-                                msmsLibrary.getFormulaOfStaticFormula()[i]);
-                    }
-               }
-
+                if(mzTolRangeMSMS.contains(FormulaUtils.calculateExactMass(
+                        msmsLibrary.getFormulaOfStaticFormula()[i]))){
+                    listOfFragments.add("Fragment: "+
+                            msmsLibrary.getFormulaOfStaticFormula()[i]);
+                }
+            }
         }
-        return listOfFragments ;
+        return listOfFragments;
     }
 
     private MSMSLibrary loadMSMSLibrary(PeakIdentity peakIdentity) {
@@ -77,4 +76,5 @@ public class MSMSLipidTools {
         MSMSLibrary msmsLibrary = MSMSLibrary.valueOf(lipidClass);
         return msmsLibrary;
     }
+
 }

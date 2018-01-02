@@ -32,7 +32,8 @@ public enum LipidType {
 	TAG("Triacyglycerol", "TAG", "C3H3O6", 3),//
 	MGDG("Monogalactosyldiacylglycerol", "MGDG", "C9H15O10",2),//
 	DGDG("Digalactosyldiacylglycerol", "DGDG", "C15H25O15", 2),//
-	SQDG("Sulfoquinovosyldiacylglyerol", "SQDG", "C9H15O12S" ,2);
+	SQDG("Sulfoquinovosyldiacylglyerol", "SQDG", "C9H15O12S" ,2),//
+        DGTS("Diacylglyceroltrimethylhomoserin", "DGTS", "C10H19O7N" , 2);
 
 	private final String name, abbr, formula;
 	private final int numberOfChains;

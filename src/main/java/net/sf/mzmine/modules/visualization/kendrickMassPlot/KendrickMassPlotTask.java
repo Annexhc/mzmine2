@@ -30,6 +30,8 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYZDataset;
 
+import com.google.common.collect.Range;
+
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
 import net.sf.mzmine.parameters.ParameterSet;
@@ -41,7 +43,7 @@ public class KendrickMassPlotTask  extends AbstractTask{
 	/**
 	 * 
 	 */
-	static final Font legendFont = new Font("SansSerif", Font.PLAIN, 10);
+	static final Font legendFont = new Font("SansSerif", Font.PLAIN, 11);
 	static final Font titleFont = new Font("SansSerif", Font.PLAIN, 11);
 
 	private Logger logger = Logger.getLogger(this.getClass().getName());
@@ -54,6 +56,7 @@ public class KendrickMassPlotTask  extends AbstractTask{
 	private String xAxisLabel;
 	private String yAxisLabel;
 	private String zAxisLabel;
+	private Range<Double> zAxisRange;
 	private ParameterSet parameterSet;
 	private int totalSteps = 3, appliedSteps = 0;
 
@@ -74,6 +77,10 @@ public class KendrickMassPlotTask  extends AbstractTask{
 				.getParameter(KendrickMassPlotParameters.zAxisValues)
 				.getValue();
 
+		zAxisRange = parameters
+		        .getParameter(KendrickMassPlotParameters.zAxisRange)
+		        .getValue();
+		
 		parameterSet = parameters;
 	}
 
@@ -144,13 +151,17 @@ public class KendrickMassPlotTask  extends AbstractTask{
 			dataset3D = new KendrickMassPlotXYZDataset(parameterSet);
 			debug.printTimeAndSetCurrent("3D plot");
 			
-			double[] copyZValues = new double[dataset3D.getItemCount(0)];
-			for (int i = 0; i < dataset3D.getItemCount(0); i++) {
-				copyZValues[i] = dataset3D.getZValue(0, i);
-			}
-			Arrays.sort(copyZValues);
-			double min = copyZValues[0];
-			double max = copyZValues[copyZValues.length-1];
+//			double[] copyZValues = new double[dataset3D.getItemCount(0)];
+//			for (int i = 0; i < dataset3D.getItemCount(0); i++) {
+//				copyZValues[i] = dataset3D.getZValue(0, i);
+//			}
+//			Arrays.sort(copyZValues);
+//			double min = copyZValues[0];
+//			double max = copyZValues[copyZValues.length-1];
+			
+			double min = zAxisRange.lowerEndpoint();
+			double max = zAxisRange.upperEndpoint();
+			
 			debug.printTimeAndSetCurrent("3D sorting+paint scale ");
 			chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel,
 					dataset3D, PlotOrientation.VERTICAL, true, true, false);

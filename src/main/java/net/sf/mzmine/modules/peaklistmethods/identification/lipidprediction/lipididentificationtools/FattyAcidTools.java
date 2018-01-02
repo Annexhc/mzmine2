@@ -21,7 +21,7 @@ public class FattyAcidTools {
         for (int fattyAcidLength = 0; fattyAcidLength <= maxfattyAcidLength; fattyAcidLength++) {
             for (int fattyAcidDoubleBonds = 0; fattyAcidDoubleBonds <= maxNumberOfDoubleBonds; fattyAcidDoubleBonds++) {
                 for (int oxidationValue = 0; oxidationValue <= maxOxidationValue; oxidationValue++) {
-                    if (((fattyAcidDoubleBonds > 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
+                    if (((fattyAcidDoubleBonds >= 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
                         fattyAcidFormulas.add(calculateFattyAcidFormula(fattyAcidLength, fattyAcidDoubleBonds, oxidationValue));
                     }
                 }
@@ -42,7 +42,7 @@ public class FattyAcidTools {
         for (int fattyAcidLength = 0; fattyAcidLength <= maxfattyAcidLength; fattyAcidLength++) {
             for (int fattyAcidDoubleBonds = 0; fattyAcidDoubleBonds <= maxNumberOfDoubleBonds; fattyAcidDoubleBonds++) {
                 for (int oxidationValue = 0; oxidationValue <= maxOxidationValue; oxidationValue++) {
-                    if (((fattyAcidDoubleBonds > 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
+                    if (((fattyAcidDoubleBonds >= 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1) == false)) {
                         fattyAcidFormulas.add(getFattyAcidName(fattyAcidLength, fattyAcidDoubleBonds, oxidationValue));
                     }
                 }
