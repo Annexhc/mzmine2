@@ -76,8 +76,8 @@ public class LipidSearchParameters extends SimpleParameterSet {
             + "of predicted lipid");
     
     public static final BooleanParameter searchForFAinMSMS = new BooleanParameter(
-            "Search for fatty acids in MS/MS spectra",
-            "Search for fatty acids in MS/MS spectra");
+            "Search for lipid class specific fragments in MS/MS spectra",
+            "Search for lipid class specific fragments in MS/MS spectra");
     
     public static final DoubleParameter noiseLevel = new DoubleParameter(
             "Noise level for MS/MS scans",

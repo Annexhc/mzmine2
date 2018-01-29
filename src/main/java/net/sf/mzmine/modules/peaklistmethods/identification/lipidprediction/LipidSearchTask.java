@@ -38,7 +38,8 @@ public class LipidSearchTask extends AbstractTask {
     private PeakList peakList;
 
     private LipidType[] selectedLipids;
-    private int minChainLength, maxChainLength, maxDoubleBonds, maxOxidationValue;
+    private int minChainLength, maxChainLength, maxDoubleBonds,
+            maxOxidationValue;
     private MZTolerance mzTolerance;
     private RTTolerance isotopeRtTolerance;
     private IonizationType ionizationType;
@@ -57,30 +58,38 @@ public class LipidSearchTask extends AbstractTask {
         this.peakList = peakList;
         this.parameters = parameters;
 
-        minChainLength = parameters.getParameter(
-                LipidSearchParameters.minChainLength).getValue();
-        maxChainLength = parameters.getParameter(
-                LipidSearchParameters.maxChainLength).getValue();
-        maxDoubleBonds = parameters.getParameter(
-                LipidSearchParameters.maxDoubleBonds).getValue();
-        maxOxidationValue = parameters.getParameter(
-                LipidSearchParameters.maxOxidationValue).getValue();
-        mzTolerance = parameters.getParameter(
-                LipidSearchParameters.mzTolerance).getValue();
-        selectedLipids = parameters.getParameter(
-                LipidSearchParameters.lipidTypes).getValue();
-        ionizationType = parameters.getParameter(
-                LipidSearchParameters.ionizationMethod).getValue();
-        searchForIsotopes = parameters.getParameter(
-                LipidSearchParameters.searchForIsotopes).getValue();
-        isotopeRtTolerance = parameters.getParameter(
-                LipidSearchParameters.isotopeRetentionTimeTolerance).getValue();
-        relIsotopeIntensityTolerance = parameters.getParameter(
-                LipidSearchParameters.relativeIsotopeIntensityTolerance).getValue();
-        searchForFAinMSMS = parameters.getParameter(
-                LipidSearchParameters.searchForFAinMSMS).getValue();
-        noiseLevelMSMS = parameters.getParameter(
-                LipidSearchParameters.noiseLevel).getValue();
+        minChainLength = parameters
+                .getParameter(LipidSearchParameters.minChainLength).getValue();
+        maxChainLength = parameters
+                .getParameter(LipidSearchParameters.maxChainLength).getValue();
+        maxDoubleBonds = parameters
+                .getParameter(LipidSearchParameters.maxDoubleBonds).getValue();
+        maxOxidationValue = parameters
+                .getParameter(LipidSearchParameters.maxOxidationValue)
+                .getValue();
+        mzTolerance = parameters.getParameter(LipidSearchParameters.mzTolerance)
+                .getValue();
+        selectedLipids = parameters
+                .getParameter(LipidSearchParameters.lipidTypes).getValue();
+        ionizationType = parameters
+                .getParameter(LipidSearchParameters.ionizationMethod)
+                .getValue();
+        searchForIsotopes = parameters
+                .getParameter(LipidSearchParameters.searchForIsotopes)
+                .getValue();
+        isotopeRtTolerance = parameters
+                .getParameter(
+                        LipidSearchParameters.isotopeRetentionTimeTolerance)
+                .getValue();
+        relIsotopeIntensityTolerance = parameters
+                .getParameter(
+                        LipidSearchParameters.relativeIsotopeIntensityTolerance)
+                .getValue();
+        searchForFAinMSMS = parameters
+                .getParameter(LipidSearchParameters.searchForFAinMSMS)
+                .getValue();
+        noiseLevelMSMS = parameters
+                .getParameter(LipidSearchParameters.noiseLevel).getValue();
     }
 
     /**
@@ -112,7 +121,8 @@ public class LipidSearchTask extends AbstractTask {
 
         // Calculate how many possible lipids we will try
 
-        totalSteps = ((maxChainLength + 1)* (maxDoubleBonds + 1)*(maxOxidationValue+1))* selectedLipids.length;
+        totalSteps = ((maxChainLength + 1) * (maxDoubleBonds + 1)
+                * (maxOxidationValue + 1)) * selectedLipids.length;
 
         // Try all combinations of fatty acid lengths and double bonds
         for (LipidType lipidType : selectedLipids) {
@@ -126,14 +136,17 @@ public class LipidSearchTask extends AbstractTask {
 
                         // If we have non-zero fatty acid, which is shorter
                         // than minimal length, skip this lipid
-                        if (((fattyAcidLength > 0) && (fattyAcidLength < minChainLength))){
+                        if (((fattyAcidLength > 0)
+                                && (fattyAcidLength < minChainLength))) {
                             finishedSteps++;
                             continue;
                         }
 
                         // If we have more double bonds than carbons, it
                         // doesn't make sense, so let's skip such lipids
-                        if (((fattyAcidDoubleBonds > 0) && (fattyAcidDoubleBonds > fattyAcidLength - 1))) {
+                        if (((fattyAcidDoubleBonds > 0)
+                                && (fattyAcidDoubleBonds > fattyAcidLength
+                                        - 1))) {
                             finishedSteps++;
                             continue;
                         }
@@ -151,9 +164,10 @@ public class LipidSearchTask extends AbstractTask {
                 }
             }
             // Add task description to peakList
-            ((SimplePeakList) peakList)
-            .addDescriptionOfAppliedTask(new SimplePeakListAppliedMethod(
-                    "Identification of glycerophospholipids", parameters));
+            ((SimplePeakList) peakList).addDescriptionOfAppliedTask(
+                    new SimplePeakListAppliedMethod(
+                            "Identification of glycerophospholipids",
+                            parameters));
 
             // Repaint the window to reflect the change in the peak list
             Desktop desktop = MZmineCore.getDesktop();
@@ -166,7 +180,6 @@ public class LipidSearchTask extends AbstractTask {
 
         }
 
-
     }
 
     /**
@@ -175,11 +188,12 @@ public class LipidSearchTask extends AbstractTask {
      * @param mainPeak
      * @param possibleFragment
      */
-    private void findPossibleLipid(LipidIdentityChain lipid, PeakListRow rows[], int oxidationValue) {
+    private void findPossibleLipid(LipidIdentityChain lipid, PeakListRow rows[],
+            int oxidationValue) {
 
         final double lipidIonMass = lipid.getMass()
                 + ionizationType.getAddedMass()
-                + oxidationValue*Elements.getAtomicMass(8);
+                + oxidationValue * Elements.getAtomicMass(8);
         logger.finest("Searching for lipid " + lipid.getDescription() + ", "
                 + lipidIonMass + " m/z");
         for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
@@ -193,78 +207,101 @@ public class LipidSearchTask extends AbstractTask {
             if (mzTolRange12C.contains(lipidIonMass)) {
                 rows[rowIndex].addPeakIdentity(lipid, false);
                 rows[rowIndex].setComment(
-                        "Ionization: "+ionizationType.getAdduct());
+                        "Ionization: " + ionizationType.getAdduct());
 
-                //If search for isotopes is selected search for isotopes
-                if(searchForIsotopes == true) {
+                // If search for isotopes is selected search for isotopes
+                if (searchForIsotopes == true) {
                     searchFor13CIsotope(rows, lipidIonMass, rowIndex, lipid);
                 }
-                //If search for FA in MSMS is selected search for FA
-                if(searchForFAinMSMS == true) {
+                // If search for FA in MSMS is selected search for FA
+                if (searchForFAinMSMS == true) {
                     searchFAinMSMS(rows, lipidIonMass, rowIndex, lipid);
                 }
 
                 // Notify the GUI about the change in the project
                 MZmineCore.getProjectManager().getCurrentProject()
-                .notifyObjectChanged(rows[rowIndex], false);
+                        .notifyObjectChanged(rows[rowIndex], false);
             }
         }
 
     }
 
-    private void searchFAinMSMS(PeakListRow rows[], double lipidIonMass, int rowIndex, LipidIdentityChain lipid) {
+    private void searchFAinMSMS(PeakListRow rows[], double lipidIonMass,
+            int rowIndex, LipidIdentityChain lipid) {
         ExactMassDetector massDetector = new ExactMassDetector();
         ExactMassDetectorParameters parametersMSMS = new ExactMassDetectorParameters();
         FattyAcidTools fattyAcidTools = new FattyAcidTools();
         parametersMSMS.noiseLevel.setValue(noiseLevelMSMS);
 
-        //Create array of all possible FA masses based on lipid annotation
-        ArrayList<String> fattyAcidFormulas = fattyAcidTools.calculateFattyAcidFormulas(4, 26,8, maxOxidationValue);
-        ArrayList<String> fattyAcidNames = fattyAcidTools.getFattyAcidNames(4,26,8, maxOxidationValue);
-        //Check if selected feature has MSMS spectra
-        if(rows[rowIndex].getBestFragmentation() != null) {
-            DataPoint[] massList = massDetector.getMassValues(rows[rowIndex].getBestFragmentation(), parametersMSMS);
-            //Check if a mass in MSMS spectra fits a mass of a FA
+        // Create array of all possible FA masses based on lipid annotation
+        ArrayList<String> fattyAcidFormulas = fattyAcidTools
+                .calculateFattyAcidFormulas(4, 26, 8, maxOxidationValue);
+        ArrayList<String> fattyAcidNames = fattyAcidTools.getFattyAcidNames(4,
+                26, 8, maxOxidationValue);
+        // Check if selected feature has MSMS spectra
+        if (rows[rowIndex].getBestFragmentation() != null) {
+            DataPoint[] massList = massDetector.getMassValues(
+                    rows[rowIndex].getBestFragmentation(), parametersMSMS);
+            // Check if a mass in MSMS spectra fits a mass of a FA
             for (int j = 0; j < massList.length; j++) {
-                Range<Double> mzTolRangeMSMS = mzTolerance.getToleranceRange(massList[j].getMZ());
+                Range<Double> mzTolRangeMSMS = mzTolerance
+                        .getToleranceRange(massList[j].getMZ());
                 for (int i = 0; i < fattyAcidFormulas.size(); i++) {
-                    if(mzTolRangeMSMS.contains(fattyAcidTools.getFAMass(FormulaUtils.
-                            ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1)))) {
-                        logger.info("Found "+fattyAcidFormulas.get(i)+" with m/z "+fattyAcidTools.getFAMass(FormulaUtils.
-                                ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1)));
-                        //Add masses to comment
-                        if(rows[rowIndex].getComment().equals(null)) {
-                            rows[rowIndex].setComment(" FA "+ fattyAcidNames.get(i)+
-                                    " m/z "+ NumberFormat.getInstance().format(fattyAcidTools.getFAMass(FormulaUtils.
-                                            ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1))));
-                        }
-                        else {
-                            rows[rowIndex].setComment(rows[rowIndex].getComment()+";"+
-                                    " FA "+ fattyAcidNames.get(i)+
-                                    " m/z "+ NumberFormat.getInstance().format(fattyAcidTools.getFAMass(FormulaUtils.
-                                            ionizeFormula(fattyAcidFormulas.get(i), IonizationType.NEGATIVE, 1))));
+                    if (mzTolRangeMSMS.contains(fattyAcidTools.getFAMass(
+                            FormulaUtils.ionizeFormula(fattyAcidFormulas.get(i),
+                                    IonizationType.NEGATIVE, 1)))) {
+                        logger.info("Found " + fattyAcidFormulas.get(i)
+                                + " with m/z "
+                                + fattyAcidTools.getFAMass(FormulaUtils
+                                        .ionizeFormula(fattyAcidFormulas.get(i),
+                                                IonizationType.NEGATIVE, 1)));
+                        // Add masses to comment
+                        if (rows[rowIndex].getComment().equals(null)) {
+                            rows[rowIndex].setComment(" FA "
+                                    + fattyAcidNames.get(i) + " m/z "
+                                    + NumberFormat.getInstance()
+                                            .format(fattyAcidTools.getFAMass(
+                                                    FormulaUtils.ionizeFormula(
+                                                            fattyAcidFormulas
+                                                                    .get(i),
+                                                            IonizationType.NEGATIVE,
+                                                            1))));
+                        } else {
+                            rows[rowIndex].setComment(rows[rowIndex]
+                                    .getComment() + ";" + " FA "
+                                    + fattyAcidNames.get(i) + " m/z "
+                                    + NumberFormat.getInstance()
+                                            .format(fattyAcidTools.getFAMass(
+                                                    FormulaUtils.ionizeFormula(
+                                                            fattyAcidFormulas
+                                                                    .get(i),
+                                                            IonizationType.NEGATIVE,
+                                                            1))));
                         }
                     }
                 }
 
                 /**
-                 * Check for lipid class specific fragment
-                 *lipid class fragments are derived from lipid blast
+                 * Check for lipid class specific fragment lipid class fragments
+                 * are derived from lipid blast
                  */
                 MSMSLipidTools msmsLipidTools = new MSMSLipidTools();
-                ArrayList<String> listOfFragments = msmsLipidTools.checkForClassSpecificFragments(mzTolRangeMSMS,
-                        rows[rowIndex].getPreferredPeakIdentity(),
-                        lipidIonMass);
-                if(listOfFragments.isEmpty() == false) {
+                ArrayList<String> listOfFragments = msmsLipidTools
+                        .checkForClassSpecificFragments(mzTolRangeMSMS,
+                                rows[rowIndex].getPreferredPeakIdentity(),
+                                lipidIonMass);
+                if (listOfFragments.isEmpty() == false) {
                     for (int i = 0; i < listOfFragments.size(); i++) {
-                        //Add masses to comment
-                        System.out.println(listOfFragments.get(i)+"\n"+listOfFragments.size());
-                        if(rows[rowIndex].getComment().equals(null)) {
-                            rows[rowIndex].setComment(" "+listOfFragments.get(i));
-                        }
-                        else {
-                            rows[rowIndex].setComment(rows[rowIndex].getComment()+";"+
-                                    " "+listOfFragments.get(i));
+                        // Add masses to comment
+                        System.out.println(listOfFragments.get(i) + "\n"
+                                + listOfFragments.size());
+                        if (rows[rowIndex].getComment().equals(null)) {
+                            rows[rowIndex]
+                                    .setComment(" " + listOfFragments.get(i));
+                        } else {
+                            rows[rowIndex].setComment(
+                                    rows[rowIndex].getComment() + ";" + " "
+                                            + listOfFragments.get(i));
                         }
                     }
                 }
@@ -272,29 +309,31 @@ public class LipidSearchTask extends AbstractTask {
         }
     }
 
-
-
-    private void searchFor13CIsotope(PeakListRow rows[], double lipidIonMass, int rowIndex, LipidIdentityChain lipid) {
+    private void searchFor13CIsotope(PeakListRow rows[], double lipidIonMass,
+            int rowIndex, LipidIdentityChain lipid) {
         for (int i = 0; i < rows.length; i++) {
 
             Range<Double> mzTolRange13C = mzTolerance
                     .getToleranceRange(rows[i].getAverageMZ());
 
-            if (mzTolRange13C.contains(lipidIonMass+1.003355) &&
-                    Math.abs(rows[i].getAverageRT()-rows[rowIndex].getAverageRT()) <= isotopeRtTolerance.getTolerance()) {
-                //Check if intensity of 13C fits calc intensity in  a range
+            if (mzTolRange13C.contains(lipidIonMass + 1.003355)
+                    && Math.abs(rows[i].getAverageRT() - rows[rowIndex]
+                            .getAverageRT()) <= isotopeRtTolerance
+                                    .getTolerance()) {
+                // Check if intensity of 13C fits calc intensity in a range
                 IsotopeLipidTools isotopeLipidTools = new IsotopeLipidTools();
-                int numberOfCAtoms = isotopeLipidTools.getNumberOfCAtoms(lipid.getFormula());
-                if(Math.abs((rows[i].getAverageHeight()/rows[rowIndex].getAverageHeight())*100-1.1*numberOfCAtoms)
-                        <= relIsotopeIntensityTolerance) {              
-                    rows[rowIndex].setComment(rows[rowIndex].getComment()+";"+
-                            " found 13C isotope"); 
-                    rows[i].setComment(" 13C isotope of Feautre with ID"+ rows[rowIndex].getID());
+                int numberOfCAtoms = isotopeLipidTools
+                        .getNumberOfCAtoms(lipid.getFormula());
+                if (Math.abs((rows[i].getAverageHeight()
+                        / rows[rowIndex].getAverageHeight()) * 100
+                        - 1.1 * numberOfCAtoms) <= relIsotopeIntensityTolerance) {
+                    rows[rowIndex].setComment(rows[rowIndex].getComment() + ";"
+                            + " found 13C isotope");
+                    rows[i].setComment(" 13C isotope of Feautre with ID"
+                            + rows[rowIndex].getID());
                 }
             }
         }
     }
-
-
 
 }

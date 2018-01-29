@@ -184,9 +184,12 @@ public class KendrickMassPlotTask  extends AbstractTask{
 			XYPlot plot = chart.getXYPlot();
 			appliedSteps++;
 			renderer.setPaintScale(scale);
-			double maxX = plot.getDomainAxis().getRange().getUpperBound();
-			double minX = plot.getDomainAxis().getRange().getLowerBound();
-			double maxY = plot.getRangeAxis().getRange().getUpperBound();
+//			double maxX = plot.getDomainAxis().getRange().getUpperBound();
+//			double minX = plot.getDomainAxis().getRange().getLowerBound();
+//			double maxY = plot.getRangeAxis().getRange().getUpperBound();
+			double maxX = 1100; //850
+			double minX = 600;  //730
+			double maxY = 1;
 			if(xAxisLabel.contains("KMD")) {
 				renderer.setBlockWidth(0.002);
 				renderer.setBlockHeight(0.002);
@@ -197,6 +200,10 @@ public class KendrickMassPlotTask  extends AbstractTask{
 			}
 			KendrickMassPlotXYZToolTipGenerator tooltipGenerator = new KendrickMassPlotXYZToolTipGenerator(xAxisLabel, yAxisLabel, zAxisLabel);
 			renderer.setSeriesToolTipGenerator(0, tooltipGenerator);
+			
+			//Nur für mich
+			plot.getDomainAxis().setRange(minX, maxX);
+			plot.getRangeAxis().setRange(0, maxY);
 			plot.setRenderer(renderer);
 			plot.setBackgroundPaint(Color.white);
 			plot.setDomainGridlinesVisible(false);

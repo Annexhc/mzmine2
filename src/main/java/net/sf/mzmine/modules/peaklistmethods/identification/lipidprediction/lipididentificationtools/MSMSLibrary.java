@@ -57,7 +57,7 @@ public enum MSMSLibrary {
     MSMSLibrary(String[] name,
             String[] formulaOfStaticFormula,
             int[] relativeIntensity) {
-        
+
         this.name = name;
         this.formulaOfStaticFormula = formulaOfStaticFormula;
         this.relativeIntensity = relativeIntensity;
