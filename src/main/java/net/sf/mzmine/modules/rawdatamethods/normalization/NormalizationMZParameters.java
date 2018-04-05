@@ -46,11 +46,11 @@ public class NormalizationMZParameters extends SimpleParameterSet {
   public static final StringParameter suffix =
       new StringParameter("Suffix", "This string is added to filename as suffix", "normalized");
 
-
   public NormalizationMZParameters() {
-    super(new Parameter[] {dataFiles, mzDiff, suffix, removeOld});
+    super(new Parameter[] {dataFiles, mzDiffType, mzDiff, suffix, removeOld});
   }
 
+  @Override
   public ExitCode showSetupDialog(Window parent, boolean valueCheckRequired) {
     NormalizationMZSetupDialog dialog =
         new NormalizationMZSetupDialog(parent, valueCheckRequired, this);

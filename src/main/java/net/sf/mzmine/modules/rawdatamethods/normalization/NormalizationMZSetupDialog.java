@@ -42,6 +42,7 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
   private static final long serialVersionUID = 1L;
 
   private double mzDiff;
+  private String mzDiffType;
   private ParameterSet parameters;
 
   /**
@@ -52,8 +53,8 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
       ParameterSet parameters) {
 
     super(parent, valueCheckRequired, parameters);
-    this.mzDiff = parameters.getParameter(NormalizationMZParameters.mzDiff).getValue();
     this.parameters = parameters;
+    this.mzDiffType = parameters.getParameter(NormalizationMZParameters.mzDiffType).getValue();
   }
 
   /**
@@ -71,7 +72,15 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
 
     // Loop through every data point
     for (int j = 0; j < previewScan.getNumberOfDataPoints(); j++) {
-      newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() - mzDiff, oldDPs[j].getIntensity());
+        if(mzDiffType.equals("absolute")) {
+          newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
+        }
+        if(mzDiffType.equals("relative ppm")) {
+          double dpSpecificMZDiff = oldDPs[j].getMZ() / 1000000 * mzDiff;
+          newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());            
+        }
+      
+
     }
 
     newScan.setDataPoints(newDPs);
@@ -95,5 +104,6 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
   public void actionPerformed(ActionEvent event) {
     super.actionPerformed(event);
     this.mzDiff = parameters.getParameter(NormalizationMZParameters.mzDiff).getValue();
+    this.mzDiffType = parameters.getParameter(NormalizationMZParameters.mzDiffType).getValue();
   }
 }
