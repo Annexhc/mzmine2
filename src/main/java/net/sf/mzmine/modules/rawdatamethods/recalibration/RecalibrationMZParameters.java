@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.rawdatamethods.normalization;
+package net.sf.mzmine.modules.rawdatamethods.recalibration;
 
 import java.awt.Window;
 import net.sf.mzmine.parameters.Parameter;
@@ -28,7 +28,7 @@ import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
 import net.sf.mzmine.util.ExitCode;
 
-public class NormalizationMZParameters extends SimpleParameterSet {
+public class RecalibrationMZParameters extends SimpleParameterSet {
 
   public static final RawDataFilesParameter dataFiles = new RawDataFilesParameter();
 
@@ -46,14 +46,14 @@ public class NormalizationMZParameters extends SimpleParameterSet {
   public static final StringParameter suffix =
       new StringParameter("Suffix", "This string is added to filename as suffix", "normalized");
 
-  public NormalizationMZParameters() {
+  public RecalibrationMZParameters() {
     super(new Parameter[] {dataFiles, mzDiffType, mzDiff, suffix, removeOld});
   }
 
   @Override
   public ExitCode showSetupDialog(Window parent, boolean valueCheckRequired) {
-    NormalizationMZSetupDialog dialog =
-        new NormalizationMZSetupDialog(parent, valueCheckRequired, this);
+    RecalibrationMZSetupDialog dialog =
+        new RecalibrationMZSetupDialog(parent, valueCheckRequired, this);
     dialog.setVisible(true);
     return dialog.getExitCode();
   }

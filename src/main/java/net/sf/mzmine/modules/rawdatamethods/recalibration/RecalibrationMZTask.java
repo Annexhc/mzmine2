@@ -16,12 +16,10 @@
  * USA
  */
 
-package net.sf.mzmine.modules.rawdatamethods.normalization;
+package net.sf.mzmine.modules.rawdatamethods.recalibration;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-import com.google.common.collect.Range;
-import io.github.msdk.util.tolerances.MzTolerance;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.RawDataFile;
@@ -31,11 +29,10 @@ import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
 import net.sf.mzmine.datamodel.impl.SimpleScan;
 import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.parameters.ParameterSet;
-import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
 
-public class NormalizationMZTask extends AbstractTask {
+public class RecalibrationMZTask extends AbstractTask {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
@@ -57,15 +54,15 @@ public class NormalizationMZTask extends AbstractTask {
    * @param dataFile
    * @param parameters
    */
-  public NormalizationMZTask(MZmineProject project, RawDataFile dataFile, ParameterSet parameters) {
+  public RecalibrationMZTask(MZmineProject project, RawDataFile dataFile, ParameterSet parameters) {
 
     this.project = project;
     this.dataFile = dataFile;
 
-    this.suffix = parameters.getParameter(NormalizationMZParameters.suffix).getValue();
-    this.mzDiff = parameters.getParameter(NormalizationMZParameters.mzDiff).getValue();
-    this.mzDiffType = parameters.getParameter(NormalizationMZParameters.mzDiffType).getValue();
-    this.removeOriginal = parameters.getParameter(NormalizationMZParameters.removeOld).getValue();
+    this.suffix = parameters.getParameter(RecalibrationMZParameters.suffix).getValue();
+    this.mzDiff = parameters.getParameter(RecalibrationMZParameters.mzDiff).getValue();
+    this.mzDiffType = parameters.getParameter(RecalibrationMZParameters.mzDiffType).getValue();
+    this.removeOriginal = parameters.getParameter(RecalibrationMZParameters.removeOld).getValue();
 
   }
 
@@ -97,7 +94,7 @@ public class NormalizationMZTask extends AbstractTask {
 
     setStatus(TaskStatus.PROCESSING);
 
-    logger.info("Started m/z values normalization on " + dataFile);
+    logger.info("Started m/z values recalibration on " + dataFile);
 
     scanNumbers = dataFile.getScanNumbers(1);
     totalScans = scanNumbers.length;
@@ -116,15 +113,16 @@ public class NormalizationMZTask extends AbstractTask {
         final SimpleScan newScan = new SimpleScan(scan);
         DataPoint[] oldDPs = scan.getDataPoints();
         DataPoint[] newDPs = new DataPoint[scan.getNumberOfDataPoints()];
-        
+
         // Loop through every data point
         for (int j = 0; j < scan.getNumberOfDataPoints(); j++) {
-          if(mzDiffType.equals("aboslute")) {
+          if (mzDiffType.equals("aboslute")) {
             newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
           }
-          if(mzDiffType.equals("relative ppm")) {
+          if (mzDiffType.equals("relative ppm")) {
             double dpSpecificMZDiff = oldDPs[j].getMZ() / 1000000 * mzDiff;
-            newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());            
+            newDPs[j] =
+                new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());
           }
         }
 
@@ -132,7 +130,7 @@ public class NormalizationMZTask extends AbstractTask {
 
         // Copy meta data to new scan
         newScan.setMSLevel(scan.getMSLevel());
-        
+
         newRDFW.addScan(newScan);
         processedScans++;
       }
@@ -153,7 +151,7 @@ public class NormalizationMZTask extends AbstractTask {
         setStatus(TaskStatus.FINISHED);
 
 
-        logger.info("Finished m/z normalization on " + dataFile + ".");
+        logger.info("Finished m/z recalibration on " + dataFile + ".");
 
       }
 
@@ -164,12 +162,5 @@ public class NormalizationMZTask extends AbstractTask {
     }
 
   }
-
-  private double calcSpecificMZDiff(double mzDiff) {
-    double specficMZDiff = 0;
-    
-    return specficMZDiff;
-  }
-
 
 }

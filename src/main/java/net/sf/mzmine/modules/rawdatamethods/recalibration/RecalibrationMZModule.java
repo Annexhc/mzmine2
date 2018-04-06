@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.rawdatamethods.normalization;
+package net.sf.mzmine.modules.rawdatamethods.recalibration;
 
 import java.util.Collection;
 import javax.annotation.Nonnull;
@@ -29,9 +29,9 @@ import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
 import net.sf.mzmine.taskcontrol.Task;
 import net.sf.mzmine.util.ExitCode;
 
-public class NormalizationMZModule implements MZmineProcessingModule {
+public class RecalibrationMZModule implements MZmineProcessingModule {
 
-  private static final String MODULE_NAME = "m/z normalization";
+  private static final String MODULE_NAME = "m/z recalibration";
   private static final String MODULE_DESCRIPTION = "This module normalizes m/z values.";
 
   public static final RawDataFilesParameter dataFiles = new RawDataFilesParameter();
@@ -55,7 +55,7 @@ public class NormalizationMZModule implements MZmineProcessingModule {
         parameters.getParameter(new RawDataFilesParameter()).getValue().getMatchingRawDataFiles();
 
     for (int i = 0; i < dataFiles.length; i++) {
-      Task newTask = new NormalizationMZTask(project, dataFiles[i], parameters.cloneParameterSet());
+      Task newTask = new RecalibrationMZTask(project, dataFiles[i], parameters.cloneParameterSet());
       tasks.add(newTask);
     }
 
@@ -69,7 +69,7 @@ public class NormalizationMZModule implements MZmineProcessingModule {
 
   @Override
   public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
-    return NormalizationMZParameters.class;
+    return RecalibrationMZParameters.class;
   }
 
 }

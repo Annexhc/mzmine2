@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.rawdatamethods.normalization;
+package net.sf.mzmine.modules.rawdatamethods.recalibration;
 
 import java.awt.Color;
 import java.awt.Window;
@@ -36,7 +36,7 @@ import net.sf.mzmine.parameters.dialogs.ParameterSetupDialogWithScanPreview;
  * This class extends ParameterSetupDialog class, including a spectraPlot. This is used to preview
  * how the selected raw data filter and his parameters works over the raw data file.
  */
-public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPreview
+public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPreview
     implements ActionListener {
 
   private static final long serialVersionUID = 1L;
@@ -49,12 +49,12 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
    * @param parameters
    * @param rawDataFilterTypeNumber
    */
-  public NormalizationMZSetupDialog(Window parent, boolean valueCheckRequired,
+  public RecalibrationMZSetupDialog(Window parent, boolean valueCheckRequired,
       ParameterSet parameters) {
 
     super(parent, valueCheckRequired, parameters);
     this.parameters = parameters;
-    this.mzDiffType = parameters.getParameter(NormalizationMZParameters.mzDiffType).getValue();
+    this.mzDiffType = parameters.getParameter(RecalibrationMZParameters.mzDiffType).getValue();
   }
 
   /**
@@ -72,14 +72,15 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
 
     // Loop through every data point
     for (int j = 0; j < previewScan.getNumberOfDataPoints(); j++) {
-        if(mzDiffType.equals("absolute")) {
-          newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
-        }
-        if(mzDiffType.equals("relative ppm")) {
-          double dpSpecificMZDiff = oldDPs[j].getMZ() / 1000000 * mzDiff;
-          newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());            
-        }
-      
+      if (mzDiffType.equals("absolute")) {
+        newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
+      }
+      if (mzDiffType.equals("relative ppm")) {
+        double dpSpecificMZDiff = oldDPs[j].getMZ() / 1000000 * mzDiff;
+        newDPs[j] =
+            new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());
+      }
+
 
     }
 
@@ -103,7 +104,7 @@ public class NormalizationMZSetupDialog extends ParameterSetupDialogWithScanPrev
    */
   public void actionPerformed(ActionEvent event) {
     super.actionPerformed(event);
-    this.mzDiff = parameters.getParameter(NormalizationMZParameters.mzDiff).getValue();
-    this.mzDiffType = parameters.getParameter(NormalizationMZParameters.mzDiffType).getValue();
+    this.mzDiff = parameters.getParameter(RecalibrationMZParameters.mzDiff).getValue();
+    this.mzDiffType = parameters.getParameter(RecalibrationMZParameters.mzDiffType).getValue();
   }
 }
