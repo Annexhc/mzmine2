@@ -94,7 +94,7 @@ public class RecalibrationMZTask extends AbstractTask {
 
     setStatus(TaskStatus.PROCESSING);
 
-    logger.info("Started m/z values recalibration on " + dataFile);
+    logger.info("Started m/z recalibration on " + dataFile);
 
     scanNumbers = dataFile.getScanNumbers(1);
     totalScans = scanNumbers.length;
