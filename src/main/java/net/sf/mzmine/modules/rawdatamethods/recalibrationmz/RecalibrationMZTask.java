@@ -42,12 +42,12 @@ public class RecalibrationMZTask extends AbstractTask {
   // scan counter
   private int processedScans = 0, totalScans = 0;
   private ScanSelection scanSelection;
-  private int[] scanNumbers;
 
   // Recalibration method
   private MZmineProcessingStep<RecalibrationMZMethod> recalibrationMZMethod;
 
   private String suffix;
+  private boolean removeOld;
 
   /**
    * @param dataFile
@@ -65,6 +65,10 @@ public class RecalibrationMZTask extends AbstractTask {
         parameters.getParameter(RecalibrationMZParameters.scanSelection).getValue();
 
     this.suffix = parameters.getParameter(RecalibrationMZParameters.suffix).getValue();
+
+    this.removeOld = parameters.getParameter(RecalibrationMZParameters.removeOld).getValue();
+
+    System.out.println(parameters.getParameter(RecalibrationMZParameters.dataFiles));
   }
 
   /**
@@ -102,13 +106,11 @@ public class RecalibrationMZTask extends AbstractTask {
 
     RecalibrationMZMethod method = recalibrationMZMethod.getModule();
 
-    scanNumbers = dataFile.getScanNumbers(1);
-    totalScans = scanNumbers.length;
     RawDataFileWriter newRawDataFileWriter = null;
     try {
       newRawDataFileWriter = MZmineCore.createNewFile(dataFile.getName() + suffix);
     } catch (IOException e) {
-      // TODO Auto-generated catch block
+      logger.info("Error, could not create file" + "\n" + e.getMessage());
       e.printStackTrace();
     }
 
@@ -117,12 +119,13 @@ public class RecalibrationMZTask extends AbstractTask {
       Scan scan = method.getScan(scans[i], recalibrationMZMethod.getParameterSet());
       try {
         newRawDataFileWriter.addScan(scan);
+        processedScans++;
       } catch (IOException e) {
-        // TODO Auto-generated catch block
+        logger.info("Error, could not add scan " + scan.getScanNumber() + "\n" + e.getMessage());
         e.printStackTrace();
       }
     }
-    processedScans++;
+
 
     if (!isCanceled()) {
 
@@ -130,17 +133,15 @@ public class RecalibrationMZTask extends AbstractTask {
       try {
         newRawDataFile = newRawDataFileWriter.finishWriting();
       } catch (IOException e) {
-        // TODO Auto-generated catch block
+        logger.info("Error, could not finish writing raw file" + "\n" + e.getMessage());
         e.printStackTrace();
       }
 
       // Add the newly created file to the project
       project.addFile(newRawDataFile);
-      System.out.println(recalibrationMZMethod.getParameterSet()
-          .getParameter(RecalibrationMZParameters.removeOld).getValue());
+
       // Remove the original data file if requested
-      if (recalibrationMZMethod.getParameterSet().getParameter(RecalibrationMZParameters.removeOld)
-          .getValue()) {
+      if (removeOld == true) {
         project.removeFile(dataFile);
       }
 

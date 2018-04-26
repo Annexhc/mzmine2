@@ -20,12 +20,14 @@ package net.sf.mzmine.modules.rawdatamethods.recalibrationmz;
 
 import java.awt.Color;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import net.sf.mzmine.datamodel.DataPoint;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import net.sf.mzmine.datamodel.Scan;
-import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
-import net.sf.mzmine.datamodel.impl.SimpleScan;
-import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.naive.NaiveRecalibrationMZParameters;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.ContaminantesTableFrame;
 import net.sf.mzmine.modules.visualization.spectra.SpectraPlot;
 import net.sf.mzmine.modules.visualization.spectra.datasets.ScanDataSet;
 import net.sf.mzmine.parameters.ParameterSet;
@@ -35,13 +37,12 @@ import net.sf.mzmine.parameters.dialogs.ParameterSetupDialogWithScanPreview;
  * This class extends ParameterSetupDialog class, including a spectraPlot. This is used to preview
  * how the selected mass detector and his parameters works over the raw data file.
  */
-public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPreview {
+public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPreview
+    implements ActionListener {
 
   private static final long serialVersionUID = 1L;
   private RecalibrationMZMethod recalibrationMZMethod;
   private ParameterSet parameters;
-  private double mzDiff;
-  private String mzDiffType;
 
   /**
    * @param parameters
@@ -53,43 +54,40 @@ public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPrev
     super(parent, valueCheckRequired, parameters);
 
     this.parameters = parameters;
-    this.mzDiff = parameters.getParameter(NaiveRecalibrationMZParameters.mzDiff).getValue();
-    this.mzDiffType = parameters.getParameter(NaiveRecalibrationMZParameters.mzDiffType).getValue();
-    for (RecalibrationMZMethod method : RecalibrationMZParameters.recalibrationMZMethods) {
-      if (method.getClass().equals(RecalibrationMZMethodClass)) {
-        this.recalibrationMZMethod = method;
+    for (RecalibrationMZMethod recalibrationMZMethod : RecalibrationMZParameters.recalibrationMZMethods) {
+      if (recalibrationMZMethod.getClass().equals(RecalibrationMZMethodClass)) {
+        this.recalibrationMZMethod = recalibrationMZMethod;
       }
     }
+    if (recalibrationMZMethod.getName().equals("Lock mass")) {
+      JMenuBar menuBar = new JMenuBar();
+      JMenu menu = new JMenu("Tools");
+      JMenuItem showTable = new JMenuItem("Show contaminantes");
+      ActionListener actionListener = new ActionListener() {
+        public void actionPerformed(ActionEvent actionEvent) {
+          ContaminantesTableFrame table = new ContaminantesTableFrame(parameters);
+          table.setVisible(true);
+          table.validate();
+        }
+      };
+      showTable.addActionListener(actionListener);
+      menuBar.add(menu);
+      menu.add(showTable);
+      this.mainPanel.add(menuBar);
+    }
   }
+
 
   protected void loadPreview(SpectraPlot spectrumPlot, Scan previewScan) {
 
     ScanDataSet spectraOriginalDataSet = new ScanDataSet("Original scan", previewScan);
 
-    Scan scan = previewScan;
-    final SimpleScan newScan = new SimpleScan(scan);
-    DataPoint[] oldDPs = scan.getDataPoints();
-    DataPoint[] newDPs = new DataPoint[scan.getNumberOfDataPoints()];
+    ScanDataSet spectraRecalibratedDataSet = new ScanDataSet("Recalibrated scan",
+        recalibrationMZMethod.getScan(previewScan, parameters));
 
-    System.out.println(mzDiffType);
-    // Loop through every data point
-    for (int j = 0; j < scan.getNumberOfDataPoints(); j++) {
-      if (mzDiffType.equals("absolute")) {
-        newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
-      }
-      if (mzDiffType.equals("relative ppm")) {
-        double dpSpecificMZDiff = oldDPs[j].getMZ() / 1000000 * mzDiff;
-        newDPs[j] =
-            new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());
-      }
-    }
-
-    newScan.setDataPoints(newDPs);
-    ScanDataSet spectraRecalibratedDataSet = new ScanDataSet("Recalibrated scan", newScan);
     // Set plot mode only if it hasn't been set before
     // if the scan is centroided, switch to centroid mode
     spectrumPlot.setPlotMode(previewScan.getSpectrumType());
-
     spectrumPlot.removeAllDataSets();
     spectrumPlot.addDataSet(spectraOriginalDataSet, Color.red, false);
     spectrumPlot.addDataSet(spectraRecalibratedDataSet, Color.green, false);
@@ -102,7 +100,6 @@ public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPrev
 
     // if the scan is centroided, switch to centroid mode
     spectrumPlot.setPlotMode(previewScan.getSpectrumType());
-
   }
 
 }

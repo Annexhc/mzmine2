@@ -19,6 +19,8 @@
 package net.sf.mzmine.modules.rawdatamethods.recalibrationmz;
 
 import java.awt.Window;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.internalstandard.InternalStandardRecalibrationMZ;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.LockMassRecalibrationMZ;
 import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.naive.NaiveRecalibrationMZ;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
@@ -32,7 +34,8 @@ import net.sf.mzmine.util.ExitCode;
 
 public class RecalibrationMZParameters extends SimpleParameterSet {
 
-  public static final RecalibrationMZMethod recalibrationMZMethods[] = {new NaiveRecalibrationMZ()};
+  public static final RecalibrationMZMethod recalibrationMZMethods[] = {new NaiveRecalibrationMZ(),
+      new LockMassRecalibrationMZ(), new InternalStandardRecalibrationMZ()};
 
   public static final RawDataFilesParameter dataFiles = new RawDataFilesParameter();
 

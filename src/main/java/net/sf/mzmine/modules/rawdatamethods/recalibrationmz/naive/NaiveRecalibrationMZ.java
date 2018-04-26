@@ -20,7 +20,6 @@ package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.naive;
 
 import javax.annotation.Nonnull;
 import net.sf.mzmine.datamodel.DataPoint;
-import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
 import net.sf.mzmine.datamodel.impl.SimpleScan;
@@ -29,17 +28,13 @@ import net.sf.mzmine.parameters.ParameterSet;
 
 public class NaiveRecalibrationMZ implements RecalibrationMZMethod {
 
-  private RawDataFile dataFile;
-
   // User parameters
   private double mzDiff;
   private String mzDiffType;
 
   public Scan getScan(Scan oldScan, ParameterSet parameters) {
-
     this.mzDiff = parameters.getParameter(NaiveRecalibrationMZParameters.mzDiff).getValue();
     this.mzDiffType = parameters.getParameter(NaiveRecalibrationMZParameters.mzDiffType).getValue();
-
     final SimpleScan newScan = new SimpleScan(oldScan);
     DataPoint[] oldDPs = oldScan.getDataPoints();
     DataPoint[] newDPs = new DataPoint[oldScan.getNumberOfDataPoints()];
@@ -49,13 +44,11 @@ public class NaiveRecalibrationMZ implements RecalibrationMZMethod {
         newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
       }
       if (mzDiffType.equals("relative ppm")) {
-        double dpSpecificMZDiff = oldDPs[j].getMZ() / 1000000 * mzDiff;
-        newDPs[j] =
-            new SimpleDataPoint(oldDPs[j].getMZ() + dpSpecificMZDiff, oldDPs[j].getIntensity());
+        double newMZ = (mzDiff / 1000000) * oldDPs[j].getMZ() + oldDPs[j].getMZ();
+        newDPs[j] = new SimpleDataPoint(newMZ, oldDPs[j].getIntensity());
       }
     }
     newScan.setDataPoints(newDPs);
-
     return newScan;
   }
 
