@@ -21,11 +21,9 @@ public class LockMassDataSet extends AbstractXYDataset {
     this.scanNumbers = dataFile.getNumOfScans();
     this.xValues = new double[scanNumbers];
     this.yValues = new double[scanNumbers];
-
     // get intensities for yValues
     for (int i = 1; i < yValues.length; i++) {
-      DataPoint[] dp = dataFile.getScan(i).getDataPoints();
-      System.out.println(dp.length);
+      DataPoint[] dp = dataFile.getScan(i).getDataPointsByMass(rangeMZ);
       double intensitySum = 0;
       for (int j = 0; j < dp.length; j++) {
         intensitySum = intensitySum + dp[j].getIntensity();

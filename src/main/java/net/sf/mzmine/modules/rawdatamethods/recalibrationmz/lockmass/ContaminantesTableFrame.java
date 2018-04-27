@@ -2,7 +2,10 @@ package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -27,7 +30,7 @@ public class ContaminantesTableFrame extends JFrame {
    * 
    */
   private static final long serialVersionUID = 1L;
-  private JTable table;
+
   private DecimalFormat numberFormat = new DecimalFormat("0.0000");
   private JScrollPane scrollPane;
   private ParameterSet parameters;
@@ -813,7 +816,6 @@ public class ContaminantesTableFrame extends JFrame {
 
     this.parameters = parameters;
     this.dataFile = RecalibrationMZParameters.dataFiles.getValue().getMatchingRawDataFiles()[0];
-    System.out.println(dataFile.getNumOfScans());
     this.mzTolerance =
         parameters.getParameter(LockMassRecalibrationMZParameters.mzTolerance).getValue();
     DefaultTableModel model = new DefaultTableModel(new Object[][] {
@@ -821,14 +823,7 @@ public class ContaminantesTableFrame extends JFrame {
     }, new String[] {"<html>Monoisotopic <br>ion mass <br>(singly charged)<html>", "Ion type",
         "<html>Formula for M<br>or subunit or<br>sequence<html>",
         "<html>Compound ID<br> or species<html>",
-        "<html>Possible origin<br>and other<br>comments<html>"}) {
-      Class[] types =
-          new Class[] {Double.class, String.class, String.class, String.class, String.class};
-
-      public Class getColumnClass(int columnIndex) {
-        return types[columnIndex];
-      }
-    };
+        "<html>Possible origin<br>and other<br>comments<html>"});
 
     // check polarity
     for (int i = 1; i < dataFile.getNumOfScans(); i++) {
@@ -842,28 +837,61 @@ public class ContaminantesTableFrame extends JFrame {
         break;
       }
     }
-
-    Range<Double> range = mzTolerance.getToleranceRange(400.5052);
-    LockMassDataSet dataSet = new LockMassDataSet(dataFile, 400.5045, range);
+    JTable table = new JTable(model);
+    LockMassCellRenderer renderer = new LockMassCellRenderer();
+    ArrayList<JLabel> picLabels = new ArrayList<JLabel>();
+    // System.out.println(monoIsoMassesNeg.length + "\n" + ionTypeNeg.length + "\n" +
+    // formulaNeg.length
+    // + "\n" + possibleOriginNeg.length);
     // Add positive ions
-    for (int i = 0; i < monoIsoMassesPos.length; i++) {
-      if (hasPositivePolarity) {
-        model.addRow(new Object[] {numberFormat.format(monoIsoMassesPos[i]), ionTypePos[i],
-            formulaPos[i], compoundIDPos[i], possibleOriginPos[i]});
+    if (hasPositivePolarity) {
+      for (int i = 0; i < monoIsoMassesPos.length; i++) {
+        Range<Double> range = mzTolerance.getToleranceRange(monoIsoMassesPos[i]);
+        LockMassDataSet dataSet = new LockMassDataSet(dataFile, monoIsoMassesPos[i], range);
+        picLabels
+            .add(new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(200, 100)))));
+        renderer.lbl.add(picLabels.get(i));
+        renderer.setSize(picLabels.get(i).getSize());
+        model.addRow(new Object[] {picLabels.get(i), numberFormat.format(monoIsoMassesPos[i]),
+            ionTypePos[i], formulaPos[i], compoundIDPos[i], possibleOriginPos[i]});
+        table.setRowHeight(i, 100);
+        System.out.println("Number " + i + " of " + monoIsoMassesPos.length + "Building XIC of: "
+            + compoundIDPos[i]);
       }
     }
-
     // Add negative ions
-    for (int i = 0; i < monoIsoMassesNeg.length; i++) {
-      if (hasNegativePolarity) {
-        model.addRow(new Object[] {numberFormat.format(monoIsoMassesNeg[i]), ionTypeNeg[i],
-            formulaNeg[i], compoundIDNeg[i], possibleOriginNeg[i]});
+    if (hasNegativePolarity) {
+      for (int i = 0; i < monoIsoMassesNeg.length; i++) {
+        Range<Double> range = mzTolerance.getToleranceRange(monoIsoMassesNeg[i]);
+        LockMassDataSet dataSet = new LockMassDataSet(dataFile, monoIsoMassesNeg[i], range);
+        picLabels
+            .add(new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(200, 100)))));
+        renderer.lbl.add(picLabels.get(i));
+        renderer.setSize(picLabels.get(i).getSize());
+        model.addRow(new Object[] {picLabels.get(i), numberFormat.format(monoIsoMassesNeg[i]),
+            ionTypeNeg[i], formulaNeg[i], null, possibleOriginNeg[i]});
+        table.setRowHeight(i, 100);
+        System.out.println("Number " + i + " of  " + monoIsoMassesNeg.length + "Building XIC of: "
+            + compoundIDPos[i]);
       }
     }
+    table.getColumnModel().getColumn(0).setCellRenderer(renderer);
+    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+    centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
+    table.setDefaultRenderer(String.class, centerRenderer);
+    table.setDefaultRenderer(Double.class, centerRenderer);
+    scrollPane = new JScrollPane();
+    scrollPane.add(table);
+    scrollPane.setViewportView(table);
+    this.add(scrollPane);
+    this.setSize(600, 900);
+  }
 
+
+  private JFreeChart getXICChart(LockMassDataSet dataSet) {
     JFreeChart chart = ChartFactory.createXYLineChart("", // title
-        "rt", // x-axis label
-        "I", // y-axis label
+        "", // x-axis label
+        "", // y-axis label
         dataSet, // data set
         PlotOrientation.VERTICAL, // orientation
         false, // create legend?
@@ -888,22 +916,6 @@ public class ContaminantesTableFrame extends JFrame {
     plot.setDomainGridlinePaint(Color.white);
     plot.setRangeGridlinePaint(Color.white);
 
-    JFrame frame = new JFrame();
-    frame.setSize(600, 800);
-    frame.add(chartPanel);
-    frame.validate();
-    frame.setVisible(true);
-
-    table = new JTable(model);
-    DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-    centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
-    table.setDefaultRenderer(String.class, centerRenderer);
-    table.setDefaultRenderer(Double.class, centerRenderer);
-    scrollPane = new JScrollPane();
-    scrollPane.add(table);
-    scrollPane.setViewportView(table);
-    this.add(scrollPane);
-    this.setSize(600, 900);
+    return chart;
   }
-
 }
