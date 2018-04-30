@@ -13,12 +13,8 @@ public class LockMassCellRenderer extends DefaultTableCellRenderer {
   private static final long serialVersionUID = 1L;
   ArrayList<JLabel> lbl = new ArrayList<JLabel>();
 
-  // ImageIcon icon = new ImageIcon(getClass().getResource("sample.png"));
-
   public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
       boolean hasFocus, int row, int column) {
-
-    // lbl.setIcon(icon);
     return lbl.get(row);
   }
 }

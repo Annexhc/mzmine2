@@ -2,7 +2,6 @@ package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass;
 
 import java.awt.Color;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -38,7 +37,7 @@ public class ContaminantesTableFrame extends JFrame {
   private MZTolerance mzTolerance;
   private boolean hasNegativePolarity = false;
   private boolean hasPositivePolarity = false;
-
+  private double noiseLevel;
 
   // Data for table
   private double[] monoIsoMassesPos = new double[] {33.03349, 42.03383, 59.06037, 63.04406,
@@ -814,14 +813,17 @@ public class ContaminantesTableFrame extends JFrame {
 
   public ContaminantesTableFrame(ParameterSet parameters) {
 
+    super.setTitle("List of potential interference- or contaminant ions");
     this.parameters = parameters;
     this.dataFile = RecalibrationMZParameters.dataFiles.getValue().getMatchingRawDataFiles()[0];
     this.mzTolerance =
         parameters.getParameter(LockMassRecalibrationMZParameters.mzTolerance).getValue();
+    this.noiseLevel =
+        parameters.getParameter(LockMassRecalibrationMZParameters.noiseLevel).getValue();
     DefaultTableModel model = new DefaultTableModel(new Object[][] {
 
-    }, new String[] {"<html>Monoisotopic <br>ion mass <br>(singly charged)<html>", "Ion type",
-        "<html>Formula for M<br>or subunit or<br>sequence<html>",
+    }, new String[] {"<html>Monoisotopic <br>ion mass <br>(singly charged)<html>", "XIC",
+        "Ion type", "<html>Formula for M<br>or subunit or<br>sequence<html>",
         "<html>Compound ID<br> or species<html>",
         "<html>Possible origin<br>and other<br>comments<html>"});
 
@@ -839,52 +841,91 @@ public class ContaminantesTableFrame extends JFrame {
     }
     JTable table = new JTable(model);
     LockMassCellRenderer renderer = new LockMassCellRenderer();
-    ArrayList<JLabel> picLabels = new ArrayList<JLabel>();
-    // System.out.println(monoIsoMassesNeg.length + "\n" + ionTypeNeg.length + "\n" +
-    // formulaNeg.length
-    // + "\n" + possibleOriginNeg.length);
+    Range<Double> mzRange = dataFile.getDataMZRange();
     // Add positive ions
     if (hasPositivePolarity) {
       for (int i = 0; i < monoIsoMassesPos.length; i++) {
-        Range<Double> range = mzTolerance.getToleranceRange(monoIsoMassesPos[i]);
-        LockMassDataSet dataSet = new LockMassDataSet(dataFile, monoIsoMassesPos[i], range);
-        picLabels
-            .add(new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(200, 100)))));
-        renderer.lbl.add(picLabels.get(i));
-        renderer.setSize(picLabels.get(i).getSize());
-        model.addRow(new Object[] {picLabels.get(i), numberFormat.format(monoIsoMassesPos[i]),
-            ionTypePos[i], formulaPos[i], compoundIDPos[i], possibleOriginPos[i]});
-        table.setRowHeight(i, 100);
-        System.out.println("Number " + i + " of " + monoIsoMassesPos.length + "Building XIC of: "
-            + compoundIDPos[i]);
+        // Set mass range filter
+        if (mzRange.contains(monoIsoMassesPos[i])) {
+          Range<Double> range = mzTolerance.getToleranceRange(monoIsoMassesPos[i]);
+          LockMassDataSet dataSet =
+              new LockMassDataSet(dataFile, monoIsoMassesPos[i], range, noiseLevel);
+          // If intensity is 0, dont add row
+          if (dataSet.intensityOverZero()) {
+            JLabel label = null;
+            label = new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(300, 75))));
+            renderer.lbl.add(label);
+            renderer.setSize(label.getSize());
+            model.addRow(new Object[] {numberFormat.format(monoIsoMassesPos[i]), label,
+                ionTypePos[i], formulaPos[i], compoundIDPos[i], possibleOriginPos[i]});
+            System.out.println("Number " + i + " of " + monoIsoMassesPos.length
+                + " Building XIC of: " + compoundIDPos[i]);
+
+            ContaminantesTableProgressBar progressBar = new ContaminantesTableProgressBar(label);
+            progressBar.removeAll();
+            progressBar.setVisible(false);
+            progressBar.setPlotXIC(label);
+            progressBar.setContaminante(numberFormat.format(monoIsoMassesPos[i]));
+            progressBar.setVisible(true);
+            progressBar.revalidate();
+            progressBar.repaint();
+          }
+        }
       }
     }
+
     // Add negative ions
     if (hasNegativePolarity) {
       for (int i = 0; i < monoIsoMassesNeg.length; i++) {
-        Range<Double> range = mzTolerance.getToleranceRange(monoIsoMassesNeg[i]);
-        LockMassDataSet dataSet = new LockMassDataSet(dataFile, monoIsoMassesNeg[i], range);
-        picLabels
-            .add(new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(200, 100)))));
-        renderer.lbl.add(picLabels.get(i));
-        renderer.setSize(picLabels.get(i).getSize());
-        model.addRow(new Object[] {picLabels.get(i), numberFormat.format(monoIsoMassesNeg[i]),
-            ionTypeNeg[i], formulaNeg[i], null, possibleOriginNeg[i]});
-        table.setRowHeight(i, 100);
-        System.out.println("Number " + i + " of  " + monoIsoMassesNeg.length + "Building XIC of: "
-            + compoundIDPos[i]);
+        // Set mass range filter
+        if (mzRange.contains(monoIsoMassesNeg[i])) {
+          Range<Double> range = mzTolerance.getToleranceRange(monoIsoMassesNeg[i]);
+          LockMassDataSet dataSet =
+              new LockMassDataSet(dataFile, monoIsoMassesNeg[i], range, noiseLevel);
+          // If intensity is 0, dont add row
+          if (dataSet.intensityOverZero()) {
+            JLabel label = null;
+            label = new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(300, 75))));
+            renderer.lbl.add(label);
+            renderer.setSize(label.getSize());
+            model.addRow(
+                new Object[] {numberFormat.format(monoIsoMassesNeg[i]), label, ionTypeNeg[i], //
+                    formulaNeg[i], //
+                    " ", //
+                    possibleOriginNeg[i]});
+            System.out.println(
+                "Number " + i + " of  " + monoIsoMassesNeg.length + " Building XIC of: " + " ");
+            ContaminantesTableProgressBar progressBar = new ContaminantesTableProgressBar(label);
+            progressBar.removeAll();
+            progressBar.setVisible(false);
+            progressBar.setPlotXIC(label);
+            progressBar.setContaminante(numberFormat.format(monoIsoMassesPos[i]));
+            progressBar.setVisible(true);
+            progressBar.revalidate();
+            progressBar.repaint();
+          }
+        }
       }
     }
-    table.getColumnModel().getColumn(0).setCellRenderer(renderer);
+
+    // format table
+    for (int i = 0; i < table.getRowCount(); i++) {
+      table.setRowHeight(i, 75);
+    }
+    table.getColumnModel().getColumn(1).setCellRenderer(renderer);
     DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
     table.setDefaultRenderer(String.class, centerRenderer);
     table.setDefaultRenderer(Double.class, centerRenderer);
+    table.getColumnModel().getColumn(1).setMinWidth(300);
+    table.getColumnModel().getColumn(1).setMaxWidth(300);
+    table.getColumnModel().getColumn(1).setPreferredWidth(300);;
+    table.getColumnModel().getColumn(1).setResizable(false);
     scrollPane = new JScrollPane();
     scrollPane.add(table);
     scrollPane.setViewportView(table);
     this.add(scrollPane);
-    this.setSize(600, 900);
+    this.setSize(900, 900);
   }
 
 
@@ -910,11 +951,13 @@ public class ContaminantesTableFrame extends JFrame {
     // Set the plot properties.
     plot = chart.getXYPlot();
     plot.setBackgroundPaint(Color.white);
+    plot.getRenderer().setSeriesPaint(0, Color.black);
     plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
 
     // Set grid properties.
     plot.setDomainGridlinePaint(Color.white);
     plot.setRangeGridlinePaint(Color.white);
+    plot.setOutlineVisible(false);
 
     return chart;
   }
