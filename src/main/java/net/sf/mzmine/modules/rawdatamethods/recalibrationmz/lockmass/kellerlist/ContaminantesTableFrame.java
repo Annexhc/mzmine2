@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.text.DecimalFormat;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
@@ -827,7 +826,7 @@ public class ContaminantesTableFrame extends JFrame {
     DefaultTableModel model = new DefaultTableModel(new Object[][] {
 
     }, new String[] {"<html>Monoisotopic <br>ion mass <br>(singly charged)<html>", "XIC",
-        "Ion type", "Use for calibration", "<html>Formula for M<br>or subunit or<br>sequence<html>",
+        "Ion type", "<html>Formula for M<br>or subunit or<br>sequence<html>",
         "<html>Compound ID<br> or species<html>",
         "<html>Possible origin<br>and other<br>comments<html>"});
 
@@ -846,7 +845,6 @@ public class ContaminantesTableFrame extends JFrame {
     JTable table = new JTable(model);
     LockMassXICCellRenderer rendererXIC = new LockMassXICCellRenderer();
     Range<Double> mzRange = dataFile.getDataMZRange();
-    int counter = 0;
     // Add positive ions
     if (hasPositivePolarity) {
       for (int i = 0; i < monoIsoMassesPos.length; i++) {
@@ -862,22 +860,10 @@ public class ContaminantesTableFrame extends JFrame {
             rendererXIC.lbl.add(label);
             rendererXIC.setSize(label.getSize());
             JButton lockMassButton = new JButton("Use for callibration");
-            model.addRow(
-                new Object[] {numberFormat.format(monoIsoMassesPos[i]), label, lockMassButton,
-                    ionTypePos[i], formulaPos[i], compoundIDPos[i], possibleOriginPos[i]});
+            model.addRow(new Object[] {numberFormat.format(monoIsoMassesPos[i]), label,
+                ionTypePos[i], formulaPos[i], compoundIDPos[i], possibleOriginPos[i]});
             System.out.println("Number " + i + " of " + monoIsoMassesPos.length
                 + " Building XIC of: " + compoundIDPos[i]);
-            table.getColumnModel().getColumn(2)
-                .setCellEditor(new ButtonEditor(new JCheckBox(), table, counter, 2));
-            counter++;
-            // ContaminantesTableProgressBar progressBar = new ContaminantesTableProgressBar(label);
-            // progressBar.removeAll();
-            // progressBar.setVisible(false);
-            // progressBar.setPlotXIC(label);
-            // progressBar.setContaminante(numberFormat.format(monoIsoMassesPos[i]));
-            // progressBar.setVisible(true);
-            // progressBar.revalidate();
-            // progressBar.repaint();
           }
         }
       }
@@ -897,20 +883,11 @@ public class ContaminantesTableFrame extends JFrame {
             label = new JLabel(new ImageIcon((getXICChart(dataSet).createBufferedImage(300, 75))));
             rendererXIC.lbl.add(label);
             rendererXIC.setSize(label.getSize());
-            LockMassButton lockMassButton = new LockMassButton();
             model.addRow(new Object[] {numberFormat.format(monoIsoMassesNeg[i]), label,
-                lockMassButton, ionTypeNeg[i], formulaNeg[i], " ", //
+                ionTypeNeg[i], formulaNeg[i], " ", //
                 possibleOriginNeg[i]});
             System.out.println(
                 "Number " + i + " of  " + monoIsoMassesNeg.length + " Building XIC of: " + " ");
-            // ContaminantesTableProgressBar progressBar = new ContaminantesTableProgressBar(label);
-            // progressBar.removeAll();
-            // progressBar.setVisible(false);
-            // progressBar.setPlotXIC(label);
-            // progressBar.setContaminante(numberFormat.format(monoIsoMassesPos[i]));
-            // progressBar.setVisible(true);
-            // progressBar.revalidate();
-            // progressBar.repaint();
           }
         }
       }
@@ -921,16 +898,15 @@ public class ContaminantesTableFrame extends JFrame {
       table.setRowHeight(i, 75);
     }
     table.getColumnModel().getColumn(1).setCellRenderer(rendererXIC);
-    table.getColumnModel().getColumn(2).setCellRenderer(new LockMassButton());
     DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
     centerRenderer.setHorizontalAlignment(SwingConstants.CENTER);
     table.setDefaultRenderer(String.class, centerRenderer);
     table.setDefaultRenderer(Double.class, centerRenderer);
     table.getColumnModel().getColumn(0).setCellRenderer(centerRenderer);
+    table.getColumnModel().getColumn(2).setCellRenderer(centerRenderer);
     table.getColumnModel().getColumn(3).setCellRenderer(centerRenderer);
     table.getColumnModel().getColumn(4).setCellRenderer(centerRenderer);
     table.getColumnModel().getColumn(5).setCellRenderer(centerRenderer);
-    table.getColumnModel().getColumn(6).setCellRenderer(centerRenderer);
     table.getColumnModel().getColumn(1).setMinWidth(300);
     table.getColumnModel().getColumn(1).setMaxWidth(300);
     table.getColumnModel().getColumn(1).setPreferredWidth(300);
