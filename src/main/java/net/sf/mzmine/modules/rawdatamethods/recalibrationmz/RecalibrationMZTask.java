@@ -18,8 +18,20 @@
 
 package net.sf.mzmine.modules.rawdatamethods.recalibrationmz;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.DatasetRenderingOrder;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.RawDataFileWriter;
@@ -67,8 +79,6 @@ public class RecalibrationMZTask extends AbstractTask {
     this.suffix = parameters.getParameter(RecalibrationMZParameters.suffix).getValue();
 
     this.removeOld = parameters.getParameter(RecalibrationMZParameters.removeOld).getValue();
-
-    System.out.println(parameters.getParameter(RecalibrationMZParameters.dataFiles));
   }
 
   /**
@@ -114,9 +124,40 @@ public class RecalibrationMZTask extends AbstractTask {
       e.printStackTrace();
     }
 
+    // To do array length for trendline m/z range
+    XYSeriesCollection seriesCollection = new XYSeriesCollection();
+    XYSeries massSeries = new XYSeries("m/z values scan ");
+    double[] xValues = new double[totalScans];
+    double[] yValues = new double[totalScans];
     // Loop through all scans
     for (int i = 0; i < totalScans; i++) {
+      // m/z vs deviation
+      // Scan scan = method.getScan(scans[i], recalibrationMZMethod.getParameterSet());
+      // double[][] trendlineXYValues = method.getTrendlineXYValues();
+      // double[][] massXYValues = method.getMassXYValues();
+      // XYSeries trendlineSeries = new XYSeries("Trendline scan " + i);
+      // XYSeries massSeries = new XYSeries("m/z values scan " + i);
+      // for (int j = 0; j < trendlineXYValues[0].length; j++) {
+      // trendlineSeries.add(trendlineXYValues[0][j], trendlineXYValues[1][j]);
+      // }
+      // for (int j = 0; j < massXYValues[0].length; j++) {
+      // massSeries.add(massXYValues[0][j], massXYValues[1][j]);
+      // }
+      // seriesCollection.addSeries(trendlineSeries);
+      // seriesCollection.addSeries(massSeries);
+
+      // scans vs deviation
       Scan scan = method.getScan(scans[i], recalibrationMZMethod.getParameterSet());
+      double[][] trendlineXYValues = method.getXYValuesDeviationPerScanTrendline();
+      double[][] massXYValues = method.getXYValuesDeviationPerScan();
+      XYSeries trendlineSeries = new XYSeries("Trendline scan ");
+      // for (int j = 0; j < trendlineXYValues[0].length; j++) {
+      // trendlineSeries.add(trendlineXYValues[0][j], trendlineXYValues[1][j]);
+      // }
+      for (int j = 0; j < massXYValues[0].length; j++) {
+        massSeries.add(massXYValues[0][j], massXYValues[1][j]);
+      }
+
       try {
         newRawDataFileWriter.addScan(scan);
         processedScans++;
@@ -125,8 +166,14 @@ public class RecalibrationMZTask extends AbstractTask {
         e.printStackTrace();
       }
     }
-
-
+    // seriesCollection.addSeries(trendlineSeries);
+    seriesCollection.addSeries(massSeries);
+    System.out.println("Start doing plot");
+    JFreeChart chart = getTrendlineChart(seriesCollection);
+    ChartFrame frame = new ChartFrame("Fit", chart);
+    frame.setVisible(true);
+    frame.setSize(450, 500);
+    System.out.println("Finished doing plot");
     if (!isCanceled()) {
 
       // Finalize writing
@@ -149,5 +196,53 @@ public class RecalibrationMZTask extends AbstractTask {
 
       logger.info("Finished m/z recalibration on " + dataFile);
     }
+  }
+
+  private JFreeChart getTrendlineChart(XYDataset dataSet) {
+    JFreeChart chart = ChartFactory.createXYLineChart("", // title
+        "m/z", // x-axis label
+        "deviation ppm", // y-axis label
+        dataSet, // data set
+        PlotOrientation.VERTICAL, // orientation
+        false, // create legend?
+        false, // generate tooltips?
+        false // generate URLs?
+    );
+    XYPlot plot = (XYPlot) chart.getPlot();
+    ChartPanel chartPanel = new ChartPanel(chart);
+    chart.setBackgroundPaint(Color.white);
+    chartPanel.setChart(chart);
+
+    XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+    // Disable maximum size (we don't want scaling).
+    chartPanel.setMaximumDrawWidth(Integer.MAX_VALUE);
+    chartPanel.setMaximumDrawHeight(Integer.MAX_VALUE);
+
+    // Set the plot properties.
+    plot = chart.getXYPlot();
+    plot.setBackgroundPaint(Color.white);
+    // for (int i = 0; i < plot.getSeriesCount(); i = i + 2) {
+    // plot.setRenderer(renderer);
+    // plot.getRenderer().setSeriesPaint(i + 1, Color.black);
+    // renderer.setSeriesLinesVisible(i + 1, false);
+    // renderer.setSeriesLinesVisible(i, true);
+    // renderer.setSeriesShapesVisible(i, false);
+    // }
+
+    for (int i = 0; i < plot.getSeriesCount(); i++) {
+      plot.setRenderer(renderer);
+      renderer.setSeriesLinesVisible(i, false);
+    }
+
+
+
+    plot.setDatasetRenderingOrder(DatasetRenderingOrder.FORWARD);
+
+    // Set grid properties.
+    plot.setDomainGridlinePaint(Color.white);
+    plot.setRangeGridlinePaint(Color.white);
+    plot.setOutlineVisible(false);
+
+    return chart;
   }
 }

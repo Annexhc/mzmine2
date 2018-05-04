@@ -26,6 +26,7 @@ import net.sf.mzmine.datamodel.impl.SimpleScan;
 import net.sf.mzmine.modules.rawdatamethods.peakpicking.massdetection.exactmass.ExactMassDetector;
 import net.sf.mzmine.modules.rawdatamethods.peakpicking.massdetection.exactmass.ExactMassDetectorParameters;
 import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.RecalibrationMZMethod;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.LockMass;
 import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.LockMassRecalibrationMZParameters;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
@@ -33,12 +34,13 @@ import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 public class InternalStandardRecalibrationMZ implements RecalibrationMZMethod {
 
   // User parameters
-  private double lockMass;
+  private LockMass[] lockMass;
   private MZTolerance mzTolerance;
   private double noiseLevel;
 
   public Scan getScan(Scan oldScan, ParameterSet parameters) {
-    this.lockMass = parameters.getParameter(LockMassRecalibrationMZParameters.lockMass).getValue();
+    this.lockMass =
+        parameters.getParameter(LockMassRecalibrationMZParameters.lockMass).getChoices();
     this.mzTolerance =
         parameters.getParameter(LockMassRecalibrationMZParameters.mzTolerance).getValue();
     this.noiseLevel =
@@ -51,7 +53,7 @@ public class InternalStandardRecalibrationMZ implements RecalibrationMZMethod {
     for (int j = 0; j < oldScan.getNumberOfDataPoints(); j++) {
       double mzDiff = 0;
       // search for lockmass in ppm window
-      mzDiff = lockMass - accurateLockMass;
+      mzDiff = lockMass[0].getLockMass() - accurateLockMass;
       newDPs[j] = new SimpleDataPoint(oldDPs[j].getMZ() + mzDiff, oldDPs[j].getIntensity());
     }
     newScan.setDataPoints(newDPs);
@@ -67,7 +69,7 @@ public class InternalStandardRecalibrationMZ implements RecalibrationMZMethod {
 
     // search for lockmass in m/z range
     for (int i = 0; i < massList.length; i++) {
-      if (mzTolerance.checkWithinTolerance(massList[i].getMZ(), lockMass)) {
+      if (mzTolerance.checkWithinTolerance(massList[i].getMZ(), lockMass[0].getLockMass())) {
         accurateLockMass = massList[i].getMZ();
         break;
       }
@@ -82,6 +84,30 @@ public class InternalStandardRecalibrationMZ implements RecalibrationMZMethod {
   @Override
   public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
     return InternalStandardRecalibrationMZParameters.class;
+  }
+
+  @Override
+  public double[][] getTrendlineXYValues() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double[][] getMassXYValues() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double[][] getXYValuesDeviationPerScan() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double[][] getXYValuesDeviationPerScanTrendline() {
+    // TODO Auto-generated method stub
+    return null;
   }
 
 }

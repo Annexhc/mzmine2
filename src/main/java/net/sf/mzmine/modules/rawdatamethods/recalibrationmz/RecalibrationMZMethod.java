@@ -32,4 +32,11 @@ public interface RecalibrationMZMethod extends MZmineModule {
    */
   public Scan getScan(Scan oldScan, ParameterSet parameters);
 
+  public double[][] getTrendlineXYValues();
+
+  public double[][] getMassXYValues();
+
+  public double[][] getXYValuesDeviationPerScan();
+
+  public double[][] getXYValuesDeviationPerScanTrendline();
 }

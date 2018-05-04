@@ -61,4 +61,28 @@ public class NaiveRecalibrationMZ implements RecalibrationMZMethod {
     return NaiveRecalibrationMZParameters.class;
   }
 
+  @Override
+  public double[][] getTrendlineXYValues() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double[][] getMassXYValues() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double[][] getXYValuesDeviationPerScan() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
+  @Override
+  public double[][] getXYValuesDeviationPerScanTrendline() {
+    // TODO Auto-generated method stub
+    return null;
+  }
+
 }

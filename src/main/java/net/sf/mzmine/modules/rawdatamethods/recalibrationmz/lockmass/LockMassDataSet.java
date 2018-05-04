@@ -15,59 +15,59 @@ public class LockMassDataSet extends AbstractXYDataset {
 
   private double[] xValues;
   private double[] yValues;
-  private int scanNumbers;
+  private int scanNumbersMSOneLevel;
   private double noiseLevel;
   private boolean intensityOverZero;
-  private boolean passedIntensityPreTest;
+  // private boolean passedIntensityPreTest;
 
   public LockMassDataSet(RawDataFile dataFile, double exactMass, Range<Double> rangeMZ,
       double noiseLevel) {
 
-    this.scanNumbers = dataFile.getNumOfScans();
-    this.xValues = new double[scanNumbers];
-    this.yValues = new double[scanNumbers];
+    this.scanNumbersMSOneLevel = dataFile.getNumOfScans(1);
+    this.xValues = new double[scanNumbersMSOneLevel];
+    this.yValues = new double[scanNumbersMSOneLevel];
     this.noiseLevel = noiseLevel;
 
-    // Intensity pre test, check 5 data points, if all are zero dont build XIC
-    int[] testScanNumbers = new int[] {1, dataFile.getNumOfScans() - 1,
-        (dataFile.getNumOfScans() - 1) / 2, (dataFile.getNumOfScans() - 1) / 4};
-    int testCounter = 0;
-    for (int i = 0; i < testScanNumbers.length; i++) {
-      DataPoint[] dpTest = dataFile.getScan(testScanNumbers[i]).getDataPointsByMass(rangeMZ);
-      double[] intensities = new double[dpTest.length];
-      for (int j = 0; j < dpTest.length; j++) {
-        intensities[j] = dpTest[j].getIntensity();
-        if (intensities[j] > 0) {
-          testCounter++;
-        }
-      }
-      if (testCounter == 4) {
-        passedIntensityPreTest = true;
-      } else {
-        passedIntensityPreTest = false;
-      }
-    }
+    // // Intensity pre test, check 3 data points, if all are zero dont build XIC
+    // int[] testScanNumbers = new int[] {dataFile.getNumOfScans(1) - 1};
+    // int testCounter = 0;
+    // for (int i = 0; i < testScanNumbers.length; i++) {
+    // DataPoint[] dpTest = dataFile.getScan(testScanNumbers[i]).getDataPointsByMass(rangeMZ);
+    // double[] intensities = new double[dpTest.length];
+    // for (int j = 0; j < dpTest.length; j++) {
+    // intensities[j] = dpTest[j].getIntensity();
+    // if (intensities[j] > 0) {
+    // testCounter++;
+    // }
+    // }
+    // if (testCounter == 4) {
+    // passedIntensityPreTest = true;
+    // } else {
+    // passedIntensityPreTest = false;
+    // }
+    // }
 
     // get intensities for yValues
-    if (passedIntensityPreTest) {
-      for (int i = 0; i < yValues.length; i++) {
-        DataPoint[] dp = dataFile.getScan(i + 1).getDataPointsByMass(rangeMZ);
-        double[] intensities = new double[dp.length];
-        for (int j = 0; j < dp.length; j++) {
-          intensities[j] = dp[j].getIntensity();
-          if (intensities[j] > 0) {
-            intensityOverZero = true;
-          }
+    // if (passedIntensityPreTest) {
+    int[] msOneScanNumbers = dataFile.getScanNumbers(1);
+    for (int i = 0; i < yValues.length; i++) {
+      DataPoint[] dp = dataFile.getScan(msOneScanNumbers[i]).getDataPointsByMass(rangeMZ);
+      double[] intensities = new double[dp.length];
+      for (int j = 0; j < dp.length; j++) {
+        intensities[j] = dp[j].getIntensity();
+        if (intensities[j] > 0) {
+          intensityOverZero = true;
         }
-        if (intensities.length > 0) {
-          yValues[i] = getMaxIntensity(intensities);
-        } else {
-          yValues[i] = 0;
-        }
-        xValues[i] = dataFile.getScan(i + 1).getRetentionTime();
       }
+      if (intensities.length > 0) {
+        yValues[i] = getMaxIntensity(intensities);
+      } else {
+        yValues[i] = 0;
+      }
+      xValues[i] = dataFile.getScan(i + 1).getRetentionTime();
     }
   }
+  // }
 
   private double getMaxIntensity(double[] intensities) {
     double intensity = 0;
@@ -79,7 +79,7 @@ public class LockMassDataSet extends AbstractXYDataset {
 
   @Override
   public int getItemCount(int series) {
-    return scanNumbers;
+    return scanNumbersMSOneLevel;
   }
 
   @Override
@@ -114,8 +114,8 @@ public class LockMassDataSet extends AbstractXYDataset {
     return intensityOverZero;
   }
 
-  public boolean passedIntensityPreTest() {
-    return passedIntensityPreTest;
-  }
+  // public boolean passedIntensityPreTest() {
+  // return passedIntensityPreTest;
+  // }
 
 }

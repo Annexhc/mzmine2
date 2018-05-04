@@ -27,17 +27,17 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import net.sf.mzmine.datamodel.Scan;
-import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.ContaminantesTableFrame;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.kellerlist.ContaminantesTableTask;
 import net.sf.mzmine.modules.visualization.spectra.SpectraPlot;
 import net.sf.mzmine.modules.visualization.spectra.datasets.ScanDataSet;
 import net.sf.mzmine.parameters.ParameterSet;
-import net.sf.mzmine.parameters.dialogs.ParameterSetupDialogWithScanPreview;
+import net.sf.mzmine.parameters.dialogs.ParamterSetupDialogWithCalibrationPreview;
 
 /**
  * This class extends ParameterSetupDialog class, including a spectraPlot. This is used to preview
  * how the selected mass detector and his parameters works over the raw data file.
  */
-public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPreview
+public class RecalibrationMZSetupDialog extends ParamterSetupDialogWithCalibrationPreview
     implements ActionListener {
 
   private static final long serialVersionUID = 1L;
@@ -62,12 +62,11 @@ public class RecalibrationMZSetupDialog extends ParameterSetupDialogWithScanPrev
     if (recalibrationMZMethod.getName().equals("Lock mass")) {
       JMenuBar menuBar = new JMenuBar();
       JMenu menu = new JMenu("Tools");
-      JMenuItem showTable = new JMenuItem("Show contaminantes");
+      JMenuItem showTable = new JMenuItem("Build XICs of potential contaminantes");
       ActionListener actionListener = new ActionListener() {
         public void actionPerformed(ActionEvent actionEvent) {
-          ContaminantesTableFrame table = new ContaminantesTableFrame(parameters);
-          table.setVisible(true);
-          table.validate();
+          ContaminantesTableTask tableTask = new ContaminantesTableTask(parameters);
+          tableTask.run();
         }
       };
       showTable.addActionListener(actionListener);

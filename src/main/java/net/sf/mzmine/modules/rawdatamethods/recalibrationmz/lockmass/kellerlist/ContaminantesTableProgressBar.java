@@ -1,4 +1,4 @@
-package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass;
+package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.kellerlist;
 
 import java.awt.FlowLayout;
 import javax.swing.JFrame;

@@ -23,13 +23,14 @@ import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.RecalibrationMZSetup
 import net.sf.mzmine.parameters.UserParameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
+import net.sf.mzmine.parameters.parametertypes.LockMassParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
 import net.sf.mzmine.util.ExitCode;
 
 public class LockMassRecalibrationMZParameters extends SimpleParameterSet {
 
-  public static final DoubleParameter lockMass =
-      new DoubleParameter("Exact mass of lock mass", "Enter the exact mass of the lock mass");
+  public static final LockMassParameter lockMass = new LockMassParameter("Exact mass of lock mass",
+      "Enter the exact mass of the lock mass", new LockMass[0]);
 
   public static final MZToleranceParameter mzTolerance = new MZToleranceParameter(
       "m/z tolerance to search for lock mass", "m/z tolerance to search for lock mass");

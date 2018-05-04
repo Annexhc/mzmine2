@@ -18,6 +18,7 @@
 
 package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass;
 
+import java.util.ArrayList;
 import javax.annotation.Nonnull;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.Scan;
@@ -26,34 +27,90 @@ import net.sf.mzmine.datamodel.impl.SimpleScan;
 import net.sf.mzmine.modules.rawdatamethods.peakpicking.massdetection.exactmass.ExactMassDetector;
 import net.sf.mzmine.modules.rawdatamethods.peakpicking.massdetection.exactmass.ExactMassDetectorParameters;
 import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.RecalibrationMZMethod;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.regression.PolyTrendLine;
+import net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.regression.TrendLine;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 
 public class LockMassRecalibrationMZ implements RecalibrationMZMethod {
 
   // User parameters
-  private double lockMass;
+  private LockMass[] lockMasses;
   private MZTolerance mzTolerance;
   private double noiseLevel;
+  private double[][] xyValues;
+  private double[][] xyValuesTrendline;
+  private double[][] xyValuesDeviationPerScan;
+  private double[][] xyValuesDeviationPerScanTrendline;
 
   public Scan getScan(Scan oldScan, ParameterSet parameters) {
-    this.lockMass = parameters.getParameter(LockMassRecalibrationMZParameters.lockMass).getValue();
+    this.lockMasses =
+        parameters.getParameter(LockMassRecalibrationMZParameters.lockMass).getChoices();
     this.mzTolerance =
         parameters.getParameter(LockMassRecalibrationMZParameters.mzTolerance).getValue();
     this.noiseLevel =
         parameters.getParameter(LockMassRecalibrationMZParameters.noiseLevel).getValue();
+
+    // do regression all m/z vs deviation
+    ArrayList<Double> accurateLockMasses = getAccurateLockMasses(oldScan);
+    TrendLine trendline = new PolyTrendLine(1);
+    int lowestMZ = (int) Math.round((oldScan.getDataPointMZRange().lowerEndpoint()));
+    int highestMZ = (int) Math.round((oldScan.getDataPointMZRange().upperEndpoint()));
+    xyValues = new double[2][lockMasses.length];
+    xyValuesTrendline = new double[2][highestMZ - lowestMZ];
+    for (int i = 0; i < accurateLockMasses.size(); i++) {
+      // accurate lock masses as x Values
+      xyValues[0][i] = accurateLockMasses.get(i);
+      // calc deviation for y Values
+      xyValues[1][i] =
+          ((accurateLockMasses.get(i) - lockMasses[i].getLockMass()) / lockMasses[i].getLockMass())
+              * 1000000;
+    }
+    trendline.setValues(xyValues[1], xyValues[0]);
+    // calc values for regression
+    for (int i = 0; i < xyValuesTrendline[1].length; i++) {
+      // nominal masses as x Values
+      xyValuesTrendline[0][i] = i + lowestMZ;
+      // predict y Values
+      xyValuesTrendline[1][i] = trendline.predict(i + lowestMZ);
+    }
+
+    // do regression number of scan vs deviation
+    TrendLine trendlineDeviationPerScan = new PolyTrendLine(1);
+    xyValuesDeviationPerScan = new double[2][accurateLockMasses.size()];
+    xyValuesDeviationPerScanTrendline = new double[2][accurateLockMasses.size()];
+    for (int i = 0; i < accurateLockMasses.size(); i++) {
+      // accurate lock masses as x Values
+      xyValuesDeviationPerScan[0][i] = oldScan.getScanNumber();
+      // calc deviation for y Values
+      xyValuesDeviationPerScan[1][i] =
+          ((accurateLockMasses.get(i) - lockMasses[i].getLockMass()) / lockMasses[i].getLockMass())
+              * 1000000;
+    }
+    // trendlineDeviationPerScan.setValues(xyValuesDeviationPerScan[1],
+    // xyValuesDeviationPerScan[0]);
+
+    // calc values for regression
+    // for (int i = 0; i < xyValuesDeviationPerScanTrendline[1].length; i++) {
+    // // nominal masses as x Values
+    // xyValuesDeviationPerScanTrendline[0][i] = oldScan.getScanNumber();
+    // // predict y Values
+    // xyValuesDeviationPerScanTrendline[1][i] = trendlineDeviationPerScan.predict(i);
+    // }
+
+
     final SimpleScan newScan = new SimpleScan(oldScan);
     DataPoint[] oldDPs = oldScan.getDataPoints();
     DataPoint[] newDPs = new DataPoint[oldScan.getNumberOfDataPoints()];
-    double accurateLockMass = getAccurateLockMass(oldScan);
+
     // Loop through every data point
     for (int j = 0; j < oldScan.getNumberOfDataPoints(); j++) {
-      {
+      for (int n = 0; n < accurateLockMasses.size(); n++) {
         double mzDiff = 0;
         double mzDiffRelative = 0;
         // search for lockmass in ppm window
-        mzDiff = lockMass - accurateLockMass;
-        mzDiffRelative = (mzDiff / lockMass) * 1000000;
+        mzDiff = lockMasses[n].getLockMass() - accurateLockMasses.get(n);
+        mzDiffRelative = (mzDiff / lockMasses[0].getLockMass()) * 1000000;
         newDPs[j] =
             new SimpleDataPoint((mzDiffRelative / 1000000) * oldDPs[j].getMZ() + oldDPs[j].getMZ(),
                 oldDPs[j].getIntensity());
@@ -63,21 +120,39 @@ public class LockMassRecalibrationMZ implements RecalibrationMZMethod {
     return newScan;
   }
 
-  private double getAccurateLockMass(Scan oldScan) {
-    double accurateLockMass = 0;
+  private ArrayList<Double> getAccurateLockMasses(Scan oldScan) {
+    ArrayList<Double> accurateLockMass = new ArrayList<Double>();
     ExactMassDetector exactMassDetector = new ExactMassDetector();
     ExactMassDetectorParameters exactMassDetectorParameters = new ExactMassDetectorParameters();
     exactMassDetectorParameters.noiseLevel.setValue(noiseLevel);
     DataPoint[] massList = exactMassDetector.getMassValues(oldScan, exactMassDetectorParameters);
-
     // search for lockmass in m/z range
-    for (int i = 0; i < massList.length; i++) {
-      if (mzTolerance.checkWithinTolerance(massList[i].getMZ(), lockMass)) {
-        accurateLockMass = massList[i].getMZ();
-        break;
+    for (int j = 0; j < lockMasses.length; j++) {
+      for (int i = 0; i < massList.length; i++) {
+        if (mzTolerance.checkWithinTolerance(massList[i].getMZ(), lockMasses[j].getLockMass())) {
+          accurateLockMass.add(massList[i].getMZ());
+          break;
+        }
       }
     }
     return accurateLockMass;
+  }
+
+
+  public double[][] getTrendlineXYValues() {
+    return xyValuesTrendline;
+  }
+
+  public double[][] getMassXYValues() {
+    return xyValues;
+  }
+
+  public double[][] getXYValuesDeviationPerScan() {
+    return xyValuesDeviationPerScan;
+  }
+
+  public double[][] getXYValuesDeviationPerScanTrendline() {
+    return xyValuesDeviationPerScanTrendline;
   }
 
   public @Nonnull String getName() {

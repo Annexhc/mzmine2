@@ -1,4 +1,4 @@
-package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass;
+package net.sf.mzmine.modules.rawdatamethods.recalibrationmz.lockmass.kellerlist;
 
 import java.awt.Component;
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class LockMassCellRenderer extends DefaultTableCellRenderer {
+public class LockMassXICCellRenderer extends DefaultTableCellRenderer {
   /**
    * 
    */
