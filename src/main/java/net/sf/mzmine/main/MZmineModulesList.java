@@ -31,6 +31,7 @@ import net.sf.mzmine.modules.peaklistmethods.dataanalysis.projectionplots.PCAPlo
 import net.sf.mzmine.modules.peaklistmethods.dataanalysis.projectionplots.SammonsPlotModule;
 import net.sf.mzmine.modules.peaklistmethods.dataanalysis.rtmzplots.cvplot.CVPlotModule;
 import net.sf.mzmine.modules.peaklistmethods.dataanalysis.rtmzplots.logratioplot.LogratioPlotModule;
+import net.sf.mzmine.modules.peaklistmethods.featurecorrelation.FeatureCorrelationModule;
 import net.sf.mzmine.modules.peaklistmethods.filtering.clearannotations.PeaklistClearAnnotationsModule;
 import net.sf.mzmine.modules.peaklistmethods.filtering.duplicatefilter.DuplicateFilterModule;
 import net.sf.mzmine.modules.peaklistmethods.filtering.peakcomparisonrowfilter.PeakComparisonRowFilterModule;
@@ -139,6 +140,9 @@ public class MZmineModulesList {
 
       RansacAlignerModule.class,
       // PathAlignerModule.class,
+
+      // Feature correlation
+      FeatureCorrelationModule.class,
 
       // I/O
       CSVExportModule.class, MetaboAnalystExportModule.class, MzTabExportModule.class,
