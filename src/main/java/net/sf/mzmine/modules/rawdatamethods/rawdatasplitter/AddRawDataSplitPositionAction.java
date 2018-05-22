@@ -12,7 +12,6 @@ import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
-import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.SplitPositionChoiceComponent;
 import net.sf.mzmine.util.ExitCode;
 
@@ -45,7 +44,6 @@ public class AddRawDataSplitPositionAction extends AbstractAction {
 
         // Create new split position.
         final RawDataFileSplitPosition rawDataFileSplitPosition = new RawDataFileSplitPosition(
-            parameters.getParameter(AddSplitPositionParameters.splitID).getValue(),
             parameters.getParameter(AddSplitPositionParameters.splitPosition).getValue());
 
         // Add to list of choices (if not already present).
@@ -66,16 +64,12 @@ public class AddRawDataSplitPositionAction extends AbstractAction {
    */
   private static class AddSplitPositionParameters extends SimpleParameterSet {
 
-    // Adduct name.
-    private static final IntegerParameter splitID =
-        new IntegerParameter("Number of split", "Number of split");
-
-    // Adduct mass difference.
+    // Retention time to split.
     private static final DoubleParameter splitPosition = new DoubleParameter("Split position",
         "Scan number after split position", MZmineCore.getConfiguration().getRTFormat());
 
     private AddSplitPositionParameters() {
-      super(new Parameter[] {splitID, splitPosition});
+      super(new Parameter[] {splitPosition});
     }
   }
 }

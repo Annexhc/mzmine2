@@ -73,8 +73,6 @@ public class FeatureCorrelationTask extends AbstractTask {
     this.peakList = peakList;
     this.parameters = parameters;
 
-    rtTolerance = parameters.getParameter(FeatureCorrelationParameters.rtTolerance).getValue();
-    mzTolerance = parameters.getParameter(FeatureCorrelationParameters.mzTolerance).getValue();
     selectedPeaks = parameters.getParameter(FeatureCorrelationParameters.peakSelection)
         .getMatchingRows(peakList);
     minCoefficientOfDetermination = parameters
@@ -132,8 +130,8 @@ public class FeatureCorrelationTask extends AbstractTask {
           for (int k =
               scanNumbersForCorrelationComparison[0]; k < scanNumbersForCorrelationComparison.length
                   - scanNumbersForCorrelationComparison[0]; k++) {
-            xValues[k] = selectedPeaks[i].getBestPeak().getDataPoint(k).getIntensity();
             try {
+              xValues[k] = selectedPeaks[i].getBestPeak().getDataPoint(k).getIntensity();
               yValues[k] = allRows[j].getBestPeak().getDataPoint(k).getIntensity();
             } catch (Exception e) {
               System.out.println("Intensity error");
@@ -154,7 +152,6 @@ public class FeatureCorrelationTask extends AbstractTask {
       MZmineCore.getProjectManager().getCurrentProject().addPeakList(correlatedFeatures);
 
     }
-
 
     // show correlation plot
     System.out.println("Start doing plot");

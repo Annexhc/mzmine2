@@ -19,6 +19,7 @@
 package net.sf.mzmine.modules.rawdatamethods.rawdatasplitter;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.logging.Logger;
 import com.google.common.collect.Range;
 import net.sf.mzmine.datamodel.MZmineProject;
@@ -99,9 +100,17 @@ public class RawDataSplitterTask extends AbstractTask {
     scanNumbers = dataFile.getScanNumbers(1);
     totalScans = scanNumbers.length;
 
+    // sort split positions
+    double[] sortedSplitPositions = sortSplitPositions(rawDataFileSplitPositions);
+
+    // determine start split position
+    double startSplitPosition = 0.0;
     for (int i = 0; i < numberOfSplits; i++) {
-      double splitPosition = rawDataFileSplitPositions[i].getSplitPosition();
-      newSplittedRawDataFile(dataFile, splitPosition);
+      if (i - 1 >= 0) {
+        startSplitPosition = sortedSplitPositions[i - 1];
+      }
+      double endSplitPosition = sortedSplitPositions[i];
+      newSplittedRawDataFile(dataFile, startSplitPosition, endSplitPosition);
     }
 
     processedScans++;
@@ -111,24 +120,29 @@ public class RawDataSplitterTask extends AbstractTask {
     logger.info("Finished splitting raw file " + dataFile);
   }
 
-  private RawDataFile newSplittedRawDataFile(RawDataFile data, double splitPosition) {
+  private RawDataFile newSplittedRawDataFile(RawDataFile data, double startSplitPosition,
+      double endSplitPosition) {
 
     RawDataFile newRawDataFile = null;
 
     RawDataFileWriter newRawDataFileWriter = null;
 
     try {
-      newRawDataFileWriter = MZmineCore.createNewFile(dataFile.getName() + suffix);
+      newRawDataFileWriter =
+          MZmineCore.createNewFile(dataFile.getName() + "splitted@RT" + endSplitPosition + suffix);
     } catch (IOException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
-    Range<Double> rtRange = Range.closed(0.0, splitPosition);
+    // Get start split position depending on last split
+    Range<Double> rtRange = Range.closed(startSplitPosition, endSplitPosition);
     dataFile.getScanNumbers(1, rtRange);
-    System.out.println(dataFile.getScanNumbers(1, rtRange).length);
+    for (int i = 0; i < dataFile.getScanNumbers(1, rtRange).length; i++) {
+      System.out.println(dataFile.getScanNumbers(1, rtRange)[i]);
+    }
     // Loop through all scans
     for (int i = 0; i < dataFile.getScanNumbers(1, rtRange).length; i++) {
-      Scan scan = dataFile.getScan(i + 1);
+      Scan scan = dataFile.getScan(dataFile.getScanNumbers(1, rtRange)[0] + i);
       try {
         newRawDataFileWriter.addScan(scan);
       } catch (IOException e) {
@@ -147,6 +161,16 @@ public class RawDataSplitterTask extends AbstractTask {
     // Add the newly created file to the project
     project.addFile(newRawDataFile);
     return newRawDataFile;
+  }
+
+  private double[] sortSplitPositions(RawDataFileSplitPosition[] rawDataFileSplitPosition) {
+    double[] sortedSplitPositionRTs = new double[rawDataFileSplitPosition.length];
+
+    for (int i = 0; i < rawDataFileSplitPosition.length; i++) {
+      sortedSplitPositionRTs[i] = rawDataFileSplitPosition[i].getSplitPosition();
+    }
+    Arrays.sort(sortedSplitPositionRTs, 0, sortedSplitPositionRTs.length);
+    return sortedSplitPositionRTs;
   }
 
 }

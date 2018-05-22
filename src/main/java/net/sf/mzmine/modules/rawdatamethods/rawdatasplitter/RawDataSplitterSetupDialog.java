@@ -39,17 +39,19 @@ public class RawDataSplitterSetupDialog extends ParameterSetupDialogWithChromato
    * @param massDetectorTypeNumber
    */
   public RawDataSplitterSetupDialog(Window parent, boolean valueCheckRequired,
-      Class<?> massDetectorClass, ParameterSet parameters) {
+      ParameterSet parameters) {
 
     super(parent, valueCheckRequired, parameters);
 
     this.parameters = parameters;
+
   }
 
+  @Override
   protected void loadPreview(TICPlot ticPlot, RawDataFile dataFile, Range<Double> rtRange,
       Range<Double> mzRange) {
 
-    ticPlot.setVisible(true);
   }
 
 }
+

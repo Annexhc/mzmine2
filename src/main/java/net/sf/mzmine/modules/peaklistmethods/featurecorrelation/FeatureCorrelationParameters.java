@@ -25,8 +25,6 @@ import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakSelectionParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
-import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
-import net.sf.mzmine.parameters.parametertypes.tolerances.RTToleranceParameter;
 
 public class FeatureCorrelationParameters extends SimpleParameterSet {
 
@@ -36,10 +34,11 @@ public class FeatureCorrelationParameters extends SimpleParameterSet {
 
   public static final PeakSelectionParameter peakSelection = new PeakSelectionParameter();
 
-  public static final RTToleranceParameter rtTolerance = new RTToleranceParameter();
+  // public static final RTToleranceParameter rtTolerance = new RTToleranceParameter();
 
-  public static final MZToleranceParameter mzTolerance = new MZToleranceParameter("m/z tolerance",
-      "Tolerance value of the m/z difference between peaks in MS/MS scans");
+  // public static final MZToleranceParameter mzTolerance = new MZToleranceParameter("m/z
+  // tolerance",
+  // "Tolerance value of the m/z difference between peaks in MS/MS scans");
 
   public static final DoubleParameter minCoefficientOfDetermination = new DoubleParameter(
       "Min R-squared",
@@ -47,8 +46,7 @@ public class FeatureCorrelationParameters extends SimpleParameterSet {
       MZmineCore.getConfiguration().getRTFormat());
 
   public FeatureCorrelationParameters() {
-    super(new Parameter[] {dataFiles, peakLists, peakSelection, rtTolerance, mzTolerance,
-        minCoefficientOfDetermination});
+    super(new Parameter[] {dataFiles, peakLists, peakSelection, minCoefficientOfDetermination});
   }
 
 

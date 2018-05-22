@@ -2,21 +2,23 @@ package net.sf.mzmine.modules.rawdatamethods.rawdatasplitter;
 
 public class RawDataFileSplitPosition {
 
-  private final int splitID;
-  private final double splitPosition;
+  private double splitPosition;
 
-  public RawDataFileSplitPosition(final int splitID, final double splitPosition) {
+  public RawDataFileSplitPosition(double splitPosition) {
 
-    this.splitID = splitID;
     this.splitPosition = splitPosition;
-  }
-
-  public int getSplitID() {
-    return splitID;
   }
 
   public double getSplitPosition() {
     return splitPosition;
   }
 
+  public void setSplitPosition(double newSplitPosition) {
+    splitPosition = newSplitPosition;
+  }
+
+  public String toString() {
+
+    return "Split raw file @" + Double.toString(splitPosition);
+  }
 }

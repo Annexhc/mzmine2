@@ -44,8 +44,12 @@ public class RawDataSplitterParameters extends SimpleParameterSet {
 
   @Override
   public ExitCode showSetupDialog(Window parent, boolean valueCheckRequired) {
-    ExitCode exitCode = super.showSetupDialog(parent, valueCheckRequired);
-    return exitCode;
+
+    RawDataSplitterSetupDialog dialog =
+        new RawDataSplitterSetupDialog(parent, valueCheckRequired, this);
+    dialog.setVisible(true);
+    return dialog.getExitCode();
+
   }
 
 }
