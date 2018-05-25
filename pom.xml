@@ -185,6 +185,14 @@
 			<version>1.7.25</version>
 		</dependency>
 		
+		<!-- To send error e-Mails -->
+		<dependency>
+     		 <groupId>org.apache.commons</groupId>
+		      <artifactId>commons-email</artifactId>
+		      <version>1.5</version>
+		      <scope>compile</scope>
+		</dependency>
+		
 		<!-- START EXCEL -->
 		<dependency>
 			<groupId>org.apache.poi</groupId>
