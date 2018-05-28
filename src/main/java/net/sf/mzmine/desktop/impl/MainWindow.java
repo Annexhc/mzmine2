@@ -79,6 +79,8 @@ public class MainWindow extends JFrame implements MZmineModule, Desktop, WindowL
 
   private HelpImpl help;
 
+  private int mailCounter;
+
   public MainMenu getMainMenu() {
     return menuBar;
   }
@@ -133,17 +135,18 @@ public class MainWindow extends JFrame implements MZmineModule, Desktop, WindowL
   public void displayMessage(Window window, String title, String msg, int type) {
     assert msg != null;
 
+    // sending error message with a maximum of 5
     if (MZminePreferences.sendErrorEMail.getValue() != null
-        && MZminePreferences.sendErrorEMail.getValue()) {
+        && MZminePreferences.sendErrorEMail.getValue() && mailCounter < 5) {
       ErrorMail errorMail = new ErrorMail();
       try {
         errorMail.sendErrorEmail(ErrorMailSettings.eMailAddress.getValue(),
             ErrorMailSettings.eMailAddress.getValue(), ErrorMailSettings.smtpHost.getValue(),
             "MZmine error!!! ", msg, ErrorMailSettings.eMailPassword.getValue(),
             ErrorMailSettings.smtpPort.getValue());
+        mailCounter++;
       } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
+        logger.info("Sending mail error");
       }
     }
 

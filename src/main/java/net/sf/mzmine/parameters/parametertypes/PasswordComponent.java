@@ -22,7 +22,8 @@ public class PasswordComponent extends JPanel {
   }
 
   public String getText() {
-    return passwordField.getPassword().toString();
+    String passText = new String(passwordField.getPassword());
+    return passText;
   }
 
   @Override
