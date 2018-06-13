@@ -31,7 +31,8 @@ public enum IonizationType {
   FORMATE("[M+HCO2]-", "HCO2", 44.99820, PolarityType.NEGATIVE), ACETATE("[M+CH3COO]-", "CH3COO",
       59.01385, PolarityType.NEGATIVE), //
   CARBONATE("[M+CO3]-", "CO3", 59.98529, PolarityType.NEGATIVE), //
-  PHOSPHATE("[M+H2PO4]-", "H2PO4", 96.96962, PolarityType.NEGATIVE);
+  PHOSPHATE("[M+H2PO4]-", "H2PO4", 96.96962, PolarityType.NEGATIVE), //
+  SODIUMTWO("[M-2H+Na]-", "-2H+Na", 20.974121, PolarityType.NEGATIVE);
 
   private final String name, adductFormula;
   private final PolarityType polarity;

@@ -35,7 +35,10 @@ public enum LipidType {
   DGTS("Diacylglyceroltrimethylhomoserin", "DGTS", "C10H19O7N", 2), //
   MELA("Monosylerythrotol lipid A", "MELA", "C14H21O13", 2), //
   MELBC("Monosylerythrotol lipid B/C", "MELBC", "C12H19O12", 2), //
-  MELD("Monosylerythrotol lipid D", "MELD", "C10H17O11", 2);
+  MELD("Monosylerythrotol lipid D", "MELD", "C10H17O11", 2), //
+  mRL("mono-Rhamnolipid", "mRL", "C6H9O9", 2), //
+  diRL("di-Rhamnolipid", "diRL", "C12H19O13", 2), //
+  HAA("HAA", "HAA", "C0H-1O5", 2); //
 
   private final String name, abbr, formula;
   private final int numberOfChains;

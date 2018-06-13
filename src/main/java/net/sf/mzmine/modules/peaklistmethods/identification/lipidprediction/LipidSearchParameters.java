@@ -19,12 +19,14 @@
 package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction;
 
 import net.sf.mzmine.datamodel.IonizationType;
+import net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction.lipidmodification.LipidModification;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.BooleanParameter;
 import net.sf.mzmine.parameters.parametertypes.ComboParameter;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
 import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
+import net.sf.mzmine.parameters.parametertypes.LipidModificationChoiceParameter;
 import net.sf.mzmine.parameters.parametertypes.MultiChoiceParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZToleranceParameter;
@@ -51,7 +53,9 @@ public class LipidSearchParameters extends SimpleParameterSet {
       new IntegerParameter("Maximum number of additional oxygen due to oxidation [M+xO]",
           "Maximum number of additional oxygen due to oxidation [M+xO]");
 
-  public static final MZToleranceParameter mzTolerance = new MZToleranceParameter();
+  public static final MZToleranceParameter mzTolerance =
+      new MZToleranceParameter("m/z tolerance MS1 level:",
+          "Enter m/z tolerance for exact mass database matching on MS1 level");
 
   public static final ComboParameter<IonizationType> ionizationMethod =
       new ComboParameter<IonizationType>("Ionization method",
@@ -72,15 +76,26 @@ public class LipidSearchParameters extends SimpleParameterSet {
       new BooleanParameter("Search for lipid class specific fragments in MS/MS spectra",
           "Search for lipid class specific fragments in MS/MS spectra");
 
+  public static final MZToleranceParameter mzToleranceMS2 =
+      new MZToleranceParameter("m/z tolerance MS2 level:",
+          "Enter m/z tolerance for exact mass database matching on MS2 level");
+
   public static final DoubleParameter noiseLevel = new DoubleParameter(
       "Noise level for MS/MS scans", "Intensities less than this value are interpreted as noise.");
+
+  public static final BooleanParameter useModification = new BooleanParameter(
+      "Search for lipid modification", "If checked the algorithm searches for lipid modifications");
+
+  public static final LipidModificationChoiceParameter modification =
+      new LipidModificationChoiceParameter("Lipid modifications", "Add lipid modifications",
+          new LipidModification[0]);
 
 
   public LipidSearchParameters() {
     super(new Parameter[] {peakLists, lipidTypes, minChainLength, maxChainLength, maxDoubleBonds,
         maxOxidationValue, mzTolerance, ionizationMethod, searchForIsotopes,
         isotopeRetentionTimeTolerance, relativeIsotopeIntensityTolerance, searchForFAinMSMS,
-        noiseLevel});
+        mzToleranceMS2, noiseLevel, useModification, modification});
   }
 
 }

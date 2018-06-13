@@ -30,9 +30,20 @@ public enum MSMSLibrary {
       new int[] {300, 100, 999}), //
   DGTS(new String[] {"fragment C10H22O5N", "fragment C7H14O2N"},
       new String[] {"C10H22O5N", "C7H14O2N"}, new int[] {100, 100}), //
-  MELA(new String[] {"-139 -(Erythritol + NH3) "}, new String[] {"-139"}, new int[] {900}), //
-  MELBC(new String[] {"-139 -(Erythritol + NH3) "}, new String[] {"-139"}, new int[] {900}), //
-  MELD(new String[] {"-139 -(Erythritol + NH3) "}, new String[] {"-139"}, new int[] {900}); //
+  MELA(new String[] {"-139 -(Erythritol + NH3) ", "[M-139 - sn1]", "[M-139 - H2O]"},
+      new String[] {"-139", "-139-sn1", "-139-H2O"}, new int[] {900, 900, 900}), //
+  MELBC(new String[] {"-139 -(Erythritol + NH3) ", "[M-139 - sn1]", "[M-139 - H2O]"},
+      new String[] {"-139", "-139-sn1", "-139-H2O"}, new int[] {900, 900, 900}), //
+  MELD(new String[] {"-139 -(Erythritol + NH3) ", "[M-139 - sn1]", "[M-139 - H2O]"},
+      new String[] {"-139", "-139-sn1", "-139-H2O"}, new int[] {900, 900, 900}), //
+  diRL(
+      new String[] {"[M-H]-sn1-2H", "sn1-2H", "[M-H]-C12H22O9(di-Rhamnose+H)",
+          "[M-H]-C6H12O5(Rhamnose+H)", "C12H21O9 (di-Rhamnose)", "C6H11O5 (Rhamnose)"},
+      new String[] {null, null, "C12H22O9", "C6H12O5", "C12H21O9", "C6H11O5"},
+      new int[] {900, 900, 900, 900, 900, 900}), //
+  mRL(new String[] {"[M-H]-sn1-2H", "sn1-2H", "[M-H]-C6H12O5(Rhamnose+H)", "C6H11O5 (Rhamnose)"},
+      new String[] {null, null, "C6H12O5", "C6H11O5"}, new int[] {900, 900, 900, 900}), //
+  HAA(new String[] {"sn1+O"}, null, null); //
 
   private final String[] name, formulaOfStaticFormula;
   private final int[] relativeIntensity;
