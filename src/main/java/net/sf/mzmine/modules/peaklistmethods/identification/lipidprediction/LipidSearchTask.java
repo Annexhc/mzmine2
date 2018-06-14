@@ -9,6 +9,7 @@ import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.datamodel.PolarityType;
+import net.sf.mzmine.datamodel.impl.SimplePeakIdentity;
 import net.sf.mzmine.datamodel.impl.SimplePeakList;
 import net.sf.mzmine.datamodel.impl.SimplePeakListAppliedMethod;
 import net.sf.mzmine.desktop.Desktop;
@@ -41,6 +42,7 @@ public class LipidSearchTask extends AbstractTask {
   private Boolean searchForIsotopes, searchForFAinMSMS, searchForModifications;
   private int relIsotopeIntensityTolerance;
   private double noiseLevelMSMS;
+  private double[] lipidModificationMasses;
   private LipidModification[] lipidModification;
 
   private ParameterSet parameters;
@@ -77,15 +79,17 @@ public class LipidSearchTask extends AbstractTask {
   /**
    * @see net.sf.mzmine.taskcontrol.Task#getFinishedPercentage()
    */
+  @Override
   public double getFinishedPercentage() {
     if (totalSteps == 0)
       return 0;
-    return ((double) finishedSteps) / totalSteps;
+    return (finishedSteps) / totalSteps;
   }
 
   /**
    * @see net.sf.mzmine.taskcontrol.Task#getTaskDescription()
    */
+  @Override
   public String getTaskDescription() {
     return "Prediction of lipids in " + peakList;
   }
@@ -93,6 +97,7 @@ public class LipidSearchTask extends AbstractTask {
   /**
    * @see java.lang.Runnable#run()
    */
+  @Override
   public void run() {
 
     setStatus(TaskStatus.PROCESSING);
@@ -101,8 +106,11 @@ public class LipidSearchTask extends AbstractTask {
 
     PeakListRow rows[] = peakList.getRows();
 
-    // Calculate how many possible lipids we will try
+    if (searchForModifications == true) {
+      lipidModificationMasses = getLipidModificationMasses(lipidModification);
+    }
 
+    // Calculate how many possible lipids we will try
     totalSteps = ((maxChainLength + 1) * (maxDoubleBonds + 1) * (maxOxidationValue + 1))
         * selectedLipids.length;
 
@@ -171,10 +179,8 @@ public class LipidSearchTask extends AbstractTask {
         + oxidationValue * Elements.getAtomicMass(8);
     logger.finest("Searching for lipid " + lipid.getDescription() + ", " + lipidIonMass + " m/z");
     for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
-
       if (isCanceled())
         return;
-
       Range<Double> mzTolRange12C = mzTolerance.getToleranceRange(rows[rowIndex].getAverageMZ());
       if (mzTolRange12C.contains(lipidIonMass)) {
         rows[rowIndex].addPeakIdentity(lipid, false);
@@ -195,7 +201,8 @@ public class LipidSearchTask extends AbstractTask {
       }
       // If search for modifications is selected search for modifications in MS1
       if (searchForModifications == true) {
-        searchModifications(rows, lipidIonMass, rowIndex, lipid, lipidModification);
+        searchModifications(rows[rowIndex], lipidIonMass, lipid, lipidModificationMasses,
+            mzTolRange12C);
 
         // Notify the GUI about the change in the project
         MZmineCore.getProjectManager().getCurrentProject().notifyObjectChanged(rows[rowIndex],
@@ -323,26 +330,22 @@ public class LipidSearchTask extends AbstractTask {
     }
   }
 
-  private void searchModifications(PeakListRow rows[], double lipidIonMass, int rowIndex,
-      LipidIdentityChain lipid, LipidModification[] lipidModifications) {
-    for (int i = 0; i < rows.length; i++) {
-      for (int j = 0; j < lipidModifications.length; j++) {
-
-        Range<Double> mzTolModification = mzTolerance.getToleranceRange(rows[i].getAverageMZ());
-
-        if (mzTolModification
-            .contains(lipidIonMass + lipidModifications[j].getModificationMass())) {
-          // Check if intensity of 13C fits calc intensity in a range
-          IsotopeLipidTools isotopeLipidTools = new IsotopeLipidTools();
-          int numberOfCAtoms = isotopeLipidTools.getNumberOfCAtoms(lipid.getFormula());
-          if (Math.abs((rows[i].getAverageHeight() / rows[rowIndex].getAverageHeight()) * 100
-              - 1.1 * numberOfCAtoms) <= relIsotopeIntensityTolerance) {
-            rows[rowIndex].setComment(rows[rowIndex].getComment() + ";" + " found 13C isotope");
-            rows[i].setComment(" 13C isotope of Feautre with ID" + rows[rowIndex].getID());
-          }
-        }
+  private void searchModifications(PeakListRow rows, double lipidIonMass, LipidIdentityChain lipid,
+      double[] lipidModificationMasses, Range<Double> mzTolModification) {
+    for (int j = 0; j < lipidModificationMasses.length; j++) {
+      if (mzTolModification.contains(lipidIonMass + lipidModificationMasses[j])) {
+        // Add row identity
+        rows.addPeakIdentity(new SimplePeakIdentity(lipid + " " + lipidModification[j]), false);
+        rows.setComment("Ionization: " + ionizationType.getAdduct() + " " + lipidModification[j]);
       }
     }
   }
 
+  private double[] getLipidModificationMasses(LipidModification[] lipidModification) {
+    double[] lipidModificationMasses = new double[lipidModification.length];
+    for (int i = 0; i < lipidModification.length; i++) {
+      lipidModificationMasses[i] = lipidModification[i].getModificationMass();
+    }
+    return lipidModificationMasses;
+  }
 }
