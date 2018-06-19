@@ -32,8 +32,13 @@ public enum IonizationType {
       59.01385, PolarityType.NEGATIVE), //
   CARBONATE("[M+CO3]-", "CO3", 59.98529, PolarityType.NEGATIVE), //
   PHOSPHATE("[M+H2PO4]-", "H2PO4", 96.96962, PolarityType.NEGATIVE), //
-  SODIUMTWO("[M-2H+Na]-", "-2H+Na", 20.974121, PolarityType.NEGATIVE);
-
+  SODIUMTWO("[M-2H+Na]-", "-2H+Na", 20.974121, PolarityType.NEGATIVE), //
+  DOUBLE_NEGATIVE_HYDROGEN("[M-2H]2-", "[M-2H]2-", -2.01456, PolarityType.NEGATIVE), //
+  DOUBLE_NEGATIVE_2M_2HYDROGEN("[2M-2H]2-", "[2M-2H]2-", -2.01456, PolarityType.NEGATIVE), //
+  DOUBLE_NEGATIVE_2M_3HYDROGEN_NATRIUM("[2M-3H+Na]2-", "[2M-3H+Na]2-", 19.96793,
+      PolarityType.NEGATIVE), //
+  DOUBLE_NEGATIVE_2M_4HYDROGEN_2NATRIUM("[2M-4H+2Na]2-", "[2M-4H+2Na]2-", 18.96065,
+      PolarityType.NEGATIVE);
   private final String name, adductFormula;
   private final PolarityType polarity;
   private final double addedMass;

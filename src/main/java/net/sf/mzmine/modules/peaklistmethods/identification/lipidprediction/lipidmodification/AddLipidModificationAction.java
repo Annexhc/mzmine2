@@ -20,12 +20,12 @@ public class AddLipidModificationAction extends AbstractAction {
    * 
    */
   private static final long serialVersionUID = 1L;
+  private LipidModification lipidModification = null;
 
   /**
    * Create the action.
    */
   public AddLipidModificationAction() {
-
     super("Add...");
   }
 
@@ -35,16 +35,13 @@ public class AddLipidModificationAction extends AbstractAction {
     final LipidModificationChoiceComponent parent =
         (LipidModificationChoiceComponent) SwingUtilities
             .getAncestorOfClass(LipidModificationChoiceComponent.class, (Component) e.getSource());
-
     if (parent != null) {
-
       // Show dialog.
       final ParameterSet parameters = new AddLipidModificationParameters();
       if (parameters.showSetupDialog(MZmineCore.getDesktop().getMainWindow(),
           true) == ExitCode.OK) {
-
         // Create new lipid modification
-        final LipidModification lipidModification = new LipidModification(
+        lipidModification = new LipidModification(
             parameters.getParameter(AddLipidModificationParameters.lipidModification).getValue());
 
         // Add to list of choices (if not already present).

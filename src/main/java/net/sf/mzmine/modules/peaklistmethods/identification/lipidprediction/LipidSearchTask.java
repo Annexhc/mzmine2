@@ -1,5 +1,6 @@
 package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.jmol.util.Elements;
@@ -174,9 +175,21 @@ public class LipidSearchTask extends AbstractTask {
    * @param possibleFragment
    */
   private void findPossibleLipid(LipidIdentityChain lipid, PeakListRow rows[], int oxidationValue) {
-
-    final double lipidIonMass = lipid.getMass() + ionizationType.getAddedMass()
-        + oxidationValue * Elements.getAtomicMass(8);
+    double lipidIonMass = 0.0;
+    double lipidMass = 0.0;
+    if (ionizationType.toString().contains("2M")) {
+      lipidMass = lipid.getMass() * 2;
+    } else {
+      lipidMass = lipid.getMass();
+    }
+    if (ionizationType.toString().contains("2-")) {
+      lipidIonMass =
+          (lipidMass + ionizationType.getAddedMass() + oxidationValue * Elements.getAtomicMass(8))
+              / 2;
+    } else {
+      lipidIonMass =
+          lipidMass + ionizationType.getAddedMass() + oxidationValue * Elements.getAtomicMass(8);
+    }
     logger.finest("Searching for lipid " + lipid.getDescription() + ", " + lipidIonMass + " m/z");
     for (int rowIndex = 0; rowIndex < rows.length; rowIndex++) {
       if (isCanceled())
@@ -209,7 +222,6 @@ public class LipidSearchTask extends AbstractTask {
             false);
       }
     }
-
   }
 
   private void searchFAinMSMS(PeakListRow rows[], double lipidIonMass, int rowIndex,
@@ -332,11 +344,22 @@ public class LipidSearchTask extends AbstractTask {
 
   private void searchModifications(PeakListRow rows, double lipidIonMass, LipidIdentityChain lipid,
       double[] lipidModificationMasses, Range<Double> mzTolModification) {
+    int charge = 0;
+    if (ionizationType.toString().contains("2-")) {
+      charge = 2;
+    } else {
+      charge = 1;
+    }
     for (int j = 0; j < lipidModificationMasses.length; j++) {
-      if (mzTolModification.contains(lipidIonMass + lipidModificationMasses[j])) {
+      if (mzTolModification.contains(lipidIonMass + (lipidModificationMasses[j] / charge))) {
+        // Calc relativ mass deviation
+        double relMassDev =
+            (((lipidIonMass + (lipidModificationMasses[j] / charge)) - rows.getAverageMZ())
+                / (lipidIonMass + (lipidModificationMasses[j] / charge))) * 1000000;
         // Add row identity
         rows.addPeakIdentity(new SimplePeakIdentity(lipid + " " + lipidModification[j]), false);
-        rows.setComment("Ionization: " + ionizationType.getAdduct() + " " + lipidModification[j]);
+        rows.setComment("Ionization: " + ionizationType.getAdduct() + " " + lipidModification[j]
+            + " Δ " + NumberFormat.getInstance().format(relMassDev) + " ppm");
       }
     }
   }

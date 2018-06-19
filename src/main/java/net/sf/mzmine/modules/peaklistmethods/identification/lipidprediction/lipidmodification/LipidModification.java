@@ -1,5 +1,7 @@
 package net.sf.mzmine.modules.peaklistmethods.identification.lipidprediction.lipidmodification;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import net.sf.mzmine.util.FormulaUtils;
 
@@ -8,7 +10,6 @@ public class LipidModification {
   private String lipidModification;
 
   public LipidModification(String lipidModification) {
-
     this.lipidModification = lipidModification;
   }
 
@@ -78,7 +79,9 @@ public class LipidModification {
 
   @Override
   public String toString() {
-    return "Modify lipid with [" + lipidModification + "]";
+    NumberFormat format = new DecimalFormat("0.0000");
+    return "Modify lipid with [" + lipidModification + "] (" + format.format(getModificationMass())
+        + ")";
   }
 
 }

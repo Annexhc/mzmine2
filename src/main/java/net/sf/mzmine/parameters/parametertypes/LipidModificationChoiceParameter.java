@@ -12,8 +12,6 @@ public class LipidModificationChoiceParameter extends MultiChoiceParameter<Lipid
   public LipidModificationChoiceParameter(String name, String description,
       LipidModification[] choices) {
     super(name, description, choices);
-
-
   }
 
   @Override
@@ -23,7 +21,6 @@ public class LipidModificationChoiceParameter extends MultiChoiceParameter<Lipid
 
   @Override
   public void setValueFromComponent(final MultiChoiceComponent component) {
-
     super.setValueFromComponent(component);
     setChoices((LipidModification[]) component.getChoices());
   }
