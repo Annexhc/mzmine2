@@ -22,75 +22,32 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.logging.Logger;
-
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
-
-import com.google.common.collect.Range;
-
-import net.sf.mzmine.datamodel.PeakList;
-import net.sf.mzmine.datamodel.RawDataFile;
-import net.sf.mzmine.datamodel.Scan;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CombinedDomainXYPlot;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
-import net.sf.mzmine.main.MZmineCore;
-import net.sf.mzmine.parameters.ParameterSet;
-import net.sf.mzmine.parameters.parametertypes.WindowSettingsParameter;
-import net.sf.mzmine.util.dialogs.AxesSetupDialog;
 
 /**
- * 2D visualizer using JFreeChart library
+ * Window for IMS visualization
+ * 
+ * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
 public class ImsVisualizerWindow extends JFrame implements ActionListener {
 
-  private Logger logger = Logger.getLogger(this.getClass().getName());
-
   private static final long serialVersionUID = 1L;
-  private ImsToolBar toolBar;
-  private ImsPlot twoDPlot;
-  private ImsBottomPanel bottomPanel;
-  private ImsDataSet dataset;
-  private RawDataFile dataFile;
-  private boolean tooltipMode;
-  private boolean logScale;
+  private ImsVisualizerToolBar toolBar;
+  private JFreeChart chart;
 
-  public ImsVisualizerWindow(RawDataFile dataFile, Scan scans[], Range<Double> rtRange,
-      Range<Double> mzRange, ParameterSet parameters) {
+  public ImsVisualizerWindow(JFreeChart chart) {
 
-    super("2D view: [" + dataFile.getName() + "]");
-
+    this.chart = chart;
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     setBackground(Color.white);
 
-    this.dataFile = dataFile;
-
-    this.tooltipMode = true;
-
-    dataset = new ImsDataSet(dataFile, scans, rtRange, mzRange, this);
-    if (parameters.getParameter(ImsVisualizerParameters.plotType).getValue() == PlotType.FAST2D) {
-      twoDPlot = new ImsPlot(dataFile, this, dataset, rtRange, mzRange, "default");
-      add(twoDPlot, BorderLayout.CENTER);
-    }
-
-    if (parameters.getParameter(ImsVisualizerParameters.plotType).getValue() == PlotType.POINT2D) {
-      twoDPlot = new ImsPlot(dataFile, this, dataset, rtRange, mzRange, "point2D");
-      add(twoDPlot, BorderLayout.CENTER);
-    }
-
-
-    toolBar = new ImsToolBar(this);
+    // Add toolbar
+    toolBar = new ImsVisualizerToolBar(this);
     add(toolBar, BorderLayout.EAST);
-
-    bottomPanel = new ImsBottomPanel(this, dataFile, parameters);
-    add(bottomPanel, BorderLayout.SOUTH);
-
-    updateTitle();
-
-    // After we have constructed everything, load the peak lists into the
-    // bottom panel
-    bottomPanel.rebuildPeakListSelector();
-
-    MZmineCore.getDesktop().addPeakListTreeListener(bottomPanel);
 
     // Add the Windows menu
     JMenuBar menuBar = new JMenuBar();
@@ -98,94 +55,34 @@ public class ImsVisualizerWindow extends JFrame implements ActionListener {
     setJMenuBar(menuBar);
 
     pack();
-
-    // get the window settings parameter
-    ParameterSet paramSet =
-        MZmineCore.getConfiguration().getModuleParameters(ImsVisualizerModule.class);
-    WindowSettingsParameter settings =
-        paramSet.getParameter(ImsVisualizerParameters.windowSettings);
-
-    // update the window and listen for changes
-    settings.applySettingsToWindow(this);
-    this.addComponentListener(settings);
-
   }
 
-  public void dispose() {
-    super.dispose();
-    MZmineCore.getDesktop().removePeakListTreeListener(bottomPanel);
-  }
-
-  void updateTitle() {
-    StringBuffer title = new StringBuffer();
-    title.append("[");
-    title.append(dataFile.getName());
-    title.append("]: 2D view");
-    twoDPlot.setTitle(title.toString());
-  }
-
-  /**
-   * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-   */
+  @Override
   public void actionPerformed(ActionEvent event) {
-
     String command = event.getActionCommand();
 
-    if (command.equals("SWITCH_PALETTE")) {
-      twoDPlot.getXYPlot().switchPalette();
-    }
-
-    if (command.equals("SHOW_DATA_POINTS")) {
-      twoDPlot.switchDataPointsVisible();
-    }
-
-    if (command.equals("SETUP_AXES")) {
-      AxesSetupDialog dialog = new AxesSetupDialog(this, twoDPlot.getXYPlot());
-      dialog.setVisible(true);
-    }
-
-    if (command.equals("SWITCH_PLOTMODE")) {
-
-      if (twoDPlot.getPlotMode() == PlotMode.CENTROID) {
-        toolBar.setCentroidButton(true);
-        twoDPlot.setPlotMode(PlotMode.CONTINUOUS);
+    if (command.equals("TOGGLE_BACK_COLOR")) {
+      CombinedDomainXYPlot plot = (CombinedDomainXYPlot) chart.getXYPlot();
+      if (plot.getBackgroundPaint() == Color.WHITE) {
+        plot.setBackgroundPaint(Color.BLACK);
       } else {
-        toolBar.setCentroidButton(false);
-        twoDPlot.setPlotMode(PlotMode.CENTROID);
+        plot.setBackgroundPaint(Color.WHITE);
       }
+
     }
 
-    if (command.equals("SWITCH_TOOLTIPS")) {
-      if (tooltipMode) {
-        twoDPlot.showPeaksTooltips(false);
-        toolBar.setTooltipButton(false);
-        tooltipMode = false;
+    if (command.equals("TOGGLE_GRID")) {
+      CombinedDomainXYPlot plot = (CombinedDomainXYPlot) chart.getXYPlot();
+      if (plot.getDomainGridlinePaint() == Color.BLACK) {
+        plot.setDomainGridlinePaint(Color.WHITE);
+        plot.setRangeGridlinePaint(Color.WHITE);
       } else {
-        twoDPlot.showPeaksTooltips(true);
-        toolBar.setTooltipButton(true);
-        tooltipMode = true;
+        plot.setDomainGridlinePaint(Color.BLACK);
+        plot.setRangeGridlinePaint(Color.BLACK);
       }
-    }
 
-    if (command.equals("SWITCH_LOG_SCALE")) {
-      if (twoDPlot != null) {
-        logScale = !logScale;
-        twoDPlot.setLogScale(logScale);
-      }
     }
-
-    if ("PEAKLIST_CHANGE".equals(command)) {
-      final PeakList selectedPeakList = bottomPanel.getSelectedPeakList();
-      if (selectedPeakList != null) {
-        logger.finest("Loading a peak list " + selectedPeakList + " to a 2D view of " + dataFile);
-        twoDPlot.loadPeakList(selectedPeakList);
-      }
-    }
-
 
   }
 
-  ImsPlot getPlot() {
-    return twoDPlot;
-  }
 }

@@ -20,27 +20,22 @@ package net.sf.mzmine.modules.visualization.ims;
 
 import java.util.Collection;
 import javax.annotation.Nonnull;
-import com.google.common.collect.Range;
 import net.sf.mzmine.datamodel.MZmineProject;
-import net.sf.mzmine.datamodel.RawDataFile;
-import net.sf.mzmine.datamodel.Scan;
-import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.modules.MZmineModuleCategory;
-import net.sf.mzmine.modules.MZmineRunnableModule;
+import net.sf.mzmine.modules.MZmineProcessingModule;
 import net.sf.mzmine.parameters.ParameterSet;
-import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesSelectionType;
-import net.sf.mzmine.parameters.parametertypes.selectors.ScanSelection;
 import net.sf.mzmine.taskcontrol.Task;
 import net.sf.mzmine.util.ExitCode;
-import net.sf.mzmine.util.ScanUtils;
 
 /**
- * 2D visualizer using JFreeChart library
+ * Kendrick mass plot module
+ * 
+ * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-public class ImsVisualizerModule implements MZmineRunnableModule {
+public class ImsVisualizerModule implements MZmineProcessingModule {
 
   private static final String MODULE_NAME = "IMS visualizer";
-  private static final String MODULE_DESCRIPTION = "IMS visualizer.";
+  private static final String MODULE_DESCRIPTION = "IMS visualizer";
 
   @Override
   public @Nonnull String getName() {
@@ -56,58 +51,11 @@ public class ImsVisualizerModule implements MZmineRunnableModule {
   @Nonnull
   public ExitCode runModule(@Nonnull MZmineProject project, @Nonnull ParameterSet parameters,
       @Nonnull Collection<Task> tasks) {
-    RawDataFile dataFiles[] = parameters.getParameter(ImsVisualizerParameters.dataFiles).getValue()
-        .getMatchingRawDataFiles();
-    ScanSelection scanSel =
-        parameters.getParameter(ImsVisualizerParameters.scanSelection).getValue();
-    Scan scans[] = scanSel.getMatchingScans(dataFiles[0]);
-    Range<Double> rtRange = ScanUtils.findRtRange(scans);
 
-    Range<Double> mzRange = parameters.getParameter(ImsVisualizerParameters.mzRange).getValue();
-    ImsVisualizerWindow newWindow =
-        new ImsVisualizerWindow(dataFiles[0], scans, rtRange, mzRange, parameters);
-
-    newWindow.setVisible(true);
+    Task newTask = new ImsVisualizerTask(parameters);
+    tasks.add(newTask);
 
     return ExitCode.OK;
-  }
-
-  public static void showIMSVisualizerSetupDialog(RawDataFile dataFile) {
-    showIMSVisualizerSetupDialog(dataFile, null, null);
-  }
-
-  public static void showIMSVisualizerSetupDialog(RawDataFile dataFile, Range<Double> mzRange,
-      Range<Double> rtRange) {
-
-    ParameterSet parameters =
-        MZmineCore.getConfiguration().getModuleParameters(ImsVisualizerModule.class);
-
-    parameters.getParameter(ImsVisualizerParameters.dataFiles)
-        .setValue(RawDataFilesSelectionType.SPECIFIC_FILES, new RawDataFile[] {dataFile});
-
-    if (rtRange != null)
-      parameters.getParameter(ImsVisualizerParameters.scanSelection)
-          .setValue(new ScanSelection(rtRange, 1));
-    if (mzRange != null)
-      parameters.getParameter(ImsVisualizerParameters.mzRange).setValue(mzRange);
-
-    ExitCode exitCode = parameters.showSetupDialog(MZmineCore.getDesktop().getMainWindow(), true);
-
-    if (exitCode != ExitCode.OK)
-      return;
-
-    ScanSelection scanSel =
-        parameters.getParameter(ImsVisualizerParameters.scanSelection).getValue();
-    Scan scans[] = scanSel.getMatchingScans(dataFile);
-    rtRange = ScanUtils.findRtRange(scans);
-
-    mzRange = parameters.getParameter(ImsVisualizerParameters.mzRange).getValue();
-
-    ImsVisualizerWindow newWindow =
-        new ImsVisualizerWindow(dataFile, scans, rtRange, mzRange, parameters);
-
-    newWindow.setVisible(true);
-
   }
 
   @Override
@@ -119,5 +67,4 @@ public class ImsVisualizerModule implements MZmineRunnableModule {
   public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
     return ImsVisualizerParameters.class;
   }
-
 }

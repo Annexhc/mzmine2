@@ -20,7 +20,6 @@ package net.sf.mzmine.modules.visualization.ims;
 
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
-import net.sf.mzmine.parameters.parametertypes.ComboParameter;
 import net.sf.mzmine.parameters.parametertypes.WindowSettingsParameter;
 import net.sf.mzmine.parameters.parametertypes.ranges.MZRangeParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
@@ -28,12 +27,11 @@ import net.sf.mzmine.parameters.parametertypes.selectors.ScanSelection;
 import net.sf.mzmine.parameters.parametertypes.selectors.ScanSelectionParameter;
 
 /**
- * 2D visualizer parameter set
+ * parameters for IMS visualization
+ * 
+ * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
 public class ImsVisualizerParameters extends SimpleParameterSet {
-
-  public static final ComboParameter<PlotType> plotType = new ComboParameter<>("Type of plot",
-      "Resampled data -> fast. Raw data -> slow.", PlotType.values());
 
   public static final RawDataFilesParameter dataFiles = new RawDataFilesParameter(1, 1);
 
@@ -42,16 +40,13 @@ public class ImsVisualizerParameters extends SimpleParameterSet {
 
   public static final MZRangeParameter mzRange = new MZRangeParameter();
 
-  public static final PeakThresholdParameter peakThresholdSettings = new PeakThresholdParameter();
-
   /**
    * Windows size and position
    */
   public static final WindowSettingsParameter windowSettings = new WindowSettingsParameter();
 
   public ImsVisualizerParameters() {
-    super(new Parameter[] {plotType, dataFiles, scanSelection, mzRange, peakThresholdSettings,
-        windowSettings});
+    super(new Parameter[] {dataFiles, scanSelection, mzRange, windowSettings});
   }
 
 }

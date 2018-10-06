@@ -31,7 +31,7 @@ public class XYBlockPixelSizePaintScales {
 
   /*
    * Method to select the right scale for the applied settings in the modules kendrickmassplot and
-   * vankrevelendiagram
+   * vankrevelendiagram and IMS visualizer
    */
   public static Paint[] getPaintColors(String zAxisScaleType, Range<Double> zScaleRange,
       String paintScaleStyle) {
@@ -95,6 +95,10 @@ public class XYBlockPixelSizePaintScales {
       } else if (paintScaleStyle.contains("cyan")) {
         scale = getCyanScale();
       }
+    }
+    // IMS
+    if (paintScaleStyle.contains("IMS")) {
+      scale = getFullRainBowScaleForIMS();
     }
     return scale;
   }
@@ -456,6 +460,27 @@ public class XYBlockPixelSizePaintScales {
     }
 
     return cyanScale;
+  }
+
+  /*
+   * returns an array with rainbow colors for IMS
+   */
+  public static Paint[] getFullRainBowScaleForIMS() {
+    int ncolor = 360;
+    Color[] readRainbow = new Color[ncolor];
+    Color[] rainbow = new Color[ncolor + 1];
+
+    float x = (float) (1. / (ncolor + 160));
+    for (int i = 0; i < readRainbow.length; i++) {
+      readRainbow[i] = new Color(Color.HSBtoRGB((i) * x, 1.0F, 1.0F));
+    }
+    for (int i = 0; i < 1; i++) {
+      rainbow[i] = new Color(0, 0, 0);
+    }
+    for (int i = 1; i < readRainbow.length; i++) {
+      rainbow[i] = readRainbow[readRainbow.length - i - 1];
+    }
+    return rainbow;
   }
 
 }

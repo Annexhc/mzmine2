@@ -19,43 +19,42 @@
 package net.sf.mzmine.modules.visualization.ims;
 
 import java.awt.Color;
-import java.awt.Paint;
-import java.awt.Shape;
-import java.awt.geom.Ellipse2D;
-
-import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import java.awt.Insets;
+import java.awt.event.ActionListener;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JToolBar;
+import net.sf.mzmine.util.GUIUtils;
 
 /**
+ * IMS visualizer toolbar class
  * 
+ * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-class PeakDataRenderer extends XYLineAndShapeRenderer {
+public class ImsVisualizerToolBar extends JToolBar {
 
   private static final long serialVersionUID = 1L;
+  static final Icon backColorIcon = new ImageIcon("icons/bgicon.png");
+  static final Icon gridIcon = new ImageIcon("icons/gridicon.png");
 
-  private static final Color peakColor = Color.green;
+  public ImsVisualizerToolBar(ActionListener masterFrame) {
 
-  // data points shape
-  private static final Shape dataPointsShape = new Ellipse2D.Double(-2, -2, 5, 5);
+    super(JToolBar.VERTICAL);
 
-  PeakDataRenderer() {
-    setDefaultShapesFilled(true);
-    setDrawOutlines(false);
-    setUseFillPaint(false);
-    setDefaultShapesVisible(false);
-    setDefaultShape(dataPointsShape);
+    setFloatable(false);
+    setFocusable(false);
+    setMargin(new Insets(5, 5, 5, 5));
+    setBackground(Color.white);
 
-    PeakToolTipGenerator toolTipGenerator = new PeakToolTipGenerator();
-    setDefaultToolTipGenerator(toolTipGenerator);
-    setDrawSeriesLineAsPath(true);
+    GUIUtils.addButton(this, null, backColorIcon, masterFrame, "TOGGLE_BACK_COLOR",
+        "Toggle background color white/black");
 
-  }
+    addSeparator();
 
-  public Paint getItemPaint(int row, int column) {
-    return peakColor;
-  }
+    GUIUtils.addButton(this, null, gridIcon, masterFrame, "TOGGLE_GRID", "Toggle grid");
 
-  public Shape getItemShape(int row, int column) {
-    return dataPointsShape;
+    addSeparator();
+
   }
 
 }
