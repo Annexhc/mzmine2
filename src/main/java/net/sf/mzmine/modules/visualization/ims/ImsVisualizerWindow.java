@@ -22,10 +22,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CombinedDomainXYPlot;
+import org.jfree.chart.plot.XYPlot;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
 
 /**
@@ -60,27 +62,64 @@ public class ImsVisualizerWindow extends JFrame implements ActionListener {
   @Override
   public void actionPerformed(ActionEvent event) {
     String command = event.getActionCommand();
+    CombinedDomainXYPlot plot = (CombinedDomainXYPlot) chart.getXYPlot();
+
+    @SuppressWarnings("unchecked")
+    List<XYPlot> subPlots = plot.getSubplots();
 
     if (command.equals("TOGGLE_BACK_COLOR")) {
-      CombinedDomainXYPlot plot = (CombinedDomainXYPlot) chart.getXYPlot();
-      if (plot.getBackgroundPaint() == Color.WHITE) {
-        plot.setBackgroundPaint(Color.BLACK);
+      if (subPlots.get(0).getBackgroundPaint() == Color.WHITE) {
+        subPlots.get(0).setBackgroundPaint(Color.BLACK);
+        subPlots.get(0).getRenderer().setSeriesPaint(0, Color.WHITE);
       } else {
-        plot.setBackgroundPaint(Color.WHITE);
+        subPlots.get(0).setBackgroundPaint(Color.WHITE);
+        subPlots.get(0).getRenderer().setSeriesPaint(0, Color.BLACK);
       }
-
+    }
+    for (XYPlot xyPlot : subPlots) {
+      if (command.equals("TOGGLE_GRID")) {
+        if (xyPlot.getBackgroundPaint() == Color.BLACK
+            && xyPlot.isDomainGridlinesVisible() == false) {
+          xyPlot.setDomainGridlinesVisible(true);
+          xyPlot.setRangeGridlinesVisible(true);
+          xyPlot.setDomainGridlinePaint(Color.WHITE);
+          xyPlot.setRangeGridlinePaint(Color.WHITE);
+        } else if (xyPlot.getBackgroundPaint() == Color.WHITE
+            && xyPlot.isDomainGridlinesVisible() == false) {
+          xyPlot.setDomainGridlinesVisible(true);
+          xyPlot.setRangeGridlinesVisible(true);
+          xyPlot.setDomainGridlinePaint(Color.BLACK);
+          xyPlot.setRangeGridlinePaint(Color.BLACK);
+        } else if (xyPlot.getBackgroundPaint() == Color.BLACK
+            && xyPlot.isDomainGridlinesVisible() == true) {
+          xyPlot.setDomainGridlinesVisible(false);
+          xyPlot.setRangeGridlinesVisible(false);
+          xyPlot.setDomainGridlinePaint(Color.BLACK);
+          xyPlot.setRangeGridlinePaint(Color.BLACK);
+        } else if (xyPlot.getBackgroundPaint() == Color.WHITE
+            && xyPlot.isDomainGridlinesVisible() == true) {
+          xyPlot.setDomainGridlinesVisible(false);
+          xyPlot.setRangeGridlinesVisible(false);
+          xyPlot.setDomainGridlinePaint(Color.WHITE);
+          xyPlot.setRangeGridlinePaint(Color.WHITE);
+        }
+      }
     }
 
-    if (command.equals("TOGGLE_GRID")) {
-      CombinedDomainXYPlot plot = (CombinedDomainXYPlot) chart.getXYPlot();
-      if (plot.getDomainGridlinePaint() == Color.BLACK) {
-        plot.setDomainGridlinePaint(Color.WHITE);
-        plot.setRangeGridlinePaint(Color.WHITE);
-      } else {
-        plot.setDomainGridlinePaint(Color.BLACK);
-        plot.setRangeGridlinePaint(Color.BLACK);
+    if (command.equals("TOGGLE_ALPHA")) {
+      if (subPlots.get(1).getForegroundAlpha() == 1.0f) {
+        subPlots.get(1).setForegroundAlpha(0.1f);
+      } else if (subPlots.get(1).getForegroundAlpha() == 0.1f) {
+        subPlots.get(1).setForegroundAlpha(1.0f);
       }
+    }
 
+    if (command.equals("TOGGLE_LEGEND")) {
+      if (chart.getSubtitle(1).isVisible() == true) {
+        chart.getSubtitle(1).setVisible(false);
+      } else {
+        chart.getSubtitle(1).setVisible(true);
+      }
     }
 
   }

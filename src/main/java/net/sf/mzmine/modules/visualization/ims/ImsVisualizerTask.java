@@ -45,6 +45,7 @@ import org.jfree.data.xy.XYZDataset;
 import com.google.common.collect.Range;
 import net.sf.mzmine.chartbasics.gui.swing.EChartPanel;
 import net.sf.mzmine.datamodel.RawDataFile;
+import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizePaintScales;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.taskcontrol.AbstractTask;
@@ -66,6 +67,7 @@ public class ImsVisualizerTask extends AbstractTask {
   private XYDataset datasetXIC;
   private JFreeChart chart;
   private RawDataFile dataFiles[];
+  private Scan scans[];
   private Range<Double> mzRange;
   private ParameterSet parameterSet;
   private int totalSteps = 3, appliedSteps = 0;
@@ -74,6 +76,9 @@ public class ImsVisualizerTask extends AbstractTask {
 
     dataFiles = parameters.getParameter(ImsVisualizerParameters.dataFiles).getValue()
         .getMatchingRawDataFiles();
+
+    scans = parameters.getParameter(ImsVisualizerParameters.scanSelection).getValue()
+        .getMatchingScans(dataFiles[0]);
 
     mzRange = parameters.getParameter(ImsVisualizerParameters.mzRange).getValue();
 
@@ -101,7 +106,7 @@ public class ImsVisualizerTask extends AbstractTask {
     chart = createPlot();
     chart.setBackgroundPaint(Color.white);
 
-    // Create Kendrick mass plot Window
+    // Create IMS plot Window
     ImsVisualizerWindow frame = new ImsVisualizerWindow(chart);
 
     // create chart JPanel
@@ -148,24 +153,32 @@ public class ImsVisualizerTask extends AbstractTask {
     int maxScaleIndex = copyZValues.length - 1;
     double min = copyZValues[minScaleIndex];
     double max = copyZValues[maxScaleIndex];
-    Paint[] contourColors =
-        XYBlockPixelSizePaintScales.getPaintColors("percentile", Range.closed(min, max), "IMS");
+
     LookupPaintScale scale = null;
     scale = new LookupPaintScale(min, max, new Color(244, 66, 223));
+    Paint[] contourColors =
+        XYBlockPixelSizePaintScales.getPaintColors("percentile", Range.closed(min, max), "IMS");
     double[] scaleValues = new double[contourColors.length];
     double delta = (max - min) / (contourColors.length - 1);
     double value = min;
-    for (int i = 0; i < contourColors.length; i++) {
-      scale.add(value, contourColors[i]);
-      scaleValues[i] = value;
-      value = value + delta;
+
+    // only show data if there is a drift time dimension
+    if (datasetIMS.getItemCount(0) == datasetXIC.getItemCount(0)) {
+      scale.add(min, Color.black);
+      scale.add(max, Color.black);
+    } else {
+      for (int i = 0; i < contourColors.length; i++) {
+        scale.add(value, contourColors[i]);
+        scaleValues[i] = value;
+        value = value + delta;
+      }
     }
 
     // set axis
     NumberAxis domain = new NumberAxis("Retention time (min)");
     // parent plot
     CombinedDomainXYPlot plot = new CombinedDomainXYPlot(domain);
-    plot.setGap(10.0);
+    plot.setGap(5.0);
 
     // copy and sort x-Values for min and max of the domain axis
     double[] copyXValues = new double[datasetXIC.getItemCount(0)];
@@ -173,10 +186,11 @@ public class ImsVisualizerTask extends AbstractTask {
       copyXValues[i] = datasetXIC.getXValue(0, i);
     }
     // set renderer
-    // XYBlockPixelSizeRenderer rendererIMS = new XYBlockPixelSizeRenderer();
     XYBlockRenderer rendererIMS = new XYBlockRenderer();
-    double retentionTimeWidthInSec = copyXValues[1] / 60 - copyXValues[0] / 60;
-    rendererIMS.setBlockWidth(retentionTimeWidthInSec + retentionTimeWidthInSec * 0.3);
+    // double retentionTimeWidthInSec = copyXValues[1] / 60 - copyXValues[0] / 60;
+    double retentionTimeWidthInSec = copyXValues[1] - copyXValues[0];
+    // rendererIMS.setBlockWidth(retentionTimeWidthInSec + retentionTimeWidthInSec * 0.3);
+    rendererIMS.setBlockWidth(retentionTimeWidthInSec);
     rendererIMS.setBlockHeight(1);
     appliedSteps++;
 
@@ -229,10 +243,11 @@ public class ImsVisualizerTask extends AbstractTask {
 
 
     final XYItemRenderer rendererXIC = new StandardXYItemRenderer();
+    rendererXIC.setSeriesPaint(0, Color.black);
     final XYPlot subplotXIC = new XYPlot(datasetXIC, null, rangeXIC, rendererXIC);
-    subplotXIC.setBackgroundPaint(Color.black);
-    subplotXIC.setRangeGridlinePaint(Color.black);
-    subplotXIC.setDomainGridlinePaint(Color.black);
+    subplotXIC.setBackgroundPaint(Color.white);
+    subplotXIC.setRangeGridlinePaint(Color.white);
+    subplotXIC.setDomainGridlinePaint(Color.white);
     subplotXIC.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
     subplotXIC.setOutlinePaint(Color.black);
 
@@ -243,7 +258,7 @@ public class ImsVisualizerTask extends AbstractTask {
         JFreeChart.DEFAULT_TITLE_FONT, plot, true);
 
     chart.addSubtitle(legend);
-
+    appliedSteps++;
     return chart;
   }
 

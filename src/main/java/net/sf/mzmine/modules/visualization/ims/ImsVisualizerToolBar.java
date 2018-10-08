@@ -36,6 +36,7 @@ public class ImsVisualizerToolBar extends JToolBar {
   private static final long serialVersionUID = 1L;
   static final Icon backColorIcon = new ImageIcon("icons/bgicon.png");
   static final Icon gridIcon = new ImageIcon("icons/gridicon.png");
+  static final Icon legendIcon = new ImageIcon("icons/colorbaricon.png");
 
   public ImsVisualizerToolBar(ActionListener masterFrame) {
 
@@ -54,6 +55,12 @@ public class ImsVisualizerToolBar extends JToolBar {
     GUIUtils.addButton(this, null, gridIcon, masterFrame, "TOGGLE_GRID", "Toggle grid");
 
     addSeparator();
+
+    GUIUtils.addButton(this, null, gridIcon, masterFrame, "TOGGLE_ALPHA", "Toggle alpha");
+
+    addSeparator();
+
+    GUIUtils.addButton(this, null, legendIcon, masterFrame, "TOGGLE_LEGEND", "Toggle legend");
 
   }
 
