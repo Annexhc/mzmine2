@@ -39,11 +39,14 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
   private String customXAxisKMBase;
   private double[] xValues;
   private double[] yValues;
+  private ParameterSet parameters;
 
   public KendrickMassPlotXYDataset(ParameterSet parameters) {
 
     PeakList peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
+
+    this.parameters = parameters;
 
     this.selectedRows =
         parameters.getParameter(KendrickMassPlotParameters.selectedRows).getMatchingRows(peakList);
@@ -91,6 +94,14 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
     }
   }
 
+  public ParameterSet getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(ParameterSet parameters) {
+    this.parameters = parameters;
+  }
+
   @Override
   public int getItemCount(int series) {
     return selectedRows.length;
@@ -126,6 +137,14 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
 
   public double[] getyValues() {
     return yValues;
+  }
+
+  public void setxValues(double[] values) {
+    xValues = values;
+  }
+
+  public void setyValues(double[] values) {
+    yValues = values;
   }
 
   private double getKendrickMassFactor(String formula) {

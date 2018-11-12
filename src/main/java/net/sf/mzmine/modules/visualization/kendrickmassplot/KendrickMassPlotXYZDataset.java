@@ -42,11 +42,14 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
   private double[] xValues;
   private double[] yValues;
   private double[] zValues;
+  private ParameterSet parameters;
 
   public KendrickMassPlotXYZDataset(ParameterSet parameters) {
 
     PeakList peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
+
+    this.parameters = parameters;
 
     this.selectedRows =
         parameters.getParameter(KendrickMassPlotParameters.selectedRows).getMatchingRows(peakList);
@@ -132,6 +135,13 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
       }
   }
 
+  public ParameterSet getParameters() {
+    return parameters;
+  }
+
+  public void setParameters(ParameterSet parameters) {
+    this.parameters = parameters;
+  }
 
   @Override
   public int getItemCount(int series) {
@@ -152,6 +162,20 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
   public Number getZ(int series, int item) {
     return zValues[item];
   }
+
+
+  public void setxValues(double[] values) {
+    xValues = values;
+  }
+
+  public void setyValues(double[] values) {
+    yValues = values;
+  }
+
+  public void setzValues(double[] values) {
+    zValues = values;
+  }
+
 
   @Override
   public int getSeriesCount() {

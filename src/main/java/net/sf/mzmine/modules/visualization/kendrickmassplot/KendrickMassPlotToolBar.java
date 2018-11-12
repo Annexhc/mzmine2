@@ -64,9 +64,17 @@ public class KendrickMassPlotToolBar extends JToolBar {
 
     GUIUtils.addButton(this, null, annotationsIcon, masterFrame, "TOGGLE_ANNOTATIONS",
         "Toggle annotations");
+    addSeparator();
+
+    GUIUtils.addButton(this, "<html><body>Shift KMD<br>up</body></html>", null, masterFrame,
+        "SHIFT_KMD_UP", "Shift KMD up");
 
     addSeparator();
 
+    GUIUtils.addButton(this, "<html><body>Shift KMD<br>down</body></html>", null, masterFrame,
+        "SHIFT_KMD_DOWN", "Shift KMD down");
+
+    addSeparator();
   }
 
 }

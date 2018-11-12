@@ -122,6 +122,59 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
       }
     }
 
-  }
+    if (command.equals("SHIFT_KMD_UP")) {
 
+      Double shiftValue = 0.01;
+      XYPlot plot = chart.getXYPlot();
+      if (plot.getDataset() instanceof KendrickMassPlotXYDataset) {
+        KendrickMassPlotXYDataset dataset = (KendrickMassPlotXYDataset) plot.getDataset();
+        double[] yValues = new double[plot.getDataset().getItemCount(0)];
+        for (int i = 0; i < yValues.length; i++) {
+          yValues[i] = plot.getDataset().getYValue(0, i) + shiftValue
+              - Math.floor(plot.getDataset().getYValue(0, i) - shiftValue);
+        }
+        dataset.setyValues(yValues);
+        chart.fireChartChanged();
+        validate();
+      } else if (plot.getDataset() instanceof KendrickMassPlotXYZDataset) {
+        KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+        double[] yValues = new double[plot.getDataset().getItemCount(0)];
+        for (int i = 0; i < yValues.length; i++) {
+          yValues[i] = plot.getDataset().getYValue(0, i) + shiftValue
+              - Math.floor(plot.getDataset().getYValue(0, i) - shiftValue);
+        }
+        dataset.setyValues(yValues);
+        chart.fireChartChanged();
+        validate();
+      }
+
+    }
+
+    if (command.equals("SHIFT_KMD_DOWN")) {
+
+      Double shiftValue = 0.01;
+      XYPlot plot = chart.getXYPlot();
+      if (plot.getDataset() instanceof KendrickMassPlotXYDataset) {
+        KendrickMassPlotXYDataset dataset = (KendrickMassPlotXYDataset) plot.getDataset();
+        double[] yValues = new double[plot.getDataset().getItemCount(0)];
+        for (int i = 0; i < yValues.length; i++) {
+          yValues[i] = plot.getDataset().getYValue(0, i) - shiftValue
+              - Math.floor(plot.getDataset().getYValue(0, i) - shiftValue);
+        }
+        dataset.setyValues(yValues);
+        chart.fireChartChanged();
+        validate();
+      } else if (plot.getDataset() instanceof KendrickMassPlotXYZDataset) {
+        KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+        double[] yValues = new double[plot.getDataset().getItemCount(0)];
+        for (int i = 0; i < yValues.length; i++) {
+          yValues[i] = plot.getDataset().getYValue(0, i) - shiftValue
+              - Math.floor(plot.getDataset().getYValue(0, i) - shiftValue);
+        }
+        dataset.setyValues(yValues);
+        chart.fireChartChanged();
+        validate();
+      }
+    }
+  }
 }
