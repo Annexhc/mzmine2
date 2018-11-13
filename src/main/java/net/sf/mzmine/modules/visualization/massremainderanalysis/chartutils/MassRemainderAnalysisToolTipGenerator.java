@@ -39,8 +39,8 @@ public class MassRemainderAnalysisToolTipGenerator implements XYZToolTipGenerato
   private PeakListRow rows[];
   private String featureIdentity;
 
-  public MassRemainderAnalysisToolTipGenerator(String xAxisLabel, String yAxisLabel, String zAxisLabel,
-      PeakListRow rows[]) {
+  public MassRemainderAnalysisToolTipGenerator(String xAxisLabel, String yAxisLabel,
+      String zAxisLabel, PeakListRow rows[]) {
     super();
     this.xAxisLabel = xAxisLabel;
     this.yAxisLabel = yAxisLabel;

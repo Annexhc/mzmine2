@@ -57,6 +57,11 @@ public class KendrickMassPlotToolTipGenerator implements XYZToolTipGenerator, Pu
           + numberFormatX.format(dataset.getXValue(series, item)) + " " + yAxisLabel + ": "
           + numberFormatY.format(dataset.getYValue(series, item)) + " " + zAxisLabel + ": "
           + numberFormatY.format(dataset.getZValue(series, item)));
+    } else if (xAxisLabel.contains("KMD") && yAxisLabel.contains("KMD")) {
+      return "m/z: " + String.valueOf(numberFormatX.format(rows[item].getAverageMZ())) + " "
+          + String.valueOf(xAxisLabel + ": " + numberFormatX.format(dataset.getXValue(series, item))
+              + " " + yAxisLabel + ": " + numberFormatY.format(dataset.getYValue(series, item))
+              + " " + zAxisLabel + ": " + numberFormatY.format(dataset.getZValue(series, item)));
     } else {
       return String
           .valueOf(xAxisLabel + ": " + numberFormatX.format(dataset.getXValue(series, item)) + " "
@@ -72,6 +77,10 @@ public class KendrickMassPlotToolTipGenerator implements XYZToolTipGenerator, Pu
       return String.valueOf(featureIdentity + "\n" + xAxisLabel + ": "
           + numberFormatX.format(dataset.getXValue(series, item)) + " " + yAxisLabel + ": "
           + numberFormatY.format(dataset.getYValue(series, item)));
+    } else if (xAxisLabel.contains("KMD") && yAxisLabel.contains("KMD")) {
+      return "m/z: " + String.valueOf(numberFormatX.format(rows[item].getAverageMZ())) + " "
+          + String.valueOf(xAxisLabel + ": " + numberFormatX.format(dataset.getXValue(series, item))
+              + " " + yAxisLabel + ": " + numberFormatY.format(dataset.getYValue(series, item)));
     } else {
       return String
           .valueOf(xAxisLabel + ": " + numberFormatX.format(dataset.getXValue(series, item)) + " "

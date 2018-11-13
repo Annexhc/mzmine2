@@ -48,8 +48,8 @@ import net.sf.mzmine.chartbasics.gui.swing.EChartPanel;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.modules.visualization.intensityplot.IntensityPlotParameters;
+import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.NameItemLabelGenerator;
 import net.sf.mzmine.modules.visualization.massremainderanalysis.chartutils.MassRemainderAnalysisToolTipGenerator;
-import net.sf.mzmine.modules.visualization.massremainderanalysis.chartutils.NameItemLabelGenerator;
 import net.sf.mzmine.modules.visualization.massremainderanalysis.chartutils.XYBlockPixelSizePaintScales;
 import net.sf.mzmine.modules.visualization.massremainderanalysis.chartutils.XYBlockPixelSizeRenderer;
 import net.sf.mzmine.parameters.ParameterSet;
@@ -197,14 +197,6 @@ public class MassRemainderAnalysisTask extends AbstractTask {
       plot.setBackgroundPaint(Color.WHITE);
       appliedSteps++;
 
-      // set axis
-      // NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-      // NumberAxis range = (NumberAxis) plot.getRangeAxis();
-      // range.setRange(0, 1);
-      // if (xAxisLabel.contains("KMD")) {
-      // domain.setRange(0, 1);
-      // }
-
       // set renderer
       XYBlockPixelSizeRenderer renderer = new XYBlockPixelSizeRenderer();
 
@@ -280,13 +272,6 @@ public class MassRemainderAnalysisTask extends AbstractTask {
         PlotOrientation.VERTICAL, true, true, false);
     XYPlot plot = chart.getXYPlot();
 
-    // set axis
-    NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-    NumberAxis range = (NumberAxis) plot.getRangeAxis();
-    range.setRange(0, 1);
-    if (xAxisLabel.contains("KMD")) {
-      domain.setRange(0, 1);
-    }
     // set renderer
     XYBlockPixelSizeRenderer renderer = new XYBlockPixelSizeRenderer();
     appliedSteps++;

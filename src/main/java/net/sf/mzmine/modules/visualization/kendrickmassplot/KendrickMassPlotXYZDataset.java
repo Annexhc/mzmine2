@@ -130,7 +130,7 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
         } else if (zAxisKMBase.equals("FWHM")) {
           zValues[i] = selectedRows[i].getBestPeak().getFWHM();
         } else if (zAxisKMBase.equals("m/z")) {
-          zValues[i] = selectedRows[i].getBestPeak().getFWHM();
+          zValues[i] = selectedRows[i].getBestPeak().getMZ();
         }
       }
   }

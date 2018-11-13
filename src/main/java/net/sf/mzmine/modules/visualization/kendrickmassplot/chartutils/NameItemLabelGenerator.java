@@ -18,6 +18,8 @@
 
 package net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.data.xy.XYDataset;
 import net.sf.mzmine.datamodel.PeakListRow;
@@ -30,6 +32,7 @@ import net.sf.mzmine.datamodel.PeakListRow;
 public class NameItemLabelGenerator implements XYItemLabelGenerator {
 
   private PeakListRow rows[];
+  private NumberFormat numberFormat = new DecimalFormat("####0.0000");
 
   public NameItemLabelGenerator(PeakListRow rows[]) {
     this.rows = rows;
@@ -40,8 +43,11 @@ public class NameItemLabelGenerator implements XYItemLabelGenerator {
 
     // Create label
     String label = null;
-    label = rows[item].getPreferredPeakIdentity().getName();
-
+    if (rows[item].getPreferredPeakIdentity() != null) {
+      label = rows[item].getPreferredPeakIdentity().getName();
+    } else {
+      label = "m/z: " + String.valueOf(numberFormat.format(rows[item].getAverageMZ()));
+    }
     return label;
   }
 

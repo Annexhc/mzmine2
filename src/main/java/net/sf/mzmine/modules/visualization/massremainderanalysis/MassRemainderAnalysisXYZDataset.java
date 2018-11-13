@@ -127,7 +127,7 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
         } else if (zAxisValues.equals("FWHM")) {
           zValues[i] = selectedRows[i].getBestPeak().getFWHM();
         } else if (zAxisValues.equals("m/z")) {
-          zValues[i] = selectedRows[i].getBestPeak().getFWHM();
+          zValues[i] = selectedRows[i].getBestPeak().getMZ();
         }
       }
   }
