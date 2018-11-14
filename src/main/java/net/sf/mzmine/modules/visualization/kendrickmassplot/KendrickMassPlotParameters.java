@@ -51,8 +51,12 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
       new StringParameter("Kendrick mass base for y-Axis",
           "Enter a sum formula for a Kendrick mass base, e.g. \"CH2\" ");
 
+  public static final ComboParameter<Object> yAxisCharge = new ComboParameter<Object>(
+      "Y-Axis charge", "Select charge value for KMD. Select 1 for classic Kendrick analysis",
+      new Object[] {1, 2, 3, 4, 5, 6, 7, 8, "auto"});
+
   public static final ComboParameter<String> xAxisValues = new ComboParameter<>("X-Axis",
-      "Select Kendrick mass (KM) or m/z", new String[] {"m/z", "KM"});
+      "Select Kendrick mass (KM) or m/z", new String[] {"m/z", "m/z*z", "KM"});
 
   public static final OptionalParameter<StringParameter> xAxisCustomKendrickMassBase =
       new OptionalParameter<>(new StringParameter("Kendrick mass base for x-Axis",
@@ -86,9 +90,9 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
   public static final WindowSettingsParameter windowSettings = new WindowSettingsParameter();
 
   public KendrickMassPlotParameters() {
-    super(new Parameter[] {peakList, selectedRows, yAxisCustomKendrickMassBase, xAxisValues,
-        xAxisCustomKendrickMassBase, zAxisValues, zAxisCustomKendrickMassBase, zScaleType,
-        zScaleRange, paintScale, windowSettings});
+    super(new Parameter[] {peakList, selectedRows, yAxisCustomKendrickMassBase, yAxisCharge,
+        xAxisValues, xAxisCustomKendrickMassBase, zAxisValues, zAxisCustomKendrickMassBase,
+        zScaleType, zScaleRange, paintScale, windowSettings});
   }
 
   @Override

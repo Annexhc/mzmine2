@@ -19,6 +19,7 @@
 package net.sf.mzmine.modules.visualization.massremainderanalysis;
 
 import org.jfree.data.xy.AbstractXYZDataset;
+import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.parameters.ParameterSet;
@@ -38,6 +39,9 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
   private String yAxisMolecularUnit;
   private String zAxisMolecularUnit;
   private String zAxisValues;
+  private Object yAxisChargeSelection;
+  private String massOfChargeCarrier;
+  private boolean useMassOfChargeCarrier;
   private double[] xValues;
   private double[] yValues;
   private double[] zValues;
@@ -55,6 +59,16 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
 
     this.yAxisMolecularUnit =
         parameters.getParameter(MassRemainderAnalysisParameters.yAxisMolecularUnit).getValue();
+
+    this.yAxisChargeSelection =
+        parameters.getParameter(MassRemainderAnalysisParameters.yAxisCharge).getValue();
+
+    this.massOfChargeCarrier =
+        parameters.getParameter(MassRemainderAnalysisParameters.massOfChargeCarrier)
+            .getEmbeddedParameter().getValue();
+
+    this.useMassOfChargeCarrier =
+        parameters.getParameter(MassRemainderAnalysisParameters.massOfChargeCarrier).getValue();
 
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
@@ -82,28 +96,80 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
       for (int i = 0; i < selectedRows.length; i++) {
-        xValues[i] = selectedRows[i].getAverageMZ() - Math.ceil(
-            selectedRows[i].getAverageMZ() / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
-            * FormulaUtils.calculateExactMass(yAxisMolecularUnit);
+        // get charge
+        int charge = 1;
+        if (yAxisChargeSelection == "auto") {
+          if (selectedRows[i].getRowCharge() != 0) {
+            charge = selectedRows[i].getRowCharge();
+          }
+        } else {
+          charge = Integer.parseInt(yAxisChargeSelection.toString());
+        }
+        // use charge carrier mass
+        double exactMassOfChargeCarrier = 0;
+        if (useMassOfChargeCarrier == true) {
+          // get charge carrier mass
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(massOfChargeCarrier);
+        }
+        xValues[i] = (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier) * charge - Math
+            .ceil((selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier) * charge
+                / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
+            * FormulaUtils.calculateExactMass(xAxisMolecularUnit);
       }
     } else {
       for (int i = 0; i < selectedRows.length; i++) {
-        xValues[i] = selectedRows[i].getAverageMZ();
+        // get charge
+        int charge = 1;
+        if (yAxisChargeSelection == "auto") {
+          if (selectedRows[i].getRowCharge() != 0) {
+            charge = selectedRows[i].getRowCharge();
+          }
+        } else {
+          charge = Integer.parseInt(yAxisChargeSelection.toString());
+        }
+        xValues[i] = charge * selectedRows[i].getAverageMZ();
       }
     }
 
     // Calc yValues
     yValues = new double[selectedRows.length];
     for (int i = 0; i < selectedRows.length; i++) {
-      yValues[i] = yValues[i] = selectedRows[i].getAverageMZ() - Math.ceil(
-          selectedRows[i].getAverageMZ() / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
-          * FormulaUtils.calculateExactMass(yAxisMolecularUnit);
+      // get charge
+      int charge = 1;
+      if (yAxisChargeSelection == "auto") {
+        if (selectedRows[i].getRowCharge() != 0) {
+          charge = selectedRows[i].getRowCharge();
+        }
+      } else {
+        charge = Integer.parseInt(yAxisChargeSelection.toString());
+      }
+      // use charge carrier mass
+      double exactMassOfChargeCarrier = 0;
+      if (useMassOfChargeCarrier == true) {
+        // get charge carrier mass
+        // get charge of charge carrier
+        if (massOfChargeCarrier.contains("+")) {
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+              FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.POSITIVE, 1));
+        } else if (massOfChargeCarrier.contains("-")) {
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+              FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.NEGATIVE, 1));
+        } else {
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(massOfChargeCarrier);
+        }
+      }
+      yValues[i] = (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier) * charge - (Math
+          .floor(((selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier) * charge)
+              / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
+          * FormulaUtils.calculateExactMass(yAxisMolecularUnit));
     }
 
     // Calc zValues
     zValues = new double[selectedRows.length];
     if (parameters.getParameter(MassRemainderAnalysisParameters.zAxisCustomMolecularUnit)
-        .getValue() == true) {
+        .getValue() == true)
+
+    {
       // Calc yValues
       zValues = new double[selectedRows.length];
       for (int i = 0; i < selectedRows.length; i++) {

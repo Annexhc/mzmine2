@@ -51,6 +51,15 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
       new StringParameter("Molecular unit for y-Axis",
           "Enter a sum formula to use for mass remainder calculation, e.g. \"CH2\" ");
 
+  public static final ComboParameter<Object> yAxisCharge =
+      new ComboParameter<Object>("Y-Axis charge",
+          "Select charge value for MolecularUnit. Select 1 for mass remainder analysis",
+          new Object[] {1, 2, 3, 4, 5, 6, 7, 8, "auto"});
+
+  public static final OptionalParameter<StringParameter> massOfChargeCarrier =
+      new OptionalParameter<>(new StringParameter("Sum formula of charge carrier",
+          "Enter a sum formula of the charge carrier, including the charge, e.g. NH4+"));
+
   public static final OptionalParameter<StringParameter> xAxisCustomMolecularUnit =
       new OptionalParameter<>(new StringParameter("Molecular unit for x-Axis",
           "Enter a sum formula to use for mass remainder calculation to display a 2D Kendrick mass defect plot"));
@@ -59,7 +68,6 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
       "Select a parameter for a third dimension, displayed as a heatmap or select none for a 2D plot",
       new String[] {"none", "Retention time", "Intensity", "Area", "Tailing factor",
           "Asymmetry factor", "FWHM", "m/z"});
-
 
   public static final OptionalParameter<StringParameter> zAxisCustomMolecularUnit =
       new OptionalParameter<>(new StringParameter("Molecular unit for z-Axis",
@@ -84,9 +92,9 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
   public static final WindowSettingsParameter windowSettings = new WindowSettingsParameter();
 
   public MassRemainderAnalysisParameters() {
-    super(new Parameter[] {peakList, selectedRows, yAxisMolecularUnit, xAxisCustomMolecularUnit,
-        zAxisValues, zAxisCustomMolecularUnit, zScaleType, zScaleRange, paintScale,
-        windowSettings});
+    super(new Parameter[] {peakList, selectedRows, yAxisMolecularUnit, yAxisCharge,
+        massOfChargeCarrier, xAxisCustomMolecularUnit, zAxisValues, zAxisCustomMolecularUnit,
+        zScaleType, zScaleRange, paintScale, windowSettings});
   }
 
   @Override

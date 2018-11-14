@@ -46,7 +46,15 @@ public class NameItemLabelGenerator implements XYItemLabelGenerator {
     if (rows[item].getPreferredPeakIdentity() != null) {
       label = rows[item].getPreferredPeakIdentity().getName();
     } else {
-      label = "m/z: " + String.valueOf(numberFormat.format(rows[item].getAverageMZ()));
+      // get charge
+      int charge = 1;
+      if (rows[item].getRowCharge() == 0) {
+        charge = 1;
+      } else {
+        charge = rows[item].getRowCharge();
+      }
+      label = "m/z: " + String.valueOf(numberFormat.format(rows[item].getAverageMZ())) + " charge: "
+          + charge;
     }
     return label;
   }
