@@ -229,11 +229,12 @@ public class VanKrevelenDiagramTask extends AbstractTask {
       max = zScaleRange.upperEndpoint();
     }
 
-    // create paint scale for thrid dimension
+    // create paint scale for third dimension
     Paint[] contourColors =
         XYBlockPixelSizePaintScales.getPaintColors(zAxisScaleType, zScaleRange, paintScaleStyle);
     LookupPaintScale scale = null;
-    scale = new LookupPaintScale(min, max, Color.MAGENTA);
+    scale = new LookupPaintScale(copyZValues[0], copyZValues[copyZValues.length - 1],
+        new Color(0, 0, 0));
     double[] scaleValues = new double[contourColors.length];
     double delta = (max - min) / (contourColors.length - 1);
     double value = min;

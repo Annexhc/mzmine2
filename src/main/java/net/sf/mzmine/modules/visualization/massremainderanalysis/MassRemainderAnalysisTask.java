@@ -257,7 +257,8 @@ public class MassRemainderAnalysisTask extends AbstractTask {
     Paint[] contourColors =
         XYBlockPixelSizePaintScales.getPaintColors(zAxisScaleType, zScaleRange, paintScaleStyle);
     LookupPaintScale scale = null;
-    scale = new LookupPaintScale(min, max, new Color(244, 66, 223));
+    scale = new LookupPaintScale(copyZValues[0], copyZValues[copyZValues.length - 1],
+        new Color(0, 0, 0));
     double[] scaleValues = new double[contourColors.length];
     double delta = (max - min) / (contourColors.length - 1);
     double value = min;

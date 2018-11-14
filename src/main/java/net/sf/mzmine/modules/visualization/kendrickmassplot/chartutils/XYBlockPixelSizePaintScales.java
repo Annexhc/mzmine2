@@ -150,14 +150,14 @@ public class XYBlockPixelSizePaintScales {
     Color[] rainbow = new Color[ncolor + 5];
 
     float x = (float) (1. / (ncolor + 160));
-    for (int i = 0; i < readRainbow.length; i++) {
+    for (int i = 5; i < readRainbow.length; i++) {
       readRainbow[i] = new Color(Color.HSBtoRGB((i) * x, 1.0F, 1.0F));
     }
     for (int i = 0; i < 5; i++) {
       rainbow[i] = new Color(0, 0, 0);
     }
     for (int i = 5; i < readRainbow.length; i++) {
-      rainbow[i] = readRainbow[readRainbow.length - i - 1];
+      rainbow[i] = readRainbow[readRainbow.length - i - 1 + 5];
     }
     return rainbow;
   }
@@ -180,6 +180,7 @@ public class XYBlockPixelSizePaintScales {
     for (int i = rainbow.length - 5; i < rainbow.length; i++) {
       rainbow[i] = new Color(244, 66, 223);
     }
+
     return rainbow;
   }
 
