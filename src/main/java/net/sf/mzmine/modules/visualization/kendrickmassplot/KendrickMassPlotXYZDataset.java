@@ -19,6 +19,7 @@
 package net.sf.mzmine.modules.visualization.kendrickmassplot;
 
 import org.jfree.data.xy.AbstractXYZDataset;
+import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.parameters.ParameterSet;
@@ -39,6 +40,8 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
   private String customYAxisKMBase;
   private String customXAxisKMBase;
   private String customZAxisKMBase;
+  private String massOfChargeCarrier;
+  private boolean useMassOfChargeCarrier;
   private double[] xValues;
   private double[] yValues;
   private double[] zValues;
@@ -60,6 +63,13 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
 
     this.yAxisChargeSelection =
         parameters.getParameter(KendrickMassPlotParameters.yAxisCharge).getValue();
+
+    this.massOfChargeCarrier =
+        parameters.getParameter(KendrickMassPlotParameters.massOfChargeCarrier)
+            .getEmbeddedParameter().getValue();
+
+    this.useMassOfChargeCarrier =
+        parameters.getParameter(KendrickMassPlotParameters.massOfChargeCarrier).getValue();
 
     if (parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickMassBase)
         .getValue() == true) {
@@ -115,6 +125,23 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
         // plot m/z * z as x axis
         else if (xAxisKMBase.equals("m/z*z")) {
           xValues[i] = charge * selectedRows[i].getAverageMZ();
+        } else if (xAxisKMBase.contains("(m/z-")) {
+          // use charge carrier mass
+          double exactMassOfChargeCarrier = 0;
+          if (useMassOfChargeCarrier == true) {
+            // get charge carrier mass
+            // get charge of charge carrier
+            if (massOfChargeCarrier.contains("+")) {
+              exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+                  FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.POSITIVE, 1));
+            } else if (massOfChargeCarrier.contains("-")) {
+              exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+                  FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.NEGATIVE, 1));
+            } else {
+              exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(massOfChargeCarrier);
+            }
+          }
+          xValues[i] = charge * (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier);
         }
         // plot Kendrick masses as x axis
         else if (xAxisKMBase.equals("KM")) {
@@ -135,9 +162,26 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
       } else {
         charge = Integer.parseInt(yAxisChargeSelection.toString());
       }
+      // use charge carrier mass
+      double exactMassOfChargeCarrier = 0;
+      if (useMassOfChargeCarrier == true) {
+        // get charge carrier mass
+        // get charge of charge carrier
+        if (massOfChargeCarrier.contains("+")) {
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+              FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.POSITIVE, 1));
+        } else if (massOfChargeCarrier.contains("-")) {
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+              FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.NEGATIVE, 1));
+        } else {
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(massOfChargeCarrier);
+        }
+      }
       yValues[i] = Math
-          .ceil(charge * selectedRows[i].getAverageMZ() * getKendrickMassFactor(customYAxisKMBase))
-          - charge * selectedRows[i].getAverageMZ() * getKendrickMassFactor(customYAxisKMBase);
+          .ceil(charge * (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier)
+              * getKendrickMassFactor(customYAxisKMBase))
+          - charge * (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier)
+              * getKendrickMassFactor(customYAxisKMBase);
     }
 
     // Calc zValues

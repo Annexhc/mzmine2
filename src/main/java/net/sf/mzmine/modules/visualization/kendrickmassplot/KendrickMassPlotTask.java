@@ -215,6 +215,8 @@ public class KendrickMassPlotTask extends AbstractTask {
       renderer.setDefaultItemLabelGenerator(generator);
       renderer.setDefaultItemLabelsVisible(false);
       renderer.setDefaultItemLabelFont(legendFont);
+      renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER,
+          TextAnchor.TOP_RIGHT, TextAnchor.TOP_RIGHT, -45), true);
     }
     return chart;
   }

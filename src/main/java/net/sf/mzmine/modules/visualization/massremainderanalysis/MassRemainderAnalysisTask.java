@@ -96,7 +96,7 @@ public class MassRemainderAnalysisTask extends AbstractTask {
               .getEmbeddedParameter().getValue()
           + ")";
     } else {
-      xAxisLabel = "m/z";
+      xAxisLabel = parameters.getParameter(MassRemainderAnalysisParameters.xAxisValues).getValue();
     }
 
     yAxisLabel = "Mass remainder ("
@@ -210,6 +210,8 @@ public class MassRemainderAnalysisTask extends AbstractTask {
       renderer.setDefaultItemLabelGenerator(generator);
       renderer.setDefaultItemLabelsVisible(false);
       renderer.setDefaultItemLabelFont(legendFont);
+      renderer.setDefaultPositiveItemLabelPosition(new ItemLabelPosition(ItemLabelAnchor.CENTER,
+          TextAnchor.TOP_RIGHT, TextAnchor.TOP_RIGHT, -45), true);
     }
     return chart;
   }

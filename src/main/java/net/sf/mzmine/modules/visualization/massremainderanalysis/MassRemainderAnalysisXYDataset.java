@@ -27,7 +27,7 @@ import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.util.FormulaUtils;
 
 /**
- * XYDataset for Kendrick mass plots
+ * XYDataset for mass remainder analysis
  * 
  * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
@@ -40,6 +40,7 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
   private String yAxisMolecularUnit;
   private Object yAxisChargeSelection;
   private String massOfChargeCarrier;
+  private String xAxisValues;
   private boolean useMassOfChargeCarrier;
   private double[] xValues;
   private double[] yValues;
@@ -68,6 +69,9 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
     this.useMassOfChargeCarrier =
         parameters.getParameter(MassRemainderAnalysisParameters.massOfChargeCarrier).getValue();
 
+    this.xAxisValues =
+        parameters.getParameter(MassRemainderAnalysisParameters.xAxisValues).getValue();
+
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
       this.xAxisMolecularUnit =
@@ -91,12 +95,46 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
         } else {
           charge = Integer.parseInt(yAxisChargeSelection.toString());
         }
-        xValues[i] = selectedRows[i].getAverageMZ() * charge - Math
-            .ceil(selectedRows[i].getAverageMZ() * charge
+        // use charge carrier mass
+        double exactMassOfChargeCarrier = 0;
+        if (useMassOfChargeCarrier == true) {
+          // get charge carrier mass
+          exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(massOfChargeCarrier);
+        }
+        xValues[i] = (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier) * charge - Math
+            .ceil((selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier) * charge
                 / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
-            * FormulaUtils.calculateExactMass(yAxisMolecularUnit);
+            * FormulaUtils.calculateExactMass(xAxisMolecularUnit);
       }
-    } else {
+    } else if (xAxisValues.contains("(m/z-")) {
+      for (int i = 0; i < selectedRows.length; i++) {
+        // get charge
+        int charge = 1;
+        if (yAxisChargeSelection == "auto") {
+          if (selectedRows[i].getRowCharge() != 0) {
+            charge = selectedRows[i].getRowCharge();
+          }
+        } else {
+          charge = Integer.parseInt(yAxisChargeSelection.toString());
+        }
+        // use charge carrier mass
+        double exactMassOfChargeCarrier = 0;
+        if (useMassOfChargeCarrier == true) {
+          // get charge carrier mass
+          // get charge of charge carrier
+          if (massOfChargeCarrier.contains("+")) {
+            exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+                FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.POSITIVE, 1));
+          } else if (massOfChargeCarrier.contains("-")) {
+            exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(
+                FormulaUtils.ionizeFormula(massOfChargeCarrier, IonizationType.NEGATIVE, 1));
+          } else {
+            exactMassOfChargeCarrier = FormulaUtils.calculateExactMass(massOfChargeCarrier);
+          }
+        }
+        xValues[i] = charge * (selectedRows[i].getAverageMZ() - exactMassOfChargeCarrier);
+      }
+    } else if (xAxisValues.contains("m/z*z")) {
       for (int i = 0; i < selectedRows.length; i++) {
         // get charge
         int charge = 1;
@@ -108,6 +146,10 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
           charge = Integer.parseInt(yAxisChargeSelection.toString());
         }
         xValues[i] = charge * selectedRows[i].getAverageMZ();
+      }
+    } else {
+      for (int i = 0; i < selectedRows.length; i++) {
+        xValues[i] = selectedRows[i].getAverageMZ();
       }
     }
 

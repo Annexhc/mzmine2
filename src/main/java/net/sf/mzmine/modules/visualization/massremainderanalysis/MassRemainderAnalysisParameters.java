@@ -60,6 +60,10 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
       new OptionalParameter<>(new StringParameter("Sum formula of charge carrier",
           "Enter a sum formula of the charge carrier, including the charge, e.g. NH4+"));
 
+  public static final ComboParameter<String> xAxisValues =
+      new ComboParameter<>("X-Axis", "Select what to display on x-Axis",
+          new String[] {"m/z", "m/z*z", "(m/z-Mass of charge carrier)*z"});
+
   public static final OptionalParameter<StringParameter> xAxisCustomMolecularUnit =
       new OptionalParameter<>(new StringParameter("Molecular unit for x-Axis",
           "Enter a sum formula to use for mass remainder calculation to display a 2D Kendrick mass defect plot"));
@@ -93,8 +97,8 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
 
   public MassRemainderAnalysisParameters() {
     super(new Parameter[] {peakList, selectedRows, yAxisMolecularUnit, yAxisCharge,
-        massOfChargeCarrier, xAxisCustomMolecularUnit, zAxisValues, zAxisCustomMolecularUnit,
-        zScaleType, zScaleRange, paintScale, windowSettings});
+        massOfChargeCarrier, xAxisValues, xAxisCustomMolecularUnit, zAxisValues,
+        zAxisCustomMolecularUnit, zScaleType, zScaleRange, paintScale, windowSettings});
   }
 
   @Override
