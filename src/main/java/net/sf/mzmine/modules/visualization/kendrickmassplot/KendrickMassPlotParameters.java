@@ -26,6 +26,7 @@ import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.ComboParameter;
+import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.OptionalParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.WindowSettingsParameter;
@@ -51,9 +52,13 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
       new StringParameter("Kendrick mass base for y-Axis",
           "Enter a sum formula for a Kendrick mass base, e.g. \"CH2\" ");
 
-  public static final ComboParameter<Object> yAxisCharge = new ComboParameter<Object>(
-      "Y-Axis charge", "Select charge value for KMD. Select 1 for classic Kendrick analysis",
-      new Object[] {1, 2, 3, 4, 5, 6, 7, 8, "auto"});
+  public static final IntegerParameter yAxisCustomKendrickCharge = new IntegerParameter(
+      "Charge for KMD on y-axis", "Leave empty or enter 1 for classc Kendrick mass plot", 1, false);
+
+  public static final IntegerParameter yAxisCustomKendrickDivisor = new IntegerParameter(
+      "Divisor for KMD on y-axis",
+      "Leave empty or enter 1 for classc Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
+      1, false);
 
   public static final OptionalParameter<StringParameter> massOfChargeCarrier =
       new OptionalParameter<>(new StringParameter("Sum formula of charge carrier",
@@ -67,6 +72,14 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
       new OptionalParameter<>(new StringParameter("Kendrick mass base for x-Axis",
           "Enter a sum formula for a Kendrick mass base to display a 2D Kendrick mass defect plot"));
 
+  public static final IntegerParameter xAxisCustomKendrickCharge = new IntegerParameter(
+      "Charge for KMD on x-axis", "Leave empty or enter 1 for classc Kendrick mass plot", 1, false);
+
+  public static final IntegerParameter xAxisCustomKendrickDivisor = new IntegerParameter(
+      "Divisor for KMD on x-axis",
+      "Leave empty or enter 1 for classc Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
+      1, false);
+
   public static final ComboParameter<String> zAxisValues = new ComboParameter<>("Z-Axis",
       "Select a parameter for a third dimension, displayed as a heatmap or select none for a 2D plot",
       new String[] {"none", "Retention time", "Intensity", "Area", "Tailing factor",
@@ -76,8 +89,16 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
       new OptionalParameter<>(new StringParameter("Kendrick mass base for z-Axis",
           "Enter a sum formula for a Kendrick mass base to display a Kendrick mass defect in form of a heatmap"));
 
+  public static final IntegerParameter zAxisCustomKendrickCharge = new IntegerParameter(
+      "Charge for KMD on z-axis", "Leave empty or enter 1 for classc Kendrick mass plot", 1, false);
+
+  public static final IntegerParameter zAxisCustomKendrickDivisor = new IntegerParameter(
+      "Divisor for KMD on z-axis",
+      "Leave empty or enter 1 for classc Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
+      1, false);
+
   public static final ComboParameter<String> zScaleType = new ComboParameter<>("Z-Axis scale",
-      "Select Z-Axis scale", new String[] {"percentile", "custom"});
+      "Select z-Axis scale", new String[] {"percentile", "custom"});
 
   public static final DoubleRangeParameter zScaleRange = new DoubleRangeParameter(
       "Range for z-Axis scale",
@@ -95,9 +116,11 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
   public static final WindowSettingsParameter windowSettings = new WindowSettingsParameter();
 
   public KendrickMassPlotParameters() {
-    super(new Parameter[] {peakList, selectedRows, yAxisCustomKendrickMassBase, yAxisCharge,
-        massOfChargeCarrier, xAxisValues, xAxisCustomKendrickMassBase, zAxisValues,
-        zAxisCustomKendrickMassBase, zScaleType, zScaleRange, paintScale, windowSettings});
+    super(new Parameter[] {peakList, selectedRows, yAxisCustomKendrickMassBase,
+        yAxisCustomKendrickCharge, yAxisCustomKendrickDivisor, massOfChargeCarrier, xAxisValues,
+        xAxisCustomKendrickMassBase, xAxisCustomKendrickCharge, xAxisCustomKendrickDivisor,
+        zAxisValues, zAxisCustomKendrickMassBase, zAxisCustomKendrickCharge,
+        zAxisCustomKendrickDivisor, zScaleType, zScaleRange, paintScale, windowSettings});
   }
 
   @Override
