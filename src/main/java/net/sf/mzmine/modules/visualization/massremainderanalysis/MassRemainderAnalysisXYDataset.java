@@ -22,7 +22,6 @@ import org.jfree.data.xy.AbstractXYDataset;
 import net.sf.mzmine.datamodel.IonizationType;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
-import net.sf.mzmine.modules.visualization.kendrickmassplot.KendrickMassPlotParameters;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.util.FormulaUtils;
 
@@ -60,7 +59,7 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
         parameters.getParameter(MassRemainderAnalysisParameters.yAxisMolecularUnit).getValue();
 
     this.yAxisChargeSelection =
-        parameters.getParameter(KendrickMassPlotParameters.yAxisCharge).getValue();
+        parameters.getParameter(MassRemainderAnalysisParameters.yAxisCharge).getValue();
 
     this.massOfChargeCarrier =
         parameters.getParameter(MassRemainderAnalysisParameters.massOfChargeCarrier)
