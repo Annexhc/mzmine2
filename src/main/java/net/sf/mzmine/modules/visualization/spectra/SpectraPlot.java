@@ -53,6 +53,7 @@ import net.sf.mzmine.modules.visualization.spectra.datasets.ScanDataSet;
 import net.sf.mzmine.modules.visualization.spectra.renderers.ContinuousRenderer;
 import net.sf.mzmine.modules.visualization.spectra.renderers.PeakRenderer;
 import net.sf.mzmine.modules.visualization.spectra.renderers.SpectraItemLabelGenerator;
+import net.sf.mzmine.modules.visualization.spectra.spectraidentification.SpectraDatabaseSearchLabelGenerator;
 import net.sf.mzmine.util.GUIUtils;
 import net.sf.mzmine.util.SaveImage;
 import net.sf.mzmine.util.SaveImage.FileType;
@@ -400,6 +401,41 @@ public class SpectraPlot extends EChartPanel {
 
     } else {
       newRenderer = new PeakRenderer(color, transparency);
+    }
+
+    plot.setDataset(numOfDataSets, dataSet);
+    plot.setRenderer(numOfDataSets, newRenderer);
+    numOfDataSets++;
+
+  }
+
+  // add Dataset with label generator
+  public synchronized void addDataSet(XYDataset dataSet, Color color, boolean transparency,
+      SpectraDatabaseSearchLabelGenerator labelGenerator) {
+
+    XYItemRenderer newRenderer;
+
+    if (dataSet instanceof ScanDataSet) {
+      ScanDataSet scanDataSet = (ScanDataSet) dataSet;
+      Scan scan = scanDataSet.getScan();
+      if (scan.getSpectrumType() == MassSpectrumType.CENTROIDED)
+        newRenderer = new PeakRenderer(color, transparency);
+      else {
+        newRenderer = new ContinuousRenderer(color, transparency);
+        ((ContinuousRenderer) newRenderer).setDefaultShapesVisible(dataPointsVisible);
+      }
+
+      // Add label generator for the dataset
+      newRenderer.setDefaultItemLabelGenerator(labelGenerator);
+      newRenderer.setDefaultItemLabelsVisible(itemLabelsVisible);
+      newRenderer.setDefaultItemLabelPaint(labelsColor);
+
+    } else {
+      newRenderer = new PeakRenderer(color, transparency);
+      // Add label generator for the dataset
+      newRenderer.setDefaultItemLabelGenerator(labelGenerator);
+      newRenderer.setDefaultItemLabelsVisible(itemLabelsVisible);
+      newRenderer.setDefaultItemLabelPaint(labelsColor);
     }
 
     plot.setDataset(numOfDataSets, dataSet);

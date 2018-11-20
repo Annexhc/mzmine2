@@ -21,12 +21,10 @@ package net.sf.mzmine.modules.visualization.spectra;
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
-
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JToolBar;
-
 import net.sf.mzmine.datamodel.MassSpectrumType;
 import net.sf.mzmine.util.GUIUtils;
 
@@ -88,6 +86,15 @@ public class SpectraToolBar extends JToolBar {
     GUIUtils.addButton(this, null, exportIcon, masterFrame, "EXPORT_SPECTRA",
         "Export spectra to spectra file");
 
+    addSeparator();
+
+    GUIUtils.addButton(this, null, null, masterFrame, "ONLINEDATABASESEARCH",
+        "Select online database for annotation");
+
+    addSeparator();
+
+    GUIUtils.addButton(this, null, null, masterFrame, "LIPIDSEARCH",
+        "Select target lipid classes for annotation");
   }
 
   public void setCentroidButton(MassSpectrumType spectrumType) {
