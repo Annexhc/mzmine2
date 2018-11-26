@@ -52,32 +52,29 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
       new StringParameter("Kendrick mass base for y-Axis",
           "Enter a sum formula for a Kendrick mass base, e.g. \"CH2\" ");
 
-  public static final IntegerParameter yAxisCustomKendrickCharge = new IntegerParameter(
-      "Charge for KMD on y-axis", "Leave empty or enter 1 for classc Kendrick mass plot", 1, false);
+  public static final IntegerParameter yAxisCustomKendrickCharge =
+      new IntegerParameter("Charge for KMD on y-axis",
+          "Leave empty or enter 1 for classic Kendrick mass plot", 1, false);
 
   public static final IntegerParameter yAxisCustomKendrickDivisor = new IntegerParameter(
       "Divisor for KMD on y-axis",
-      "Leave empty or enter 1 for classc Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
+      "Leave empty or enter 1 for classic Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
       1, false);
 
-  public static final OptionalParameter<StringParameter> massOfChargeCarrier =
-      new OptionalParameter<>(new StringParameter("Sum formula of charge carrier",
-          "Enter a sum formula of the charge carrier, including the charge, e.g. NH4+"));
-
-  public static final ComboParameter<String> xAxisValues =
-      new ComboParameter<>("X-Axis", "Select Kendrick mass (KM) or m/z",
-          new String[] {"m/z", "m/z*z", "(m/z-Mass of charge carrier)*z", "KM"});
+  public static final ComboParameter<String> xAxisValues = new ComboParameter<>("X-Axis",
+      "Select Kendrick mass (KM) or m/z", new String[] {"m/z", "KM"});
 
   public static final OptionalParameter<StringParameter> xAxisCustomKendrickMassBase =
       new OptionalParameter<>(new StringParameter("Kendrick mass base for x-Axis",
           "Enter a sum formula for a Kendrick mass base to display a 2D Kendrick mass defect plot"));
 
-  public static final IntegerParameter xAxisCustomKendrickCharge = new IntegerParameter(
-      "Charge for KMD on x-axis", "Leave empty or enter 1 for classc Kendrick mass plot", 1, false);
+  public static final IntegerParameter xAxisCustomKendrickCharge =
+      new IntegerParameter("Charge for KMD on x-axis",
+          "Leave empty or enter 1 for classic Kendrick mass plot", 1, false);
 
   public static final IntegerParameter xAxisCustomKendrickDivisor = new IntegerParameter(
       "Divisor for KMD on x-axis",
-      "Leave empty or enter 1 for classc Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
+      "Leave empty or enter 1 for classic Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
       1, false);
 
   public static final ComboParameter<String> zAxisValues = new ComboParameter<>("Z-Axis",
@@ -89,12 +86,13 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
       new OptionalParameter<>(new StringParameter("Kendrick mass base for z-Axis",
           "Enter a sum formula for a Kendrick mass base to display a Kendrick mass defect in form of a heatmap"));
 
-  public static final IntegerParameter zAxisCustomKendrickCharge = new IntegerParameter(
-      "Charge for KMD on z-axis", "Leave empty or enter 1 for classc Kendrick mass plot", 1, false);
+  public static final IntegerParameter zAxisCustomKendrickCharge =
+      new IntegerParameter("Charge for KMD on z-axis",
+          "Leave empty or enter 1 for classic Kendrick mass plot", 1, false);
 
   public static final IntegerParameter zAxisCustomKendrickDivisor = new IntegerParameter(
       "Divisor for KMD on z-axis",
-      "Leave empty or enter 1 for classc Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
+      "Leave empty or enter 1 for classic Kendrick mass plot or enter a Divisor for resolution enhanced Kendrick mass plot",
       1, false);
 
   public static final ComboParameter<String> zScaleType = new ComboParameter<>("Z-Axis scale",
@@ -117,7 +115,7 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
 
   public KendrickMassPlotParameters() {
     super(new Parameter[] {peakList, selectedRows, yAxisCustomKendrickMassBase,
-        yAxisCustomKendrickCharge, yAxisCustomKendrickDivisor, massOfChargeCarrier, xAxisValues,
+        yAxisCustomKendrickCharge, yAxisCustomKendrickDivisor, xAxisValues,
         xAxisCustomKendrickMassBase, xAxisCustomKendrickCharge, xAxisCustomKendrickDivisor,
         zAxisValues, zAxisCustomKendrickMassBase, zAxisCustomKendrickCharge,
         zAxisCustomKendrickDivisor, zScaleType, zScaleRange, paintScale, windowSettings});

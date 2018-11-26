@@ -38,6 +38,8 @@ public class KendrickMassPlotToolBar extends JToolBar {
   static final Icon backColorIcon = new ImageIcon("icons/bgicon.png");
   static final Icon gridIcon = new ImageIcon("icons/gridicon.png");
   static final Icon annotationsIcon = new ImageIcon("icons/annotationsicon.png");
+  static final Icon arrowUpIcon = new ImageIcon("icons/arrowupicon.png");
+  static final Icon arrowDownIcon = new ImageIcon("icons/arrowdownicon.png");
 
   public KendrickMassPlotToolBar(ActionListener masterFrame) {
 
@@ -66,13 +68,13 @@ public class KendrickMassPlotToolBar extends JToolBar {
         "Toggle annotations");
     addSeparator();
 
-    GUIUtils.addButton(this, "<html><body>Shift KMD<br>up</body></html>", null, masterFrame,
-        "SHIFT_KMD_UP", "Shift KMD up");
+    GUIUtils.addLabel(this, "Shift KMD:");
+
+    GUIUtils.addButton(this, null, arrowUpIcon, masterFrame, "SHIFT_KMD_UP", "Shift KMD up");
 
     addSeparator();
 
-    GUIUtils.addButton(this, "<html><body>Shift KMD<br>down</body></html>", null, masterFrame,
-        "SHIFT_KMD_DOWN", "Shift KMD down");
+    GUIUtils.addButton(this, null, arrowDownIcon, masterFrame, "SHIFT_KMD_DOWN", "Shift KMD down");
 
     addSeparator();
   }

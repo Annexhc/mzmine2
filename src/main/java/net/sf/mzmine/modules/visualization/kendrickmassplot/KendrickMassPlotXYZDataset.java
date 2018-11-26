@@ -147,12 +147,12 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
         .getValue() == true) {
       for (int i = 0; i < selectedRows.length; i++) {
         // get charge
-        int charge = yAxisChargeSelection;
+        int charge = zAxisChargeSelection;
         zValues[i] = Math
             .ceil(charge * (selectedRows[i].getAverageMZ())
-                * getKendrickMassFactor(customYAxisKMBase, zAxisDivisorSelection))
+                * getKendrickMassFactor(customZAxisKMBase, zAxisDivisorSelection))
             - charge * (selectedRows[i].getAverageMZ())
-                * getKendrickMassFactor(customYAxisKMBase, zAxisDivisorSelection);
+                * getKendrickMassFactor(customZAxisKMBase, zAxisDivisorSelection);
       }
     } else
       for (int i = 0; i < selectedRows.length; i++) {

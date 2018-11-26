@@ -96,7 +96,7 @@ public class MassRemainderAnalysisTask extends AbstractTask {
               .getEmbeddedParameter().getValue()
           + ")";
     } else {
-      xAxisLabel = parameters.getParameter(MassRemainderAnalysisParameters.xAxisValues).getValue();
+      xAxisLabel = "m/z";
     }
 
     yAxisLabel = "Mass remainder ("

@@ -26,6 +26,7 @@ import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.ComboParameter;
+import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.OptionalParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.WindowSettingsParameter;
@@ -51,22 +52,13 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
       new StringParameter("Molecular unit for y-Axis",
           "Enter a sum formula to use for mass remainder calculation, e.g. \"CH2\" ");
 
-  public static final ComboParameter<Object> yAxisCharge =
-      new ComboParameter<Object>("Y-Axis charge",
-          "Select charge value for MolecularUnit. Select 1 for mass remainder analysis",
-          new Object[] {1, 2, 3, 4, 5, 6, 7, 8, "auto"});
-
-  public static final OptionalParameter<StringParameter> massOfChargeCarrier =
-      new OptionalParameter<>(new StringParameter("Sum formula of charge carrier",
-          "Enter a sum formula of the charge carrier, including the charge, e.g. NH4+"));
-
-  public static final ComboParameter<String> xAxisValues =
-      new ComboParameter<>("X-Axis", "Select what to display on x-Axis",
-          new String[] {"m/z", "m/z*z", "(m/z-Mass of charge carrier)*z"});
+  public static final IntegerParameter yAxisCharge =
+      new IntegerParameter("Charge for molecular unit on y-axis",
+          "Leave empty or enter 1 for classic mass remainder analysis", 1, false);
 
   public static final OptionalParameter<StringParameter> xAxisCustomMolecularUnit =
       new OptionalParameter<>(new StringParameter("Molecular unit for x-Axis",
-          "Enter a sum formula to use for mass remainder calculation to display a 2D Kendrick mass defect plot"));
+          "Enter a sum formula to use for mass remainder calculation to display a 2D mass remainder plot"));
 
   public static final ComboParameter<String> zAxisValues = new ComboParameter<>("Z-Axis",
       "Select a parameter for a third dimension, displayed as a heatmap or select none for a 2D plot",
@@ -78,7 +70,7 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
           "Enter a sum formula to use for mass remainder calculation in form of a heatmap"));
 
   public static final ComboParameter<String> zScaleType = new ComboParameter<>("Z-Axis scale",
-      "Select Z-Axis scale", new String[] {"percentile", "custom"});
+      "Select z-Axis scale", new String[] {"percentile", "custom"});
 
   public static final DoubleRangeParameter zScaleRange = new DoubleRangeParameter(
       "Range for z-Axis scale",
@@ -97,8 +89,8 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
 
   public MassRemainderAnalysisParameters() {
     super(new Parameter[] {peakList, selectedRows, yAxisMolecularUnit, yAxisCharge,
-        massOfChargeCarrier, xAxisValues, xAxisCustomMolecularUnit, zAxisValues,
-        zAxisCustomMolecularUnit, zScaleType, zScaleRange, paintScale, windowSettings});
+        xAxisCustomMolecularUnit, zAxisValues, zAxisCustomMolecularUnit, zScaleType, zScaleRange,
+        paintScale, windowSettings});
   }
 
   @Override
