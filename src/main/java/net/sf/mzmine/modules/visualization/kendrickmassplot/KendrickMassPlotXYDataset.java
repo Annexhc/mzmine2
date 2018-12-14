@@ -37,8 +37,6 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
   private String xAxisKMBase;
   private String customYAxisKMBase;
   private String customXAxisKMBase;
-  private int yAxisChargeSelection;
-  private int xAxisChargeSelection;
   private int yAxisDivisorSelection;
   private int xAxisDivisorSelection;
   private double[] xValues;
@@ -55,17 +53,9 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
     this.selectedRows =
         parameters.getParameter(KendrickMassPlotParameters.selectedRows).getMatchingRows(peakList);
 
-    this.yAxisChargeSelection =
-        parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickCharge).getValue();
+    this.yAxisDivisorSelection = 1;
 
-    this.xAxisChargeSelection =
-        parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickCharge).getValue();
-
-    this.yAxisDivisorSelection =
-        parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickDivisor).getValue();
-
-    this.xAxisDivisorSelection =
-        parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickDivisor).getValue();
+    this.xAxisDivisorSelection = 1;
 
     this.customYAxisKMBase =
         parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickMassBase).getValue();
@@ -85,7 +75,8 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
         .getValue() == true) {
       for (int i = 0; i < selectedRows.length; i++) {
         // get charge
-        int charge = xAxisChargeSelection;
+        // int charge = xAxisChargeSelection;
+        int charge = 1;
         xValues[i] = Math
             .ceil(charge * selectedRows[i].getAverageMZ()
                 * getKendrickMassFactor(customXAxisKMBase, xAxisDivisorSelection))
@@ -112,7 +103,8 @@ class KendrickMassPlotXYDataset extends AbstractXYDataset {
     yValues = new double[selectedRows.length];
     for (int i = 0; i < selectedRows.length; i++) {
       // get charge
-      int charge = yAxisChargeSelection;
+      // int charge = yAxisChargeSelection;
+      int charge = 1;
       yValues[i] = Math
           .ceil(charge * (selectedRows[i].getAverageMZ())
               * getKendrickMassFactor(customYAxisKMBase, yAxisDivisorSelection))

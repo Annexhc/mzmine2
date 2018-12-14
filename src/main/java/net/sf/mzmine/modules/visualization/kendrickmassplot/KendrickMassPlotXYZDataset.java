@@ -63,24 +63,17 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
     this.customYAxisKMBase =
         parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickMassBase).getValue();
 
-    this.yAxisChargeSelection =
-        parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickCharge).getValue();
+    this.yAxisChargeSelection = 1;
 
-    this.xAxisChargeSelection =
-        parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickCharge).getValue();
+    this.xAxisChargeSelection = 1;
 
-    this.zAxisChargeSelection =
-        parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickCharge).getValue();
+    this.zAxisChargeSelection = 1;
 
-    this.yAxisDivisorSelection =
-        parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickDivisor).getValue();
+    this.yAxisDivisorSelection = 1;
 
-    this.xAxisDivisorSelection =
-        parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickDivisor).getValue();
+    this.xAxisDivisorSelection = 1;
 
-    this.zAxisDivisorSelection =
-        parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickDivisor).getValue();
-
+    this.zAxisDivisorSelection = 1;
 
     if (parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickMassBase)
         .getValue() == true) {

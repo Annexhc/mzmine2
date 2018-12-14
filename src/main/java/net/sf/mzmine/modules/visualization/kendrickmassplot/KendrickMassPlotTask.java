@@ -68,6 +68,7 @@ public class KendrickMassPlotTask extends AbstractTask {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
+  private ParameterSet parameters;
   private XYDataset dataset2D;
   private XYZDataset dataset3D;
   private JFreeChart chart;
@@ -86,6 +87,8 @@ public class KendrickMassPlotTask extends AbstractTask {
   public KendrickMassPlotTask(ParameterSet parameters) {
     peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
+
+    this.parameters = parameters;
 
     title = "Kendrick mass plot [" + peakList + "]";
 
@@ -152,7 +155,7 @@ public class KendrickMassPlotTask extends AbstractTask {
     chart.setBackgroundPaint(Color.white);
 
     // Create Kendrick mass plot Window
-    KendrickMassPlotWindow frame = new KendrickMassPlotWindow(chart);
+    KendrickMassPlotWindow frame = new KendrickMassPlotWindow(chart, parameters);
 
     // create chart JPanel
     EChartPanel chartPanel = new EChartPanel(chart, true, true, true, true, false);
