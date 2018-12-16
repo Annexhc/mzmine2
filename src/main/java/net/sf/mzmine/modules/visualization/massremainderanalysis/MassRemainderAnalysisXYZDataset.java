@@ -37,10 +37,7 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
   private String xAxisMolecularUnit;
   private String yAxisMolecularUnit;
   private String zAxisMolecularUnit;
-  private String xAxisValues;
   private String zAxisValues;
-  private int yAxisChargeSelection;
-  private boolean useMassOfChargeCarrier;
   private double[] xValues;
   private double[] yValues;
   private double[] zValues;
@@ -58,9 +55,6 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
 
     this.yAxisMolecularUnit =
         parameters.getParameter(MassRemainderAnalysisParameters.yAxisMolecularUnit).getValue();
-
-    this.yAxisChargeSelection =
-        parameters.getParameter(MassRemainderAnalysisParameters.yAxisCharge).getValue();
 
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
@@ -88,11 +82,8 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
       for (int i = 0; i < selectedRows.length; i++) {
-        // get charge
-        int charge = yAxisChargeSelection;
-        xValues[i] = selectedRows[i].getAverageMZ() * charge - (Math
-            .floor((selectedRows[i].getAverageMZ() * charge)
-                / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
+        xValues[i] = selectedRows[i].getAverageMZ() - (Math.floor(
+            (selectedRows[i].getAverageMZ()) / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
             * FormulaUtils.calculateExactMass(xAxisMolecularUnit));
       }
     } else {
@@ -104,26 +95,19 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
     // Calc yValues
     yValues = new double[selectedRows.length];
     for (int i = 0; i < selectedRows.length; i++) {
-      // get charge
-      int charge = yAxisChargeSelection;
-      yValues[i] = selectedRows[i].getAverageMZ() * charge - (Math
-          .floor((selectedRows[i].getAverageMZ() * charge)
-              / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
+      yValues[i] = selectedRows[i].getAverageMZ() - (Math.floor(
+          (selectedRows[i].getAverageMZ()) / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
           * FormulaUtils.calculateExactMass(yAxisMolecularUnit));
     }
 
     // Calc zValues
     zValues = new double[selectedRows.length];
     if (parameters.getParameter(MassRemainderAnalysisParameters.zAxisCustomMolecularUnit)
-        .getValue() == true)
-
-    {
-      // Calc yValues
-      zValues = new double[selectedRows.length];
+        .getValue() == true) {
       for (int i = 0; i < selectedRows.length; i++) {
-        zValues[i] = zValues[i] = selectedRows[i].getAverageMZ() - Math.floor(
-            selectedRows[i].getAverageMZ() / FormulaUtils.calculateExactMass(zAxisMolecularUnit))
-            * FormulaUtils.calculateExactMass(zAxisMolecularUnit);
+        zValues[i] = selectedRows[i].getAverageMZ() - (Math.floor(
+            (selectedRows[i].getAverageMZ()) / FormulaUtils.calculateExactMass(zAxisMolecularUnit))
+            * FormulaUtils.calculateExactMass(zAxisMolecularUnit));
       }
     } else
       for (int i = 0; i < selectedRows.length; i++) {
@@ -198,7 +182,7 @@ class MassRemainderAnalysisXYZDataset extends AbstractXYZDataset {
   }
 
   @Override
-  public Comparable getSeriesKey(int series) {
+  public Comparable<?> getSeriesKey(int series) {
     return getRowKey(series);
   }
 

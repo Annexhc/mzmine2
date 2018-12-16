@@ -21,8 +21,12 @@ package net.sf.mzmine.modules.visualization.massremainderanalysis;
 import java.awt.Color;
 import java.awt.Insets;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import net.sf.mzmine.util.GUIUtils;
 
@@ -38,8 +42,14 @@ public class MassRemainderAnalysisToolBar extends JToolBar {
   static final Icon backColorIcon = new ImageIcon("icons/bgicon.png");
   static final Icon gridIcon = new ImageIcon("icons/gridicon.png");
   static final Icon annotationsIcon = new ImageIcon("icons/annotationsicon.png");
+  static final Icon arrowUpIcon = new ImageIcon("icons/arrowupicon.png");
+  static final Icon arrowDownIcon = new ImageIcon("icons/arrowdownicon.png");
 
-  public MassRemainderAnalysisToolBar(ActionListener masterFrame) {
+  public MassRemainderAnalysisToolBar(ActionListener masterFrame, // listener
+      int xAxisCharge, int yAxisCharge, int zAxisCharge, // charge
+      int xAxisDivisor, int yAxisDivisor, int zAxisDivisor, // divisor
+      boolean useCustomXAxis, boolean useCustomZAxis // custom axis
+  ) {
 
     super(JToolBar.VERTICAL);
 
@@ -48,23 +58,129 @@ public class MassRemainderAnalysisToolBar extends JToolBar {
     setMargin(new Insets(5, 5, 5, 5));
     setBackground(Color.white);
 
-    GUIUtils.addButton(this, null, blockSizeIcon, masterFrame, "TOGGLE_BLOCK_SIZE",
-        "Toggle block size");
+    // list for all components
+    ArrayList<JComponent> componentsList = new ArrayList<JComponent>();
 
-    addSeparator();
+    // toggle buttons
+    componentsList.add(GUIUtils.addButton(this, null, blockSizeIcon, masterFrame,
+        "TOGGLE_BLOCK_SIZE", "Toggle block size"));
 
-    GUIUtils.addButton(this, null, backColorIcon, masterFrame, "TOGGLE_BACK_COLOR",
-        "Toggle background color white/black");
+    componentsList.add(GUIUtils.addButton(this, null, backColorIcon, masterFrame,
+        "TOGGLE_BACK_COLOR", "Toggle background color white/black"));
 
-    addSeparator();
+    componentsList
+        .add(GUIUtils.addButton(this, null, gridIcon, masterFrame, "TOGGLE_GRID", "Toggle grid"));
 
-    GUIUtils.addButton(this, null, gridIcon, masterFrame, "TOGGLE_GRID", "Toggle grid");
+    componentsList.add(GUIUtils.addButton(this, null, annotationsIcon, masterFrame,
+        "TOGGLE_ANNOTATIONS", "Toggle annotations"));
 
-    addSeparator();
+    // add empty row
+    addEmptyRow(componentsList);
 
-    GUIUtils.addButton(this, null, annotationsIcon, masterFrame, "TOGGLE_ANNOTATIONS",
-        "Toggle annotations");
-    addSeparator();
+    // yAxis components
+
+    // header
+    componentsList.add(GUIUtils.addLabel(this, "Y-Axis:"));
+    componentsList.add(GUIUtils.addLabel(this, null));
+
+    // labels
+    componentsList.add(GUIUtils.addLabel(this, "Charge", null, JLabel.CENTER, null));
+    componentsList.add(GUIUtils.addLabel(this, "Divisor", null, JLabel.CENTER, null));
+
+    // arrow up
+    componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
+        "CHANGE_CHARGE_UP_Y", "Increase charge"));
+    componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
+        "CHANGE_DIVISOR_UP_Y", "Increase divisor"));
+
+    // arrow down
+    componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+        "CHANGE_CHARGE_DOWN_Y", "Decrease charge"));
+    componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+        "CHANGE_DIVISOR_DOWN_Y", "Decrease divisor"));
+
+    // current
+    componentsList.add(GUIUtils.addLabel(this, //
+        String.valueOf(yAxisCharge), null, JLabel.CENTER, null));
+    componentsList.add(GUIUtils.addLabel(this, //
+        String.valueOf(yAxisDivisor), null, JLabel.CENTER, null));
+
+    // xAxis
+    if (useCustomXAxis) {
+
+      // add empty row
+      addEmptyRow(componentsList);
+
+      // header
+      componentsList.add(GUIUtils.addLabel(this, "X-Axis:"));
+      componentsList.add(GUIUtils.addLabel(this, null));
+
+      // labels
+      componentsList.add(GUIUtils.addLabel(this, "Charge", null, JLabel.CENTER, null));
+      componentsList.add(GUIUtils.addLabel(this, "Divisor", null, JLabel.CENTER, null));
+
+      // arrow up
+      componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
+          "CHANGE_CHARGE_UP_X", "Increase charge"));
+      componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
+          "CHANGE_DIVISOR_UP_X", "Increase divisor"));
+
+      // arrow down
+      componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_CHARGE_DOWN_X", "Decrease charge"));
+      componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_DIVISOR_DOWN_X", "Decrease divisor"));
+
+      // current
+      componentsList.add(GUIUtils.addLabel(this, //
+          String.valueOf(xAxisCharge), null, JLabel.CENTER, null));
+      componentsList.add(GUIUtils.addLabel(this, //
+          String.valueOf(xAxisDivisor), null, JLabel.CENTER, null));
+    }
+
+    // zAxis
+    if (useCustomZAxis) {
+
+      // add empty row
+      addEmptyRow(componentsList);
+
+      // header
+      componentsList.add(GUIUtils.addLabel(this, "Z-Axis:"));
+      componentsList.add(GUIUtils.addLabel(this, null));
+
+      // labels
+      componentsList.add(GUIUtils.addLabel(this, "Charge", null, JLabel.CENTER, null));
+      componentsList.add(GUIUtils.addLabel(this, "Divisor", null, JLabel.CENTER, null));
+
+      // arrow up
+      componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
+          "CHANGE_CHARGE_UP_Z", "Increase charge"));
+      componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
+          "CHANGE_DIVISOR_UP_Z", "Increase divisor"));
+
+      // arrow down
+      componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_CHARGE_DOWN_Z", "Decrease charge"));
+      componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_DIVISOR_DOWN_Z", "Decrease divisor"));
+
+      // current
+      componentsList.add(GUIUtils.addLabel(this, //
+          String.valueOf(zAxisCharge), null, JLabel.CENTER, null));
+      componentsList.add(GUIUtils.addLabel(this, //
+          String.valueOf(zAxisDivisor), null, JLabel.CENTER, null));
+    }
+    JComponent[] components = new JComponent[componentsList.size()];
+
+    JPanel componentsPanel =
+        GUIUtils.makeTablePanel(components.length / 2, 2, componentsList.toArray(components));
+    componentsPanel.setBackground(Color.WHITE);
+    this.add(componentsPanel);
+  }
+
+  private void addEmptyRow(ArrayList<JComponent> componentsList) {
+    componentsList.add(GUIUtils.addLabel(this, ""));
+    componentsList.add(GUIUtils.addLabel(this, ""));
   }
 
 }

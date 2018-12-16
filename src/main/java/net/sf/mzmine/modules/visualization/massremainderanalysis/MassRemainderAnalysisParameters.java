@@ -26,7 +26,6 @@ import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.ComboParameter;
-import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.OptionalParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.WindowSettingsParameter;
@@ -51,10 +50,6 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
   public static final StringParameter yAxisMolecularUnit =
       new StringParameter("Molecular unit for y-Axis",
           "Enter a sum formula to use for mass remainder calculation, e.g. \"CH2\" ");
-
-  public static final IntegerParameter yAxisCharge =
-      new IntegerParameter("Charge for molecular unit on y-axis",
-          "Leave empty or enter 1 for classic mass remainder analysis", 1, false);
 
   public static final OptionalParameter<StringParameter> xAxisCustomMolecularUnit =
       new OptionalParameter<>(new StringParameter("Molecular unit for x-Axis",
@@ -88,9 +83,9 @@ public class MassRemainderAnalysisParameters extends SimpleParameterSet {
   public static final WindowSettingsParameter windowSettings = new WindowSettingsParameter();
 
   public MassRemainderAnalysisParameters() {
-    super(new Parameter[] {peakList, selectedRows, yAxisMolecularUnit, yAxisCharge,
-        xAxisCustomMolecularUnit, zAxisValues, zAxisCustomMolecularUnit, zScaleType, zScaleRange,
-        paintScale, windowSettings});
+    super(new Parameter[] {peakList, selectedRows, yAxisMolecularUnit, xAxisCustomMolecularUnit,
+        zAxisValues, zAxisCustomMolecularUnit, zScaleType, zScaleRange, paintScale,
+        windowSettings});
   }
 
   @Override

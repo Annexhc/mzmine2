@@ -68,6 +68,7 @@ public class MassRemainderAnalysisTask extends AbstractTask {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
+  private ParameterSet parameters;
   private XYDataset dataset2D;
   private XYZDataset dataset3D;
   private JFreeChart chart;
@@ -86,6 +87,8 @@ public class MassRemainderAnalysisTask extends AbstractTask {
   public MassRemainderAnalysisTask(ParameterSet parameters) {
     peakList = parameters.getParameter(MassRemainderAnalysisParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
+
+    this.parameters = parameters;
 
     title = "Mass remainder analysis of [" + peakList + "]";
 
@@ -155,7 +158,7 @@ public class MassRemainderAnalysisTask extends AbstractTask {
     chart.setBackgroundPaint(Color.white);
 
     // Create Mass remainder plot Window
-    MassRemainderAnalysisWindow frame = new MassRemainderAnalysisWindow(chart);
+    MassRemainderAnalysisWindow frame = new MassRemainderAnalysisWindow(chart, parameters);
 
     // create chart JPanel
     EChartPanel chartPanel = new EChartPanel(chart, true, true, true, true, false);

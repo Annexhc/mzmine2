@@ -30,8 +30,8 @@ import com.google.common.collect.Range;
 public class XYBlockPixelSizePaintScales {
 
   /*
-   * Method to select the right scale for the applied settings in the modules kendrickmassplot and
-   * vankrevelendiagram
+   * Method to select the right scale for the applied settings in the modules Kendrick mass plot,
+   * Van Krevelen diagram and mass remainder analysis
    */
   public static Paint[] getPaintColors(String zAxisScaleType, Range<Double> zScaleRange,
       String paintScaleStyle) {
@@ -50,7 +50,6 @@ public class XYBlockPixelSizePaintScales {
       } else if (paintScaleStyle.contains("cyan")) {
         scale = getCyanScaleLowerUpperBound();
       }
-
     }
     // lower bound
     else if (zAxisScaleType.contains("percentile") && zScaleRange.lowerEndpoint() != 0
@@ -123,7 +122,7 @@ public class XYBlockPixelSizePaintScales {
   public static Paint[] getFullRainBowScaleLowerUpperBound() {
     int ncolor = 360;
     Color[] readRainbow = new Color[ncolor];
-    Color[] rainbow = new Color[ncolor + 10];
+    Color[] rainbow = new Color[ncolor];
 
     float x = (float) (1. / (ncolor + 160));
     for (int i = 0; i < readRainbow.length; i++) {
@@ -147,7 +146,7 @@ public class XYBlockPixelSizePaintScales {
   public static Paint[] getFullRainBowScaleLowerBound() {
     int ncolor = 360;
     Color[] readRainbow = new Color[ncolor];
-    Color[] rainbow = new Color[ncolor + 5];
+    Color[] rainbow = new Color[ncolor];
 
     float x = (float) (1. / (ncolor + 160));
     for (int i = 5; i < readRainbow.length; i++) {
@@ -157,7 +156,7 @@ public class XYBlockPixelSizePaintScales {
       rainbow[i] = new Color(0, 0, 0);
     }
     for (int i = 5; i < readRainbow.length; i++) {
-      rainbow[i] = readRainbow[readRainbow.length - i - 1 + 5];
+      rainbow[i] = readRainbow[readRainbow.length - i - 1];
     }
     return rainbow;
   }
@@ -168,7 +167,7 @@ public class XYBlockPixelSizePaintScales {
   public static Paint[] getFullRainBowScaleUpperBound() {
     int ncolor = 360;
     Color[] readRainbow = new Color[ncolor];
-    Color[] rainbow = new Color[ncolor + 5];
+    Color[] rainbow = new Color[ncolor];
 
     float x = (float) (1. / (ncolor + 160));
     for (int i = 0; i < readRainbow.length; i++) {

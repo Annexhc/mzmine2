@@ -36,7 +36,6 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
   private PeakListRow selectedRows[];
   private String xAxisMolecularUnit;
   private String yAxisMolecularUnit;
-  private int yAxisChargeSelection;
   private double[] xValues;
   private double[] yValues;
   private ParameterSet parameters;
@@ -54,8 +53,6 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
     this.yAxisMolecularUnit =
         parameters.getParameter(MassRemainderAnalysisParameters.yAxisMolecularUnit).getValue();
 
-    this.yAxisChargeSelection =
-        parameters.getParameter(MassRemainderAnalysisParameters.yAxisCharge).getValue();
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
       this.xAxisMolecularUnit =
@@ -70,11 +67,8 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
     if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
       for (int i = 0; i < selectedRows.length; i++) {
-        // get charge
-        int charge = yAxisChargeSelection;
-        xValues[i] = selectedRows[i].getAverageMZ() * charge - (Math
-            .floor((selectedRows[i].getAverageMZ() * charge)
-                / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
+        xValues[i] = selectedRows[i].getAverageMZ() - (Math.floor(
+            (selectedRows[i].getAverageMZ()) / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
             * FormulaUtils.calculateExactMass(xAxisMolecularUnit));
       }
     } else {
@@ -83,15 +77,11 @@ class MassRemainderAnalysisXYDataset extends AbstractXYDataset {
       }
     }
 
-
     // Calc yValues
     yValues = new double[selectedRows.length];
     for (int i = 0; i < selectedRows.length; i++) {
-      // get charge
-      int charge = yAxisChargeSelection;
-      yValues[i] = selectedRows[i].getAverageMZ() * charge - (Math
-          .floor((selectedRows[i].getAverageMZ() * charge)
-              / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
+      yValues[i] = selectedRows[i].getAverageMZ() - (Math.floor(
+          (selectedRows[i].getAverageMZ()) / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
           * FormulaUtils.calculateExactMass(yAxisMolecularUnit));
     }
   }
