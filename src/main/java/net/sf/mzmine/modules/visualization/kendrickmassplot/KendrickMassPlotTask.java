@@ -144,7 +144,7 @@ public class KendrickMassPlotTask extends AbstractTask {
       return;
 
     JFreeChart chart = null;
-    // 2D, if no thrid dimension was selected
+    // 2D, if no third dimension was selected
     if (zAxisLabel.equals("none")) {
       chart = create2DKendrickMassPlot();
     }
@@ -154,11 +154,11 @@ public class KendrickMassPlotTask extends AbstractTask {
     }
     chart.setBackgroundPaint(Color.white);
 
-    // Create Kendrick mass plot Window
-    KendrickMassPlotWindow frame = new KendrickMassPlotWindow(chart, parameters);
-
     // create chart JPanel
     EChartPanel chartPanel = new EChartPanel(chart, true, true, true, true, false);
+
+    // Create Kendrick mass plot Window
+    KendrickMassPlotWindow frame = new KendrickMassPlotWindow(chart, parameters, chartPanel);
     frame.add(chartPanel, BorderLayout.CENTER);
 
     // set title properties
@@ -191,7 +191,7 @@ public class KendrickMassPlotTask extends AbstractTask {
 
       // create chart
       chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel, dataset2D,
-          PlotOrientation.VERTICAL, true, true, false);
+          PlotOrientation.VERTICAL, true, true, true);
 
       XYPlot plot = (XYPlot) chart.getPlot();
       plot.setBackgroundPaint(Color.WHITE);
@@ -280,7 +280,7 @@ public class KendrickMassPlotTask extends AbstractTask {
 
     // create chart
     chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel, dataset3D,
-        PlotOrientation.VERTICAL, true, true, false);
+        PlotOrientation.VERTICAL, true, true, true);
     XYPlot plot = chart.getXYPlot();
 
     // set axis

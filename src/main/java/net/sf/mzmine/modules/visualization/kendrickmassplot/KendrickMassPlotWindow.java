@@ -22,16 +22,25 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.Point2D;
+import java.awt.geom.Rectangle2D;
+import java.util.stream.DoubleStream;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPopupMenu;
+import org.jfree.chart.ChartMouseEvent;
+import org.jfree.chart.ChartMouseListener;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
+import net.sf.mzmine.chartbasics.gui.swing.EChartPanel;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizeRenderer;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.util.FormulaUtils;
+import net.sf.mzmine.util.GUIUtils;
 
 /**
  * Window for Kendrick mass plots
@@ -43,6 +52,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
   private static final long serialVersionUID = 1L;
   private KendrickMassPlotToolBar toolBar;
   private JFreeChart chart;
+  private EChartPanel chartPanel;
   private PeakListRow selectedRows[];
   private String xAxisKMBase;
   private String zAxisKMBase;
@@ -61,7 +71,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
   private int xAxisDivisor;
   private int zAxisDivisor;
 
-  public KendrickMassPlotWindow(JFreeChart chart, ParameterSet parameters) {
+  public KendrickMassPlotWindow(JFreeChart chart, ParameterSet parameters, EChartPanel chartPanel) {
 
     PeakList peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
@@ -114,6 +124,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
 
     this.zAxisShift = 0;
 
+    this.chartPanel = chartPanel;
+
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     setBackground(Color.white);
 
@@ -127,6 +139,80 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     JMenuBar menuBar = new JMenuBar();
     menuBar.add(new WindowsMenu());
     setJMenuBar(menuBar);
+
+
+    // Popup menu
+    chartPanel.addChartMouseListener(new ChartMouseListener() {
+      @Override
+      public void chartMouseMoved(ChartMouseEvent event) {
+
+      }
+
+      @Override
+      public void chartMouseClicked(ChartMouseEvent event) {
+        Point2D p = chartPanel.translateScreenToJava2D(event.getTrigger().getPoint());
+        Rectangle2D plotArea = chartPanel.getScreenDataArea();
+        XYPlot plot = (XYPlot) chart.getPlot();
+        Double chartX =
+            plot.getDomainAxis().java2DToValue(p.getX(), plotArea, plot.getDomainAxisEdge());
+        Double chartY =
+            plot.getRangeAxis().java2DToValue(p.getY(), plotArea, plot.getRangeAxisEdge());
+        KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+
+        // get x Values
+        double[] xValues = new double[dataset.getItemCount(0)];
+        for (int i = 0; i < xValues.length; i++) {
+          xValues[i] = dataset.getX(0, i).intValue();
+        }
+
+        // get y Values
+        double[] yValues = new double[dataset.getItemCount(0)];
+        for (int i = 0; i < yValues.length; i++) {
+          yValues[i] = dataset.getY(0, i).intValue();
+        }
+
+        if (DoubleStream.of(xValues).anyMatch(x -> x == chartX.intValue())
+            && DoubleStream.of(yValues).anyMatch(x -> x == chartY)) {
+          System.out.println("hit at:" + chartX + "and" + chartY);
+        } else
+          System.out.println("nope");
+        System.out.println("hit at:" + chartX.intValue() + "and" + chartY.intValue());
+      }
+    });
+
+
+
+    // Add right click menu to plot
+    JPopupMenu popupMenu = chartPanel.getPopupMenu();
+
+    // Add EMF and EPS options to the save as menu
+    JMenuItem saveAsMenu = (JMenuItem) popupMenu.getComponent(3);
+    GUIUtils.addMenuItem(saveAsMenu, "EMF...", this, "SAVE_EMF");
+    GUIUtils.addMenuItem(saveAsMenu, "EPS...", this, "SAVE_EPS");
+
+    // add items to popup menu
+
+    GUIUtils.addMenuItem(popupMenu, "Export spectra to spectra file", this, "EXPORT_SPECTRA");
+
+    popupMenu.addSeparator();
+
+    GUIUtils.addMenuItem(popupMenu, "Toggle centroid/continuous mode", this, "TOGGLE_PLOT_MODE");
+    GUIUtils.addMenuItem(popupMenu, "Toggle displaying of data points in continuous mode", this,
+        "SHOW_DATA_POINTS");
+    GUIUtils.addMenuItem(popupMenu, "Toggle displaying of peak values", this, "SHOW_ANNOTATIONS");
+    GUIUtils.addMenuItem(popupMenu, "Toggle displaying of picked peaks", this, "SHOW_PICKED_PEAKS");
+
+    GUIUtils.addMenuItem(popupMenu, "Reset removed titles to visible", this, "SHOW_REMOVED_TITLES");
+
+    popupMenu.addSeparator();
+
+    GUIUtils.addMenuItem(popupMenu, "Set axes range", this, "SETUP_AXES");
+
+    GUIUtils.addMenuItem(popupMenu, "Set same range to all windows", this, "SET_SAME_RANGE");
+
+    popupMenu.addSeparator();
+
+    GUIUtils.addMenuItem(popupMenu, "Add isotope pattern", this, "ADD_ISOTOPE_PATTERN");
 
     pack();
   }
@@ -541,6 +627,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     this.add(toolBar, BorderLayout.EAST);
     this.revalidate();
   }
+
 
   /*
    * Method to calculate the Kendrick mass factor for a give sum formula
