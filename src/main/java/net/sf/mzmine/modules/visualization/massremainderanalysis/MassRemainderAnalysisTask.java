@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.massremainderanalysis;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -57,11 +57,11 @@ import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
 
 /**
- * Task to create a Kendrick mass plot of selected features of a selected feature list
+ * Task to perform a remainder analysis of selected features of a selected feature list
  * 
  * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-public class KendrickMassPlotTask extends AbstractTask {
+public class MassRemainderAnalysisTask extends AbstractTask {
 
   static final Font legendFont = new Font("SansSerif", Font.PLAIN, 12);
   static final Font titleFont = new Font("SansSerif", Font.PLAIN, 12);
@@ -84,41 +84,44 @@ public class KendrickMassPlotTask extends AbstractTask {
   private ParameterSet parameterSet;
   private int totalSteps = 3, appliedSteps = 0;
 
-  public KendrickMassPlotTask(ParameterSet parameters) {
-    peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
+  public MassRemainderAnalysisTask(ParameterSet parameters) {
+    peakList = parameters.getParameter(MassRemainderAnalysisParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
 
     this.parameters = parameters;
 
-    title = "Kendrick mass plot [" + peakList + "]";
+    title = "Mass remainder analysis of [" + peakList + "]";
 
-    if (parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickMassBase)
+    if (parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
         .getValue() == true) {
-      xAxisLabel =
-          "KMD (" + parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickMassBase)
-              .getEmbeddedParameter().getValue() + ")";
+      xAxisLabel = "Mass remainder ("
+          + parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
+              .getEmbeddedParameter().getValue()
+          + ")";
     } else {
-      xAxisLabel = parameters.getParameter(KendrickMassPlotParameters.xAxisValues).getValue();
+      xAxisLabel = "m/z";
     }
 
-    yAxisLabel = "KMD ("
-        + parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickMassBase).getValue()
+    yAxisLabel = "Mass remainder ("
+        + parameters.getParameter(MassRemainderAnalysisParameters.yAxisMolecularUnit).getValue()
         + ")";
 
-    if (parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase)
+    if (parameters.getParameter(MassRemainderAnalysisParameters.zAxisCustomMolecularUnit)
         .getValue() == true) {
-      zAxisLabel =
-          "KMD (" + parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase)
-              .getEmbeddedParameter().getValue() + ")";
+      zAxisLabel = "Mass remainder ("
+          + parameters.getParameter(MassRemainderAnalysisParameters.zAxisCustomMolecularUnit)
+              .getEmbeddedParameter().getValue()
+          + ")";
     } else {
-      zAxisLabel = parameters.getParameter(KendrickMassPlotParameters.zAxisValues).getValue();
+      zAxisLabel = parameters.getParameter(MassRemainderAnalysisParameters.zAxisValues).getValue();
     }
 
-    zAxisScaleType = parameters.getParameter(KendrickMassPlotParameters.zScaleType).getValue();
+    zAxisScaleType = parameters.getParameter(MassRemainderAnalysisParameters.zScaleType).getValue();
 
-    zScaleRange = parameters.getParameter(KendrickMassPlotParameters.zScaleRange).getValue();
+    zScaleRange = parameters.getParameter(MassRemainderAnalysisParameters.zScaleRange).getValue();
 
-    paintScaleStyle = parameters.getParameter(KendrickMassPlotParameters.paintScale).getValue();
+    paintScaleStyle =
+        parameters.getParameter(MassRemainderAnalysisParameters.paintScale).getValue();
 
     rows = parameters.getParameter(IntensityPlotParameters.selectedRows).getMatchingRows(peakList);
 
@@ -127,7 +130,7 @@ public class KendrickMassPlotTask extends AbstractTask {
 
   @Override
   public String getTaskDescription() {
-    return "Create Kendrick mass plot for " + peakList;
+    return "Mass remainder analysis for " + peakList;
   }
 
   @Override
@@ -138,27 +141,28 @@ public class KendrickMassPlotTask extends AbstractTask {
   @Override
   public void run() {
     setStatus(TaskStatus.PROCESSING);
-    logger.info("Create Kendrick mass plot of " + peakList);
+    logger.info("Mass remainder analysis for " + peakList);
     // Task canceled?
     if (isCanceled())
       return;
 
     JFreeChart chart = null;
-    // 2D, if no third dimension was selected
+    // 2D, if no thrid dimension was selected
     if (zAxisLabel.equals("none")) {
-      chart = create2DKendrickMassPlot();
+      chart = create2DMassRemainderPlot();
     }
     // 3D, if a third dimension was selected
     else {
-      chart = create3DKendrickMassPlot();
+      chart = create3DMassRemainderPlot();
     }
     chart.setBackgroundPaint(Color.white);
 
     // create chart JPanel
     EChartPanel chartPanel = new EChartPanel(chart, true, true, true, true, false);
 
-    // Create Kendrick mass plot Window
-    KendrickMassPlotWindow frame = new KendrickMassPlotWindow(chart, parameters, chartPanel);
+    // Create Mass remainder plot Window
+    MassRemainderAnalysisWindow frame =
+        new MassRemainderAnalysisWindow(chart, parameters, chartPanel);
     frame.add(chartPanel, BorderLayout.CENTER);
 
     // set title properties
@@ -174,24 +178,24 @@ public class KendrickMassPlotTask extends AbstractTask {
     frame.pack();
 
     setStatus(TaskStatus.FINISHED);
-    logger.info("Finished creating Kendrick mass plot of " + peakList);
+    logger.info("Finished Mass remainder analysis for  " + peakList);
   }
 
   /**
-   * create 2D Kendrick mass plot
+   * create 2D Mass remainder analysis plot
    */
-  private JFreeChart create2DKendrickMassPlot() {
+  private JFreeChart create2DMassRemainderPlot() {
 
     if (zAxisLabel.equals("none")) {
       logger.info("Creating new 2D chart instance");
       appliedSteps++;
 
       // load dataset
-      dataset2D = new KendrickMassPlotXYDataset(parameterSet);
+      dataset2D = new MassRemainderAnalysisXYDataset(parameterSet);
 
       // create chart
       chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel, dataset2D,
-          PlotOrientation.VERTICAL, true, true, true);
+          PlotOrientation.VERTICAL, true, true, false);
 
       XYPlot plot = (XYPlot) chart.getPlot();
       plot.setBackgroundPaint(Color.WHITE);
@@ -200,14 +204,6 @@ public class KendrickMassPlotTask extends AbstractTask {
       plot.setDomainCrosshairVisible(true);
       plot.setRangeCrosshairVisible(true);
       appliedSteps++;
-
-      // set axis
-      NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-      NumberAxis range = (NumberAxis) plot.getRangeAxis();
-      range.setRange(0, 1);
-      if (xAxisLabel.contains("KMD")) {
-        domain.setRange(0, 1);
-      }
 
       // set renderer
       XYBlockPixelSizeRenderer renderer = new XYBlockPixelSizeRenderer();
@@ -229,14 +225,14 @@ public class KendrickMassPlotTask extends AbstractTask {
   }
 
   /**
-   * create 3D Kendrick mass plot
+   * create 3D mass remainder analysis plot
    */
-  private JFreeChart create3DKendrickMassPlot() {
+  private JFreeChart create3DMassRemainderPlot() {
 
     logger.info("Creating new 3D chart instance");
     appliedSteps++;
     // load dataseta
-    dataset3D = new KendrickMassPlotXYZDataset(parameterSet);
+    dataset3D = new MassRemainderAnalysisXYZDataset(parameterSet);
 
     // copy and sort z-Values for min and max of the paint scale
     double[] copyZValues = new double[dataset3D.getItemCount(0)];
@@ -251,7 +247,7 @@ public class KendrickMassPlotTask extends AbstractTask {
     double max = 0;
 
     if (zAxisScaleType.equals("percentile")) {
-      minScaleIndex = (int) Math.ceil(copyZValues.length * (zScaleRange.lowerEndpoint() / 100));
+      minScaleIndex = (int) Math.round(copyZValues.length * (zScaleRange.lowerEndpoint() / 100));
       maxScaleIndex = copyZValues.length
           - (int) (Math.ceil(copyZValues.length * ((100 - zScaleRange.upperEndpoint()) / 100)));
       if (zScaleRange.upperEndpoint() == 100) {
@@ -284,16 +280,9 @@ public class KendrickMassPlotTask extends AbstractTask {
 
     // create chart
     chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel, dataset3D,
-        PlotOrientation.VERTICAL, true, true, true);
+        PlotOrientation.VERTICAL, true, true, false);
     XYPlot plot = chart.getXYPlot();
 
-    // set axis
-    NumberAxis domain = (NumberAxis) plot.getDomainAxis();
-    NumberAxis range = (NumberAxis) plot.getRangeAxis();
-    range.setRange(0, 1);
-    if (xAxisLabel.contains("KMD")) {
-      domain.setRange(0, 1);
-    }
     // set renderer
     XYBlockPixelSizeRenderer renderer = new XYBlockPixelSizeRenderer();
     appliedSteps++;

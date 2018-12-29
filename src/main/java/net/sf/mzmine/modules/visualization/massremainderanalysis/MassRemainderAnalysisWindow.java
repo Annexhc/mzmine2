@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.massremainderanalysis;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -39,26 +39,21 @@ import net.sf.mzmine.util.FormulaUtils;
 import net.sf.mzmine.util.dialogs.FeatureSummaryWindow;
 
 /**
- * Window for Kendrick mass plots
+ * Window for mass remainder analysis
  * 
  * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-public class KendrickMassPlotWindow extends JFrame implements ActionListener {
+public class MassRemainderAnalysisWindow extends JFrame implements ActionListener {
 
   private static final long serialVersionUID = 1L;
-  private KendrickMassPlotToolBar toolBar;
+  private MassRemainderAnalysisToolBar toolBar;
   private JFreeChart chart;
   private PeakListRow selectedRows[];
-  private String xAxisKMBase;
-  private String zAxisKMBase;
-  private String customYAxisKMBase;
-  private String customXAxisKMBase;
-  private String customZAxisKMBase;
-  private boolean useCustomXAxisKMBase;
-  private boolean useCustomZAxisKMBase;
-  private double xAxisShift;
-  private double yAxisShift;
-  private double zAxisShift;
+  private String xAxisMolecularUnit;
+  private String yAxisMolecularUnit;
+  private String zAxisMolecularUnit;
+  private boolean useCustomeXAxisMolecularUnit;
+  private boolean useCustomeZAxisMolecularUnit;
   private int yAxisCharge;
   private int xAxisCharge;
   private int zAxisCharge;
@@ -66,37 +61,39 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
   private int xAxisDivisor;
   private int zAxisDivisor;
 
-  public KendrickMassPlotWindow(JFreeChart chart, ParameterSet parameters, EChartPanel chartPanel) {
+  public MassRemainderAnalysisWindow(JFreeChart chart, ParameterSet parameters,
+      EChartPanel chartPanel) {
 
-    PeakList peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
+    PeakList peakList = parameters.getParameter(MassRemainderAnalysisParameters.peakList).getValue()
         .getMatchingPeakLists()[0];
 
-    this.selectedRows =
-        parameters.getParameter(KendrickMassPlotParameters.selectedRows).getMatchingRows(peakList);
+    this.selectedRows = parameters.getParameter(MassRemainderAnalysisParameters.selectedRows)
+        .getMatchingRows(peakList);
 
-    this.customYAxisKMBase =
-        parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickMassBase).getValue();
+    this.yAxisMolecularUnit =
+        parameters.getParameter(MassRemainderAnalysisParameters.yAxisMolecularUnit).getValue();
 
-    this.useCustomXAxisKMBase =
-        parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickMassBase).getValue();
+    this.useCustomeXAxisMolecularUnit = parameters
+        .getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit).getValue();
 
-    if (useCustomXAxisKMBase == true) {
-      this.customXAxisKMBase =
-          parameters.getParameter(KendrickMassPlotParameters.xAxisCustomKendrickMassBase)
+    if (useCustomeXAxisMolecularUnit == true) {
+      this.xAxisMolecularUnit =
+          parameters.getParameter(MassRemainderAnalysisParameters.xAxisCustomMolecularUnit)
               .getEmbeddedParameter().getValue();
     } else {
-      this.xAxisKMBase = parameters.getParameter(KendrickMassPlotParameters.xAxisValues).getValue();
+      this.xAxisMolecularUnit = null;
     }
 
-    this.useCustomZAxisKMBase =
-        parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase).getValue();
+    this.useCustomeZAxisMolecularUnit = parameters
+        .getParameter(MassRemainderAnalysisParameters.zAxisCustomMolecularUnit).getValue();
 
-    if (useCustomZAxisKMBase == true) {
-      this.customZAxisKMBase =
-          parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase)
+    if (useCustomeZAxisMolecularUnit == true) {
+      this.zAxisMolecularUnit =
+          parameters.getParameter(MassRemainderAnalysisParameters.zAxisCustomMolecularUnit)
               .getEmbeddedParameter().getValue();
     } else {
-      this.zAxisKMBase = parameters.getParameter(KendrickMassPlotParameters.zAxisValues).getValue();
+      this.zAxisMolecularUnit =
+          parameters.getParameter(MassRemainderAnalysisParameters.zAxisValues).getValue();
     }
 
     this.chart = chart;
@@ -113,19 +110,13 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
 
     this.zAxisDivisor = 1;
 
-    this.xAxisShift = 0;
-
-    this.yAxisShift = 0;
-
-    this.zAxisShift = 0;
-
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     setBackground(Color.white);
 
     // Add toolbar
-    toolBar = new KendrickMassPlotToolBar(this, xAxisShift, yAxisShift, zAxisShift, xAxisCharge,
-        yAxisCharge, zAxisCharge, xAxisDivisor, yAxisDivisor, zAxisDivisor, useCustomXAxisKMBase,
-        useCustomZAxisKMBase);
+    toolBar =
+        new MassRemainderAnalysisToolBar(this, xAxisCharge, yAxisCharge, zAxisCharge, xAxisDivisor,
+            yAxisDivisor, zAxisDivisor, useCustomeXAxisMolecularUnit, useCustomeZAxisMolecularUnit);
     add(toolBar, BorderLayout.EAST);
 
     // Add the Windows menu
@@ -142,8 +133,9 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
         double xValue = plot.getDomainCrosshairValue();
         double yValue = plot.getRangeCrosshairValue();
 
-        if (plot.getDataset() instanceof KendrickMassPlotXYZDataset) {
-          KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+        if (plot.getDataset() instanceof MassRemainderAnalysisXYZDataset) {
+          MassRemainderAnalysisXYZDataset dataset =
+              (MassRemainderAnalysisXYZDataset) plot.getDataset();
           double[] xValues = new double[dataset.getItemCount(0)];
           for (int i = 0; i < xValues.length; i++) {
             if ((event.getTrigger().getButton() == MouseEvent.BUTTON1)
@@ -155,8 +147,9 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
             }
           }
         }
-        if (plot.getDataset() instanceof KendrickMassPlotXYDataset) {
-          KendrickMassPlotXYDataset dataset = (KendrickMassPlotXYDataset) plot.getDataset();
+        if (plot.getDataset() instanceof MassRemainderAnalysisXYDataset) {
+          MassRemainderAnalysisXYDataset dataset =
+              (MassRemainderAnalysisXYDataset) plot.getDataset();
           double[] xValues = new double[dataset.getItemCount(0)];
           for (int i = 0; i < xValues.length; i++) {
             if ((event.getTrigger().getButton() == MouseEvent.BUTTON1)
@@ -182,6 +175,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     String command = event.getActionCommand();
 
     if (command.equals("TOGGLE_BLOCK_SIZE")) {
+
       XYPlot plot = chart.getXYPlot();
       XYBlockPixelSizeRenderer renderer = (XYBlockPixelSizeRenderer) plot.getRenderer();
       int height = (int) renderer.getBlockHeightPixel();
@@ -195,9 +189,11 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
       }
       renderer.setBlockHeightPixel(height);
       renderer.setBlockWidthPixel(height);
+
     }
 
     if (command.equals("TOGGLE_BACK_COLOR")) {
+
       XYPlot plot = chart.getXYPlot();
       if (plot.getBackgroundPaint() == Color.WHITE) {
         plot.setBackgroundPaint(Color.BLACK);
@@ -208,6 +204,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("TOGGLE_GRID")) {
+
       XYPlot plot = chart.getXYPlot();
       if (plot.getDomainGridlinePaint() == Color.BLACK) {
         plot.setDomainGridlinePaint(Color.WHITE);
@@ -220,6 +217,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("TOGGLE_ANNOTATIONS")) {
+
       XYPlot plot = chart.getXYPlot();
       XYBlockPixelSizeRenderer renderer = (XYBlockPixelSizeRenderer) plot.getRenderer();
       Boolean itemNameVisible = renderer.getDefaultItemLabelsVisible();
@@ -236,19 +234,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     // y axis commands
-    if (command.equals("SHIFT_KMD_UP_Y")) {
-      Double shiftValue = 0.01;
-      yAxisShift = yAxisShift + shiftValue;
-      XYPlot plot = chart.getXYPlot();
-      shiftChanged(plot, shiftValue, command);
-    }
-
-    if (command.equals("SHIFT_KMD_DOWN_Y")) {
-      Double shiftValue = -0.01;
-      yAxisShift = yAxisShift + shiftValue;
-      XYPlot plot = chart.getXYPlot();
-      shiftChanged(plot, shiftValue, command);
-    }
 
     if (command.equals("CHANGE_CHARGE_UP_Y")) {
       yAxisCharge = yAxisCharge + 1;
@@ -266,8 +251,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("CHANGE_DIVISOR_UP_Y")) {
-      int minDivisor = getMinimumRecommendedDivisor(customYAxisKMBase);
-      int maxDivisor = getMaximumRecommendedDivisor(customYAxisKMBase);
+      int minDivisor = getMinimumRecommendedDivisor(yAxisMolecularUnit);
+      int maxDivisor = getMaximumRecommendedDivisor(yAxisMolecularUnit);
       if (yAxisDivisor == 1) {
         yAxisDivisor = minDivisor;
       } else if (yAxisDivisor >= minDivisor && yAxisDivisor < maxDivisor) {
@@ -278,8 +263,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("CHANGE_DIVISOR_DOWN_Y")) {
-      int minDivisor = getMinimumRecommendedDivisor(customYAxisKMBase);
-      int maxDivisor = getMaximumRecommendedDivisor(customYAxisKMBase);
+      int minDivisor = getMinimumRecommendedDivisor(yAxisMolecularUnit);
+      int maxDivisor = getMaximumRecommendedDivisor(yAxisMolecularUnit);
       if (yAxisDivisor > minDivisor && yAxisDivisor <= maxDivisor) {
         yAxisDivisor = yAxisDivisor - 1;
       } else if (yAxisDivisor == minDivisor) {
@@ -290,20 +275,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     // x axis commands
-    if (command.equals("SHIFT_KMD_UP_X")) {
-      Double shiftValue = 0.01;
-      xAxisShift = xAxisShift + shiftValue;
-      XYPlot plot = chart.getXYPlot();
-      shiftChanged(plot, shiftValue, command);
-    }
-
-    if (command.equals("SHIFT_KMD_DOWN_X")) {
-      Double shiftValue = -0.01;
-      xAxisShift = xAxisShift + shiftValue;
-      XYPlot plot = chart.getXYPlot();
-      shiftChanged(plot, shiftValue, command);
-    }
-
     if (command.equals("CHANGE_CHARGE_UP_X")) {
       xAxisCharge = xAxisCharge + 1;
       XYPlot plot = chart.getXYPlot();
@@ -320,8 +291,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("CHANGE_DIVISOR_UP_X")) {
-      int minDivisor = getMinimumRecommendedDivisor(customXAxisKMBase);
-      int maxDivisor = getMaximumRecommendedDivisor(customXAxisKMBase);
+      int minDivisor = getMinimumRecommendedDivisor(xAxisMolecularUnit);
+      int maxDivisor = getMaximumRecommendedDivisor(xAxisMolecularUnit);
       if (xAxisDivisor == 1) {
         xAxisDivisor = minDivisor;
       } else if (xAxisDivisor >= minDivisor && xAxisDivisor < maxDivisor) {
@@ -332,8 +303,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("CHANGE_DIVISOR_DOWN_X")) {
-      int minDivisor = getMinimumRecommendedDivisor(customXAxisKMBase);
-      int maxDivisor = getMaximumRecommendedDivisor(customXAxisKMBase);
+      int minDivisor = getMinimumRecommendedDivisor(xAxisMolecularUnit);
+      int maxDivisor = getMaximumRecommendedDivisor(xAxisMolecularUnit);
       if (xAxisDivisor > minDivisor && xAxisDivisor <= maxDivisor) {
         xAxisDivisor = xAxisDivisor - 1;
       } else if (xAxisDivisor == minDivisor) {
@@ -344,22 +315,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     // z axis commands
-    if (command.equals("SHIFT_KMD_UP_Z")) {
-
-      Double shiftValue = 0.01;
-      zAxisShift = zAxisShift + shiftValue;
-      XYPlot plot = chart.getXYPlot();
-      shiftChanged(plot, shiftValue, command);
-    }
-
-    if (command.equals("SHIFT_KMD_DOWN_Z")) {
-
-      Double shiftValue = -0.01;
-      zAxisShift = zAxisShift + shiftValue;
-      XYPlot plot = chart.getXYPlot();
-      shiftChanged(plot, shiftValue, command);
-    }
-
     if (command.equals("CHANGE_CHARGE_UP_Z")) {
       zAxisCharge = zAxisCharge + 1;
       XYPlot plot = chart.getXYPlot();
@@ -376,9 +331,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("CHANGE_DIVISOR_UP_Z")) {
-
-      int minDivisor = getMinimumRecommendedDivisor(customZAxisKMBase);
-      int maxDivisor = getMaximumRecommendedDivisor(customZAxisKMBase);
+      int minDivisor = getMinimumRecommendedDivisor(zAxisMolecularUnit);
+      int maxDivisor = getMaximumRecommendedDivisor(zAxisMolecularUnit);
       if (zAxisDivisor == 1) {
         zAxisDivisor = minDivisor;
       } else if (zAxisDivisor >= minDivisor && zAxisDivisor < maxDivisor) {
@@ -389,8 +343,8 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
 
     if (command.equals("CHANGE_DIVISOR_DOWN_Z")) {
-      int minDivisor = getMinimumRecommendedDivisor(customZAxisKMBase);
-      int maxDivisor = getMaximumRecommendedDivisor(customZAxisKMBase);
+      int minDivisor = getMinimumRecommendedDivisor(zAxisMolecularUnit);
+      int maxDivisor = getMaximumRecommendedDivisor(zAxisMolecularUnit);
       if (zAxisDivisor > minDivisor && zAxisDivisor <= maxDivisor) {
         zAxisDivisor = zAxisDivisor - 1;
       } else if (zAxisDivisor == minDivisor) {
@@ -401,173 +355,101 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     }
   }
 
-  private void shiftChanged(XYPlot plot, double shiftValue, String command) {
-    if (plot.getDataset() instanceof KendrickMassPlotXYDataset) {
-      KendrickMassPlotXYDataset dataset = (KendrickMassPlotXYDataset) plot.getDataset();
-      if (command.contains("_Y")) {
-        double[] yValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < yValues.length; i++) {
-          yValues[i] = dataset.getYValue(0, i) + shiftValue
-              - Math.floor(dataset.getYValue(0, i) + shiftValue);
-        }
-        dataset.setyValues(yValues);
-      } else if (command.contains("_X")) {
-        double[] xValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < xValues.length; i++) {
-          xValues[i] = dataset.getXValue(0, i) + shiftValue
-              - Math.floor(dataset.getXValue(0, i) + shiftValue);
-        }
-        dataset.setxValues(xValues);
-      }
-    } else if (plot.getDataset() instanceof KendrickMassPlotXYZDataset) {
-      KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
-      if (command.contains("_Y")) {
-        double[] yValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < yValues.length; i++) {
-          yValues[i] = dataset.getYValue(0, i) + shiftValue
-              - Math.floor(dataset.getYValue(0, i) + shiftValue);
-        }
-        dataset.setyValues(yValues);
-      } else if (command.contains("_X")) {
-        double[] xValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < xValues.length; i++) {
-          xValues[i] = dataset.getXValue(0, i) + shiftValue
-              - Math.floor(dataset.getXValue(0, i) + shiftValue);
-        }
-        dataset.setxValues(xValues);
-      } else if (command.contains("_Z")) {
-        double[] zValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < zValues.length; i++) {
-          zValues[i] = dataset.getZValue(0, i) + shiftValue
-              - Math.floor(dataset.getZValue(0, i) + shiftValue);
-        }
-        dataset.setzValues(zValues);
-      }
-    }
-    chart.fireChartChanged();
-    validate();
-
-    // update toolbar
-    this.remove(toolBar);
-    toolBar = new KendrickMassPlotToolBar(this, xAxisShift, yAxisShift, zAxisShift, xAxisCharge,
-        yAxisCharge, zAxisCharge, xAxisDivisor, yAxisDivisor, zAxisDivisor, useCustomXAxisKMBase,
-        useCustomZAxisKMBase);
-    this.add(toolBar, BorderLayout.EAST);
-    this.revalidate();
-  }
-
   private void chargeOrDivisorChanged(XYPlot plot) {
 
-    if (plot.getDataset() instanceof KendrickMassPlotXYDataset) {
-      KendrickMassPlotXYDataset dataset = (KendrickMassPlotXYDataset) plot.getDataset();
+    if (plot.getDataset() instanceof MassRemainderAnalysisXYDataset) {
+      MassRemainderAnalysisXYDataset dataset = (MassRemainderAnalysisXYDataset) plot.getDataset();
       double[] xValues = new double[dataset.getItemCount(0)];
-
       // Calc xValues
       xValues = new double[selectedRows.length];
-      if (useCustomXAxisKMBase == true) {
+      if (useCustomeXAxisMolecularUnit == true) {
         for (int i = 0; i < selectedRows.length; i++) {
-          xValues[i] = Math
-              .ceil(xAxisCharge * selectedRows[i].getAverageMZ()
-                  * getKendrickMassFactor(customXAxisKMBase, xAxisDivisor))
-              - xAxisCharge * selectedRows[i].getAverageMZ()
-                  * getKendrickMassFactor(customXAxisKMBase, xAxisDivisor);
+          // get charge
+          int charge = xAxisCharge;
+          xValues[i] = selectedRows[i].getAverageMZ() * charge * xAxisDivisor - (Math
+              .floor((selectedRows[i].getAverageMZ() * charge * xAxisDivisor)
+                  / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
+              * FormulaUtils.calculateExactMass(xAxisMolecularUnit));
         }
       } else {
         for (int i = 0; i < selectedRows.length; i++) {
-
-          // simply plot m/z values as x axis
-          if (xAxisKMBase.equals("m/z")) {
-            xValues[i] = selectedRows[i].getAverageMZ();
-          }
-
-          // plot Kendrick masses as x axis
-          else if (xAxisKMBase.equals("KM")) {
-            xValues[i] = selectedRows[i].getAverageMZ()
-                * getKendrickMassFactor(customYAxisKMBase, yAxisDivisor);
-          }
+          xValues[i] = selectedRows[i].getAverageMZ();
         }
       }
-
       // Calc yValues
-      double[] yValues = new double[selectedRows.length];
+      double[] yValues = new double[dataset.getItemCount(0)];
+      yValues = new double[selectedRows.length];
       for (int i = 0; i < selectedRows.length; i++) {
-        yValues[i] = Math
-            .ceil(yAxisCharge * (selectedRows[i].getAverageMZ())
-                * getKendrickMassFactor(customYAxisKMBase, yAxisDivisor))
-            - yAxisCharge * (selectedRows[i].getAverageMZ())
-                * getKendrickMassFactor(customYAxisKMBase, yAxisDivisor);
+        // get charge
+        int charge = yAxisCharge;
+        yValues[i] = selectedRows[i].getAverageMZ() * charge * yAxisDivisor - (Math
+            .floor((selectedRows[i].getAverageMZ() * charge * yAxisDivisor)
+                / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
+            * FormulaUtils.calculateExactMass(yAxisMolecularUnit));
       }
       dataset.setyValues(yValues);
       dataset.setxValues(xValues);
       chart.fireChartChanged();
       validate();
-    } else if (plot.getDataset() instanceof KendrickMassPlotXYZDataset) {
-      KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+    } else if (plot.getDataset() instanceof MassRemainderAnalysisXYZDataset) {
+      MassRemainderAnalysisXYZDataset dataset = (MassRemainderAnalysisXYZDataset) plot.getDataset();
       double[] xValues = new double[dataset.getItemCount(0)];
 
       // Calc xValues
       xValues = new double[selectedRows.length];
-      if (useCustomXAxisKMBase == true) {
+      if (useCustomeXAxisMolecularUnit == true) {
         for (int i = 0; i < selectedRows.length; i++) {
-          xValues[i] = Math
-              .ceil(xAxisCharge * selectedRows[i].getAverageMZ()
-                  * getKendrickMassFactor(customXAxisKMBase, xAxisDivisor))
-              - xAxisCharge * selectedRows[i].getAverageMZ()
-                  * getKendrickMassFactor(customXAxisKMBase, xAxisDivisor);
+          // get charge
+          int charge = xAxisCharge;
+          xValues[i] = selectedRows[i].getAverageMZ() * charge * xAxisDivisor - (Math
+              .floor((selectedRows[i].getAverageMZ() * charge * xAxisDivisor)
+                  / FormulaUtils.calculateExactMass(xAxisMolecularUnit))
+              * FormulaUtils.calculateExactMass(xAxisMolecularUnit));
         }
       } else {
         for (int i = 0; i < selectedRows.length; i++) {
-
-          // simply plot m/z values as x axis
-          if (xAxisKMBase.equals("m/z")) {
-            xValues[i] = selectedRows[i].getAverageMZ();
-          }
-
-          // plot Kendrick masses as x axis
-          else if (xAxisKMBase.equals("KM")) {
-            xValues[i] = selectedRows[i].getAverageMZ()
-                * getKendrickMassFactor(customYAxisKMBase, yAxisDivisor);
-          }
+          xValues[i] = selectedRows[i].getAverageMZ();
         }
       }
 
       // Calc yValues
       double[] yValues = new double[selectedRows.length];
       for (int i = 0; i < selectedRows.length; i++) {
-        yValues[i] = Math
-            .ceil(yAxisCharge * (selectedRows[i].getAverageMZ())
-                * getKendrickMassFactor(customYAxisKMBase, yAxisDivisor))
-            - yAxisCharge * (selectedRows[i].getAverageMZ())
-                * getKendrickMassFactor(customYAxisKMBase, yAxisDivisor);
+        // get charge
+        int charge = yAxisCharge;
+        yValues[i] = selectedRows[i].getAverageMZ() * charge * yAxisDivisor - (Math
+            .floor((selectedRows[i].getAverageMZ() * charge * yAxisDivisor)
+                / FormulaUtils.calculateExactMass(yAxisMolecularUnit))
+            * FormulaUtils.calculateExactMass(yAxisMolecularUnit));
       }
 
       // Calc zValues
       double[] zValues = new double[selectedRows.length];
-      if (useCustomZAxisKMBase == true) {
+      if (useCustomeZAxisMolecularUnit == true) {
         for (int i = 0; i < selectedRows.length; i++) {
-          zValues[i] = Math
-              .ceil(zAxisCharge * (selectedRows[i].getAverageMZ())
-                  * getKendrickMassFactor(customZAxisKMBase, zAxisDivisor))
-              - zAxisCharge * (selectedRows[i].getAverageMZ())
-                  * getKendrickMassFactor(customZAxisKMBase, zAxisDivisor);
+          // get charge
+          int charge = zAxisCharge;
+          zValues[i] = selectedRows[i].getAverageMZ() * charge * zAxisDivisor - (Math
+              .floor((selectedRows[i].getAverageMZ() * charge * zAxisDivisor)
+                  / FormulaUtils.calculateExactMass(zAxisMolecularUnit))
+              * FormulaUtils.calculateExactMass(zAxisMolecularUnit));
         }
       } else
         for (int i = 0; i < selectedRows.length; i++) {
-
           // plot selected feature characteristic as z Axis
-          if (zAxisKMBase.equals("Retention time")) {
+          if (zAxisMolecularUnit.equals("Retention time")) {
             zValues[i] = selectedRows[i].getAverageRT();
-          } else if (zAxisKMBase.equals("Intensity")) {
+          } else if (zAxisMolecularUnit.equals("Intensity")) {
             zValues[i] = selectedRows[i].getAverageHeight();
-          } else if (zAxisKMBase.equals("Area")) {
+          } else if (zAxisMolecularUnit.equals("Area")) {
             zValues[i] = selectedRows[i].getAverageArea();
-          } else if (zAxisKMBase.equals("Tailing factor")) {
+          } else if (zAxisMolecularUnit.equals("Tailing factor")) {
             zValues[i] = selectedRows[i].getBestPeak().getTailingFactor();
-          } else if (zAxisKMBase.equals("Asymmetry factor")) {
+          } else if (zAxisMolecularUnit.equals("Asymmetry factor")) {
             zValues[i] = selectedRows[i].getBestPeak().getAsymmetryFactor();
-          } else if (zAxisKMBase.equals("FWHM")) {
+          } else if (zAxisMolecularUnit.equals("FWHM")) {
             zValues[i] = selectedRows[i].getBestPeak().getFWHM();
-          } else if (zAxisKMBase.equals("m/z")) {
+          } else if (zAxisMolecularUnit.equals("m/z")) {
             zValues[i] = selectedRows[i].getBestPeak().getMZ();
           }
         }
@@ -580,23 +462,15 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
 
     // update toolbar
     this.remove(toolBar);
-    toolBar = new KendrickMassPlotToolBar(this, xAxisShift, yAxisShift, zAxisShift, xAxisCharge,
-        yAxisCharge, zAxisCharge, xAxisDivisor, yAxisDivisor, zAxisDivisor, useCustomXAxisKMBase,
-        useCustomZAxisKMBase);
+    toolBar =
+        new MassRemainderAnalysisToolBar(this, xAxisCharge, yAxisCharge, zAxisCharge, xAxisDivisor,
+            yAxisDivisor, zAxisDivisor, useCustomeXAxisMolecularUnit, useCustomeZAxisMolecularUnit);
     this.add(toolBar, BorderLayout.EAST);
     this.revalidate();
   }
 
   /*
-   * Method to calculate the Kendrick mass factor for a give sum formula
-   */
-  private double getKendrickMassFactor(String formula, int divisor) {
-    double exactMassFormula = FormulaUtils.calculateExactMass(formula);
-    return ((int) ((exactMassFormula / divisor) + 0.5d)) / (exactMassFormula / divisor);
-  }
-
-  /*
-   * Method to calculate the recommended minimum of a divisor for Kendrick mass defect analysis
+   * Method to calculate the recommended minimum of a divisor for mass remainder analysis
    */
   private int getMinimumRecommendedDivisor(String formula) {
     double exactMass = FormulaUtils.calculateExactMass(formula);
@@ -604,7 +478,7 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
   }
 
   /*
-   * Method to calculate the recommended maximum of a divisor for Kendrick mass defect analysis
+   * Method to calculate the recommended maximum of a divisor for mass remainder analysis
    */
   private int getMaximumRecommendedDivisor(String formula) {
     double exactMass = FormulaUtils.calculateExactMass(formula);

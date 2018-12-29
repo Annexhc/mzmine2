@@ -26,8 +26,8 @@ import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.XYPlot;
+import net.sf.mzmine.chartbasics.chartutils.XYBlockPixelSizeRenderer;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
-import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizeRenderer;
 
 /**
  * Window for Van Krevelen Diagrams
