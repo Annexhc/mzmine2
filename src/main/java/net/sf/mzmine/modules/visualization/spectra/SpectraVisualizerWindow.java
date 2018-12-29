@@ -591,4 +591,16 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
     spectrumPlot.addDataSet(dataset, color, true);
   }
 
+  public SpectraToolBar getToolBar() {
+    return toolBar;
+  }
+
+  public void setToolBar(SpectraToolBar toolBar) {
+    this.toolBar = toolBar;
+  }
+
+  public void setSpectrumPlot(SpectraPlot spectrumPlot) {
+    this.spectrumPlot = spectrumPlot;
+  }
+
 }
