@@ -22,9 +22,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.geom.Point2D;
-import java.awt.geom.Rectangle2D;
-import java.util.stream.DoubleStream;
+import java.awt.event.MouseEvent;
 import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -37,6 +35,7 @@ import net.sf.mzmine.chartbasics.gui.swing.EChartPanel;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
+import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.FeatureSummaryWindow;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizeRenderer;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.util.FormulaUtils;
@@ -52,7 +51,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
   private static final long serialVersionUID = 1L;
   private KendrickMassPlotToolBar toolBar;
   private JFreeChart chart;
-  private EChartPanel chartPanel;
   private PeakListRow selectedRows[];
   private String xAxisKMBase;
   private String zAxisKMBase;
@@ -124,8 +122,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
 
     this.zAxisShift = 0;
 
-    this.chartPanel = chartPanel;
-
     setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     setBackground(Color.white);
 
@@ -140,47 +136,47 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     menuBar.add(new WindowsMenu());
     setJMenuBar(menuBar);
 
-
     // Popup menu
     chartPanel.addChartMouseListener(new ChartMouseListener() {
-      @Override
-      public void chartMouseMoved(ChartMouseEvent event) {
-
-      }
 
       @Override
       public void chartMouseClicked(ChartMouseEvent event) {
-        Point2D p = chartPanel.translateScreenToJava2D(event.getTrigger().getPoint());
-        Rectangle2D plotArea = chartPanel.getScreenDataArea();
         XYPlot plot = (XYPlot) chart.getPlot();
-        Double chartX =
-            plot.getDomainAxis().java2DToValue(p.getX(), plotArea, plot.getDomainAxisEdge());
-        Double chartY =
-            plot.getRangeAxis().java2DToValue(p.getY(), plotArea, plot.getRangeAxisEdge());
-        KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+        double xValue = plot.getDomainCrosshairValue();
+        double yValue = plot.getRangeCrosshairValue();
 
-        // get x Values
-        double[] xValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < xValues.length; i++) {
-          xValues[i] = dataset.getX(0, i).intValue();
+        if (plot.getDataset() instanceof KendrickMassPlotXYZDataset) {
+          KendrickMassPlotXYZDataset dataset = (KendrickMassPlotXYZDataset) plot.getDataset();
+          double[] xValues = new double[dataset.getItemCount(0)];
+          for (int i = 0; i < xValues.length; i++) {
+            if ((event.getTrigger().getButton() == MouseEvent.BUTTON1)
+                && (event.getTrigger().getClickCount() == 2)) {
+              if (dataset.getX(0, i).doubleValue() == xValue
+                  && dataset.getY(0, i).doubleValue() == yValue) {
+                new FeatureSummaryWindow(selectedRows[i]);
+              }
+            }
+          }
         }
-
-        // get y Values
-        double[] yValues = new double[dataset.getItemCount(0)];
-        for (int i = 0; i < yValues.length; i++) {
-          yValues[i] = dataset.getY(0, i).intValue();
+        if (plot.getDataset() instanceof KendrickMassPlotXYDataset) {
+          KendrickMassPlotXYDataset dataset = (KendrickMassPlotXYDataset) plot.getDataset();
+          double[] xValues = new double[dataset.getItemCount(0)];
+          for (int i = 0; i < xValues.length; i++) {
+            if ((event.getTrigger().getButton() == MouseEvent.BUTTON1)
+                && (event.getTrigger().getClickCount() == 2)) {
+              if (dataset.getX(0, i).doubleValue() == xValue
+                  && dataset.getY(0, i).doubleValue() == yValue) {
+                new FeatureSummaryWindow(selectedRows[i]);
+              }
+            }
+          }
         }
-
-        if (DoubleStream.of(xValues).anyMatch(x -> x == chartX.intValue())
-            && DoubleStream.of(yValues).anyMatch(x -> x == chartY)) {
-          System.out.println("hit at:" + chartX + "and" + chartY);
-        } else
-          System.out.println("nope");
-        System.out.println("hit at:" + chartX.intValue() + "and" + chartY.intValue());
       }
+
+      @Override
+      public void chartMouseMoved(ChartMouseEvent event) {}
+
     });
-
-
 
     // Add right click menu to plot
     JPopupMenu popupMenu = chartPanel.getPopupMenu();
@@ -191,7 +187,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     GUIUtils.addMenuItem(saveAsMenu, "EPS...", this, "SAVE_EPS");
 
     // add items to popup menu
-
     GUIUtils.addMenuItem(popupMenu, "Export spectra to spectra file", this, "EXPORT_SPECTRA");
 
     popupMenu.addSeparator();
@@ -213,7 +208,6 @@ public class KendrickMassPlotWindow extends JFrame implements ActionListener {
     popupMenu.addSeparator();
 
     GUIUtils.addMenuItem(popupMenu, "Add isotope pattern", this, "ADD_ISOTOPE_PATTERN");
-
     pack();
   }
 

@@ -28,7 +28,6 @@ import java.text.NumberFormat;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -37,14 +36,11 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.axis.NumberTickUnit;
 import org.jfree.data.xy.XYDataset;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.Feature;
 import net.sf.mzmine.datamodel.IsotopePattern;
@@ -136,6 +132,7 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
 
   }
 
+  @Override
   public void dispose() {
     super.dispose();
     MZmineCore.getDesktop().removePeakListTreeListener(bottomPanel);
@@ -187,6 +184,7 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
         // Updating the combo in other than Swing thread may cause
         // exception
         SwingUtilities.invokeLater(new Runnable() {
+          @Override
           public void run() {
             msmsSelector.addItem(itemText);
           }
@@ -301,6 +299,7 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
     yAxis.setTickUnit(new NumberTickUnit(yTickSize));
   }
 
+  @Override
   public void actionPerformed(ActionEvent event) {
 
     String command = event.getActionCommand();
@@ -329,6 +328,7 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
 
         Runnable newThreadRunnable = new Runnable() {
 
+          @Override
           public void run() {
             loadRawData(dataFile.getScan(prevScanIndex));
           }
@@ -355,6 +355,7 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
 
         Runnable newThreadRunnable = new Runnable() {
 
+          @Override
           public void run() {
             loadRawData(dataFile.getScan(nextScanIndex));
           }
@@ -516,12 +517,12 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
       // Get current axes range
       NumberAxis xAxis = (NumberAxis) spectrumPlot.getXYPlot().getDomainAxis();
       NumberAxis yAxis = (NumberAxis) spectrumPlot.getXYPlot().getRangeAxis();
-      double xMin = (double) xAxis.getRange().getLowerBound();
-      double xMax = (double) xAxis.getRange().getUpperBound();
-      double xTick = (double) xAxis.getTickUnit().getSize();
-      double yMin = (double) yAxis.getRange().getLowerBound();
-      double yMax = (double) yAxis.getRange().getUpperBound();
-      double yTick = (double) yAxis.getTickUnit().getSize();
+      double xMin = xAxis.getRange().getLowerBound();
+      double xMax = xAxis.getRange().getUpperBound();
+      double xTick = xAxis.getTickUnit().getSize();
+      double yMin = yAxis.getRange().getLowerBound();
+      double yMax = yAxis.getRange().getUpperBound();
+      double yTick = yAxis.getTickUnit().getSize();
 
       // Get all frames of my class
       Window spectraFrames[] = JFrame.getWindows();
@@ -548,6 +549,18 @@ public class SpectraVisualizerWindow extends JFrame implements ActionListener {
 
   public void addDataSet(XYDataset dataset, Color color) {
     spectrumPlot.addDataSet(dataset, color, true);
+  }
+
+  public SpectraToolBar getToolBar() {
+    return toolBar;
+  }
+
+  public void setToolBar(SpectraToolBar toolBar) {
+    this.toolBar = toolBar;
+  }
+
+  public void setSpectrumPlot(SpectraPlot spectrumPlot) {
+    this.spectrumPlot = spectrumPlot;
   }
 
 }

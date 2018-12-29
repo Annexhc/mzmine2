@@ -195,6 +195,10 @@ public class KendrickMassPlotTask extends AbstractTask {
 
       XYPlot plot = (XYPlot) chart.getPlot();
       plot.setBackgroundPaint(Color.WHITE);
+      plot.setDomainCrosshairPaint(Color.GRAY);
+      plot.setRangeCrosshairPaint(Color.GRAY);
+      plot.setDomainCrosshairVisible(true);
+      plot.setRangeCrosshairVisible(true);
       appliedSteps++;
 
       // set axis
@@ -315,6 +319,11 @@ public class KendrickMassPlotTask extends AbstractTask {
     plot.setAxisOffset(new RectangleInsets(5, 5, 5, 5));
     plot.setOutlinePaint(Color.black);
     plot.setBackgroundPaint(Color.white);
+    plot.setBackgroundPaint(Color.WHITE);
+    plot.setDomainCrosshairPaint(Color.GRAY);
+    plot.setRangeCrosshairPaint(Color.GRAY);
+    plot.setDomainCrosshairVisible(true);
+    plot.setRangeCrosshairVisible(true);
 
     // Legend
     NumberAxis scaleAxis = new NumberAxis(zAxisLabel);
