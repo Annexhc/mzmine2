@@ -24,26 +24,28 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.TreePath;
-
 import org.apache.commons.io.FilenameUtils;
-
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassList;
+import net.sf.mzmine.datamodel.MobilogramList;
+import net.sf.mzmine.datamodel.MobilogramListRow;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.main.MZmineCore;
+import net.sf.mzmine.modules.mobilogramlistmethods.ordermobilogramlists.OrderMobilogramListsModule;
+import net.sf.mzmine.modules.mobilogramlistmethods.ordermobilogramlists.OrderMobilogramListsParameters;
 import net.sf.mzmine.modules.peaklistmethods.orderpeaklists.OrderPeakListsModule;
 import net.sf.mzmine.modules.peaklistmethods.orderpeaklists.OrderPeakListsParameters;
 import net.sf.mzmine.modules.rawdatamethods.orderdatafiles.OrderDataFilesModule;
 import net.sf.mzmine.modules.rawdatamethods.orderdatafiles.OrderDataFilesParameters;
 import net.sf.mzmine.modules.rawdatamethods.rawdataexport.RawDataExportModule;
 import net.sf.mzmine.modules.visualization.infovisualizer.InfoVisualizerModule;
+import net.sf.mzmine.modules.visualization.mobilogramlisttable.MobilogramListTableModule;
 import net.sf.mzmine.modules.visualization.peaklisttable.PeakListTableModule;
 import net.sf.mzmine.modules.visualization.peaksummary.PeakSummaryVisualizerModule;
 import net.sf.mzmine.modules.visualization.scatterplot.ScatterPlotVisualizerModule;
@@ -56,6 +58,7 @@ import net.sf.mzmine.modules.visualization.threed.ThreeDVisualizerModule;
 import net.sf.mzmine.modules.visualization.tic.TICVisualizerModule;
 import net.sf.mzmine.modules.visualization.twod.TwoDVisualizerModule;
 import net.sf.mzmine.parameters.ParameterSet;
+import net.sf.mzmine.parameters.parametertypes.selectors.MobilogramListsSelectionType;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsSelectionType;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesSelectionType;
 import net.sf.mzmine.taskcontrol.Task;
@@ -68,8 +71,8 @@ import net.sf.mzmine.util.GUIUtils;
 public class ProjectTreeMouseHandler extends MouseAdapter implements ActionListener {
 
   private ProjectTree tree;
-  private JPopupMenu dataFilePopupMenu, peakListPopupMenu, scanPopupMenu, massListPopupMenu,
-      peakListRowPopupMenu;
+  private JPopupMenu dataFilePopupMenu, peakListPopupMenu, mobilogramListPopupMenu, scanPopupMenu,
+      massListPopupMenu, peakListRowPopupMenu, mobilogramListRowPopupMenu;
 
   /**
    * Constructor
@@ -113,6 +116,21 @@ public class ProjectTreeMouseHandler extends MouseAdapter implements ActionListe
     peakListRowPopupMenu = new JPopupMenu();
 
     GUIUtils.addMenuItem(peakListRowPopupMenu, "Show peak summary", this, "SHOW_PEAK_SUMMARY");
+
+    mobilogramListPopupMenu = new JPopupMenu();
+
+    GUIUtils.addMenuItem(mobilogramListPopupMenu, "Show mobilogram list table", this,
+        "SHOW_MOBILOGRAM_TABLES");
+    GUIUtils.addMenuItem(mobilogramListPopupMenu, "Show mobilogram list info", this,
+        "SHOW_MOBILOGRAM_INFO");
+    GUIUtils.addMenuItem(mobilogramListPopupMenu, "Show scatter plot", this, "SHOW_SCATTER_PLOT");
+    GUIUtils.addMenuItem(mobilogramListPopupMenu, "Sort alphabetically", this, "SORT_MOBILOGRAMS");
+    GUIUtils.addMenuItem(mobilogramListPopupMenu, "Remove", this, "REMOVE_MOBILOGRAM");
+
+    mobilogramListRowPopupMenu = new JPopupMenu();
+
+    GUIUtils.addMenuItem(mobilogramListRowPopupMenu, "Show mobilogram summary", this,
+        "SHOW_MOBILOGRAM_SUMMARY");
 
   }
 
@@ -306,6 +324,53 @@ public class ProjectTreeMouseHandler extends MouseAdapter implements ActionListe
         MZmineCore.getProjectManager().getCurrentProject().removePeakList(peakList);
     }
 
+    // Actions for mobilogram lists
+
+    if (command.equals("SHOW_MOBILOGRAMLIST_TABLES")) {
+      System.out.println("hit");
+      MobilogramList[] selectedMobilogramLists = tree.getSelectedObjects(MobilogramList.class);
+      for (MobilogramList peakList : selectedMobilogramLists) {
+        MobilogramListTableModule.showNewMobilogramListVisualizerWindow(peakList);
+      }
+    }
+
+    if (command.equals("SHOW_MOBILOGRAMLIST_INFO")) {
+      MobilogramList[] selectedMobilogramLists = tree.getSelectedObjects(MobilogramList.class);
+      for (MobilogramList peakList : selectedMobilogramLists) {
+        InfoVisualizerModule.showNewMobilogramListInfo(peakList);
+      }
+    }
+
+    // if (command.equals("SHOW_SCATTER_PLOT")) {
+    // MobilogramList[] selectedMobilogramLists = tree.getSelectedObjects(MobilogramList.class);
+    // for (MobilogramList peakList : selectedMobilogramLists) {
+    // ScatterPlotVisualizerModule.showNewScatterPlotWindow(peakList);
+    // }
+    // }
+
+    if (command.equals("SORT_MOBILOGRAMLISTS")) {
+      // save current selection
+      TreePath savedSelection[] = tree.getSelectionPaths();
+      MobilogramList selectedMobilogramLists[] = tree.getSelectedObjects(MobilogramList.class);
+      OrderMobilogramListsModule module =
+          MZmineCore.getModuleInstance(OrderMobilogramListsModule.class);
+      ParameterSet params =
+          MZmineCore.getConfiguration().getModuleParameters(OrderMobilogramListsModule.class);
+      params.getParameter(OrderMobilogramListsParameters.mobilogramLists)
+          .setValue(MobilogramListsSelectionType.SPECIFIC_MOBILOGRAMLISTS, selectedMobilogramLists);
+      module.runModule(MZmineCore.getProjectManager().getCurrentProject(), params,
+          new ArrayList<Task>());
+      // restore selection
+      tree.setSelectionPaths(savedSelection);
+    }
+
+    if (command.equals("REMOVE_MOBILOGRAMLIST")) {
+      MobilogramList[] selectedMobilogramLists = tree.getSelectedObjects(MobilogramList.class);
+      for (MobilogramList peakList : selectedMobilogramLists)
+        MZmineCore.getProjectManager().getCurrentProject().removeMobilogramList(peakList);
+    }
+
+
     // Actions for peak list rows
 
     if (command.equals("SHOW_PEAK_SUMMARY")) {
@@ -354,6 +419,10 @@ public class ProjectTreeMouseHandler extends MouseAdapter implements ActionListe
       peakListPopupMenu.show(e.getComponent(), e.getX(), e.getY());
     if (clickedObject instanceof PeakListRow)
       peakListRowPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+    if (clickedObject instanceof MobilogramList)
+      mobilogramListPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+    if (clickedObject instanceof MobilogramListRow)
+      mobilogramListRowPopupMenu.show(e.getComponent(), e.getX(), e.getY());
   }
 
   private void handleDoubleClickEvent(MouseEvent e) {
@@ -371,6 +440,11 @@ public class ProjectTreeMouseHandler extends MouseAdapter implements ActionListe
     if (clickedObject instanceof PeakList) {
       PeakList clickedPeakList = (PeakList) clickedObject;
       PeakListTableModule.showNewPeakListVisualizerWindow(clickedPeakList);
+    }
+
+    if (clickedObject instanceof MobilogramList) {
+      MobilogramList clickedMobilogramList = (MobilogramList) clickedObject;
+      MobilogramListTableModule.showNewMobilogramListVisualizerWindow(clickedMobilogramList);
     }
 
     if (clickedObject instanceof Scan) {

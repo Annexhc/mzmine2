@@ -4,16 +4,17 @@ import java.text.Format;
 import com.google.common.collect.Range;
 import net.sf.mzmine.datamodel.IMSFeature;
 import net.sf.mzmine.datamodel.IsotopePattern;
-import net.sf.mzmine.datamodel.PeakIdentity;
-import net.sf.mzmine.datamodel.PeakListRow;
+import net.sf.mzmine.datamodel.MobilogramIdentity;
+import net.sf.mzmine.datamodel.MobilogramListRow;
 import net.sf.mzmine.main.MZmineCore;
 
 public class MobilogramUtils {
 
   /**
-   * Common utility method to be used as Peak.toString() method in various Peak implementations
+   * Common utility method to be used as Mobilogram.toString() method in various Mobilogram
+   * implementations
    * 
-   * @param mobilogram Peak to be converted to String
+   * @param mobilogram Mobilogram to be converted to String
    * @return String representation of the mobilogram
    */
   public static String mobilogramToString(IMSFeature mobilogram) {
@@ -21,8 +22,10 @@ public class MobilogramUtils {
     Format mzFormat = MZmineCore.getConfiguration().getMZFormat();
     Format timeFormat = MZmineCore.getConfiguration().getRTFormat();
     buf.append(mzFormat.format(mobilogram.getMZ()));
-    buf.append(" m/z @");
+    buf.append(" m/z @ rt: ");
     buf.append(timeFormat.format(mobilogram.getRT()));
+    buf.append("  @ mobility: ");
+    buf.append(timeFormat.format(mobilogram.getMobility()));
     buf.append(" [" + mobilogram.getDataFile().getName() + "] ,");
     buf.append(timeFormat.format(mobilogram.getMobility()));
     buf.append(" [" + mobilogram.getDataFile().getName() + "]");
@@ -37,14 +40,14 @@ public class MobilogramUtils {
    * @return True if identities match between rows
    * 
    */
-  public static boolean compareIdentities(PeakListRow row1, PeakListRow row2) {
+  public static boolean compareIdentities(MobilogramListRow row1, MobilogramListRow row2) {
 
     if ((row1 == null) || (row2 == null))
       return false;
 
     // If both have preferred identity available, then compare only those
-    PeakIdentity row1PreferredIdentity = row1.getPreferredPeakIdentity();
-    PeakIdentity row2PreferredIdentity = row2.getPreferredPeakIdentity();
+    MobilogramIdentity row1PreferredIdentity = row1.getPreferredMobilogramIdentity();
+    MobilogramIdentity row2PreferredIdentity = row2.getPreferredMobilogramIdentity();
     if ((row1PreferredIdentity != null) && (row2PreferredIdentity != null)) {
       if (row1PreferredIdentity.getName().equals(row2PreferredIdentity.getName()))
         return true;
@@ -53,8 +56,8 @@ public class MobilogramUtils {
     }
 
     // If no identities at all for both rows, then return true
-    PeakIdentity[] row1Identities = row1.getPeakIdentities();
-    PeakIdentity[] row2Identities = row2.getPeakIdentities();
+    MobilogramIdentity[] row1Identities = row1.getMobilogramIdentities();
+    MobilogramIdentity[] row2Identities = row2.getMobilogramIdentities();
     if ((row1Identities.length == 0) && (row2Identities.length == 0))
       return true;
 
@@ -63,9 +66,9 @@ public class MobilogramUtils {
     if (row1Identities.length != row2Identities.length)
       return false;
     boolean sameID = false;
-    for (PeakIdentity row1Identity : row1Identities) {
+    for (MobilogramIdentity row1Identity : row1Identities) {
       sameID = false;
-      for (PeakIdentity row2Identity : row2Identities) {
+      for (MobilogramIdentity row2Identity : row2Identities) {
         if (row1Identity.getName().equals(row2Identity.getName())) {
           sameID = true;
           break;
@@ -81,17 +84,17 @@ public class MobilogramUtils {
   /**
    * Compare charge state of the best MS/MS precursor masses
    * 
-   * @param row1 PeaklistRow 1
-   * @param row2 PeakListRow 2
+   * @param row1 MobilogramlistRow 1
+   * @param row2 MobilogramListRow 2
    * 
    * @return true, same charge state
    */
-  public static boolean compareChargeState(PeakListRow row1, PeakListRow row2) {
+  public static boolean compareChargeState(MobilogramListRow row1, MobilogramListRow row2) {
 
     assert ((row1 != null) && (row2 != null));
 
-    int firstCharge = row1.getBestPeak().getCharge();
-    int secondCharge = row2.getBestPeak().getCharge();
+    int firstCharge = row1.getBestMobilogram().getCharge();
+    int secondCharge = row2.getBestMobilogram().getCharge();
 
     return (firstCharge == 0) || (secondCharge == 0) || (firstCharge == secondCharge);
 
@@ -101,9 +104,9 @@ public class MobilogramUtils {
    * Returns true if mobilogram list row contains a compound identity matching to id
    * 
    */
-  public static boolean containsIdentity(PeakListRow row, PeakIdentity id) {
+  public static boolean containsIdentity(MobilogramListRow row, MobilogramIdentity id) {
 
-    for (PeakIdentity identity : row.getPeakIdentities()) {
+    for (MobilogramIdentity identity : row.getMobilogramIdentities()) {
       if (identity.getName().equals(id.getName()))
         return true;
     }
@@ -115,7 +118,8 @@ public class MobilogramUtils {
    * Copies properties such as identification results and comments from the source row to the target
    * row.
    */
-  public static void copyPeakListRowProperties(PeakListRow source, PeakListRow target) {
+  public static void copyMobilogramListRowProperties(MobilogramListRow source,
+      MobilogramListRow target) {
 
     // Combine the comments
     String targetComment = target.getComment();
@@ -128,13 +132,13 @@ public class MobilogramUtils {
     target.setComment(targetComment);
 
     // Copy all mobilogram identities, if these are not already present
-    for (PeakIdentity identity : source.getPeakIdentities()) {
+    for (MobilogramIdentity identity : source.getMobilogramIdentities()) {
       if (!containsIdentity(target, identity))
-        target.addPeakIdentity(identity, false);
+        target.addMobilogramIdentity(identity, false);
     }
 
     // Set the preferred identity
-    target.setPreferredPeakIdentity(source.getPreferredPeakIdentity());
+    target.setPreferredMobilogramIdentity(source.getPreferredMobilogramIdentity());
 
   }
 
@@ -142,7 +146,7 @@ public class MobilogramUtils {
    * Copies properties such as isotope pattern and charge from the source mobilogram to the target
    * mobilogram
    */
-  public static void copyPeakProperties(IMSFeature source, IMSFeature target) {
+  public static void copyMobilogramProperties(IMSFeature source, IMSFeature target) {
 
     // Copy isotope pattern
     IsotopePattern originalPattern = source.getIsotopePattern();
@@ -164,9 +168,9 @@ public class MobilogramUtils {
 
     for (IMSFeature p : mobilograms) {
       if (mzRange == null) {
-        mzRange = p.getRawDataPointsMZRange();
+        mzRange = p.getRawIMSDataPointsMZRange();
       } else {
-        mzRange = mzRange.span(p.getRawDataPointsMZRange());
+        mzRange = mzRange.span(p.getRawIMSDataPointsMZRange());
       }
     }
 

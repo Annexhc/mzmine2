@@ -141,13 +141,11 @@ public class MzMLReadTask extends AbstractTask {
         SimpleScan scan =
             new SimpleScan(null, scanNumber, msLevel, retentionTime, mobility, precursorMz,
                 precursorCharge, null, dataPoints, spectrumType, polarity, scanDefinition, null);
-
         for (SimpleScan s : parentStack) {
           if (s.getScanNumber() == parentScan) {
             s.addFragmentScan(scanNumber);
           }
         }
-
         /*
          * Verify the size of parentStack. The actual size of the window to cover possible
          * candidates is defined by limitSize.
@@ -171,7 +169,7 @@ public class MzMLReadTask extends AbstractTask {
 
       finalRawDataFile = newMZmineFile.finishWriting();
       project.addFile(finalRawDataFile);
-
+      System.out.println("mobility Range: " + finalRawDataFile.getDataMobilityRange());
     } catch (Throwable e) {
       e.printStackTrace();
       setStatus(TaskStatus.ERROR);
@@ -305,15 +303,18 @@ public class MzMLReadTask extends AbstractTask {
         if ((accession == null) || (value == null))
           continue;
 
-        // UO:0000028 unitAcession for mobility in Waters files converted to mzML
-        double mobility;
-        if ((unitAccession == null) || (unitAccession.equals("UO:0000028"))) {
-          mobility = Double.parseDouble(value);
-        } else {
-          mobility = Double.parseDouble(value) / 60d;
-        }
-        return mobility;
+        // Retention time (actually "Scan start time") MS:1000016
+        if (accession.equals("MS:1002476")) {
 
+          // UO:0000028 unitAcession for mobility in Waters files converted to mzML
+          double mobility;
+          if ((unitAccession == null) || (unitAccession.equals("UO:0000028"))) {
+            mobility = Double.parseDouble(value);
+          } else {
+            mobility = Double.parseDouble(value) / 60d;
+          }
+          return mobility;
+        }
       }
     }
 

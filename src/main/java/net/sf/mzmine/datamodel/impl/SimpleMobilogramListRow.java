@@ -92,8 +92,8 @@ public class SimpleMobilogramListRow implements MobilogramListRow {
     // ConcurrentHashMap is already synchronized
     mobilograms.put(rawData, Mobilogram);
 
-    if (Mobilogram.getRawDataPointsIntensityRange().upperEndpoint() > maxDataPointIntensity)
-      maxDataPointIntensity = Mobilogram.getRawDataPointsIntensityRange().upperEndpoint();
+    if (Mobilogram.getRawIMSDataPointsIntensityRange().upperEndpoint() > maxDataPointIntensity)
+      maxDataPointIntensity = Mobilogram.getRawIMSDataPointsIntensityRange().upperEndpoint();
     calculateAverageValues();
   }
 
@@ -168,8 +168,10 @@ public class SimpleMobilogramListRow implements MobilogramListRow {
     Format timeFormat = MZmineCore.getConfiguration().getRTFormat();
     buf.append("#" + myID + " ");
     buf.append(mzFormat.format(getAverageMZ()));
-    buf.append(" m/z @");
+    buf.append(" m/z @ rt ");
     buf.append(timeFormat.format(getAverageRT()));
+    buf.append(" @ mobility ");
+    buf.append(timeFormat.format(getAverageMobility()));
     if (preferredIdentity != null)
       buf.append(" " + preferredIdentity.getName());
     if ((comment != null) && (comment.length() > 0))

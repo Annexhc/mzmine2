@@ -120,6 +120,7 @@ public class SimpleScan implements Scan {
     return pointsWithinRange;
   }
 
+
   /**
    * @return Returns scan datapoints over certain intensity
    */
@@ -165,7 +166,6 @@ public class SimpleScan implements Scan {
       }
 
     }
-
   }
 
   /**

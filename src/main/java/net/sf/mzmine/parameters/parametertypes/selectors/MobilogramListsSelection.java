@@ -9,7 +9,7 @@ import net.sf.mzmine.util.TextUtils;
 public class MobilogramListsSelection implements Cloneable {
 
   private MobilogramListsSelectionType selectionType =
-      MobilogramListsSelectionType.GUI_SELECTED_PEAKLISTS;
+      MobilogramListsSelectionType.GUI_SELECTED_MOBILOGRAMLISTS;
   private MobilogramList specificMobilogramLists[];
   private String namePattern;
   private MobilogramList batchLastMobilogramLists[];
@@ -18,11 +18,11 @@ public class MobilogramListsSelection implements Cloneable {
 
     switch (selectionType) {
 
-      case GUI_SELECTED_PEAKLISTS:
+      case GUI_SELECTED_MOBILOGRAMLISTS:
         return MZmineCore.getDesktop().getSelectedMobilogramLists();
-      case ALL_PEAKLISTS:
+      case ALL_MOBILOGRAMLISTS:
         return MZmineCore.getProjectManager().getCurrentProject().getMobilogramLists();
-      case SPECIFIC_PEAKLISTS:
+      case SPECIFIC_MOBILOGRAMLISTS:
         if (specificMobilogramLists == null)
           return new MobilogramList[0];
         return specificMobilogramLists;
@@ -47,7 +47,7 @@ public class MobilogramListsSelection implements Cloneable {
           }
         }
         return matchingMobilogramLists.toArray(new MobilogramList[0]);
-      case BATCH_LAST_PEAKLISTS:
+      case BATCH_LAST_MOBILOGRAMLISTS:
         if (batchLastMobilogramLists == null)
           return new MobilogramList[0];
         return batchLastMobilogramLists;

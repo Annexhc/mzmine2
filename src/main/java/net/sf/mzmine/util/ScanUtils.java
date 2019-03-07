@@ -53,8 +53,10 @@ public class ScanUtils {
     Format mzFormat = MZmineCore.getConfiguration().getMZFormat();
     buf.append("#");
     buf.append(scan.getScanNumber());
-    buf.append(" @");
+    buf.append(" @ rt");
     buf.append(rtFormat.format(scan.getRetentionTime()));
+    buf.append(" @ mobility ");
+    buf.append(rtFormat.format(scan.getMobility()));
     buf.append(" MS");
     buf.append(scan.getMSLevel());
     if (scan.getMSLevel() > 1)
@@ -550,6 +552,28 @@ public class ScanUtils {
     }
 
     return Range.closed(lowRt, highRt);
+  }
+
+  /**
+   * Find the RT range of given scans. We assume there is at least one scan.
+   */
+  public static @Nonnull Range<Double> findMobilityRange(@Nonnull Scan scans[]) {
+
+    assert scans.length > 0;
+
+    double lowMobility = scans[0].getRetentionTime();
+    double highMobility = lowMobility;
+    for (int i = 1; i < scans.length; i++) {
+      if (scans[i].getMobility() < lowMobility) {
+        lowMobility = scans[i].getMobility();
+        continue;
+      }
+      if (scans[i].getRetentionTime() > highMobility) {
+        highMobility = scans[i].getMobility();
+      }
+    }
+
+    return Range.closed(lowMobility, highMobility);
   }
 
   public static byte[] encodeDataPointsToBytes(DataPoint dataPoints[]) {

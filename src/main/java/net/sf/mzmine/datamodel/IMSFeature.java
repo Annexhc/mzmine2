@@ -86,27 +86,32 @@ public interface IMSFeature {
    * intensity does not need to match any actual raw data point. May return null, if there is no
    * data point in given scan.
    */
-  public @Nullable DataPoint getDataPoint(int scanNumber);
+  public @Nullable IMSDataPoint getIMSDataPoint(int scanNumber);
 
   /**
    * Returns the retention time range of all raw data points used to detect this Mobilogram
    */
-  public @Nonnull Range<Double> getRawDataPointsRTRange();
+  public @Nonnull Range<Double> getRawIMSDataPointsRTRange();
 
   /**
    * Returns the range of m/z values of all raw data points used to detect this Mobilogram
    */
-  public @Nonnull Range<Double> getRawDataPointsMZRange();
+  public @Nonnull Range<Double> getRawIMSDataPointsMZRange();
 
   /**
    * Returns the range of intensity values of all raw data points used to detect this Mobilogram
    */
-  public @Nonnull Range<Double> getRawDataPointsIntensityRange();
+  public @Nonnull Range<Double> getRawIMSDataPointsIntensityRange();
 
   /**
    * Returns the number of scan that represents the fragmentation of this Mobilogram in MS2 level.
    */
   public int getMostIntenseFragmentScanNumber();
+
+  /**
+   * Returns all scan numbers that represent fragmentations of this peak in MS2 level.
+   */
+  public int[] getAllMS2FragmentScanNumbers();
 
   /**
    * Returns the isotope pattern of this Mobilogram or null if no pattern is attached

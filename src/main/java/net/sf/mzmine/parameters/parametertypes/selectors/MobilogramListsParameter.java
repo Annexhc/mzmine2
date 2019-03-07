@@ -107,7 +107,7 @@ public class MobilogramListsParameter
     final String attrValue = xmlElement.getAttribute("type");
 
     if (Strings.isNullOrEmpty(attrValue))
-      selectionType = MobilogramListsSelectionType.GUI_SELECTED_PEAKLISTS;
+      selectionType = MobilogramListsSelectionType.GUI_SELECTED_MOBILOGRAMLISTS;
     else
       selectionType = MobilogramListsSelectionType.valueOf(xmlElement.getAttribute("type"));
 

@@ -23,33 +23,31 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import com.google.common.collect.Range;
-import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
-import net.sf.mzmine.util.DataPointSorter;
+import net.sf.mzmine.util.IMSDataPointSorter;
 import net.sf.mzmine.util.SortingDirection;
 import net.sf.mzmine.util.SortingProperty;
 
-public class HighestDataPointConnectorIMS {
+public class HighestIMSDataPointConnector {
 
   private final MZTolerance mzTolerance;
   private final double minimumTimeSpan, minimumHeight;
   private final RawDataFile dataFile;
   private final int allScanNumbers[];
-  private int numberOfBins;
 
   // Mapping of last data point m/z --> mobilogram
   private Set<Mobilogram> buildingMobilograms;
 
-  public HighestDataPointConnectorIMS(RawDataFile dataFile, int allScanNumbers[],
-      double minimumTimeSpan, double minimumHeight, MZTolerance mzTolerance, int numberOfBins) {
+  public HighestIMSDataPointConnector(RawDataFile dataFile, int allScanNumbers[],
+      double minimumTimeSpan, double minimumHeight, MZTolerance mzTolerance) {
 
     this.mzTolerance = mzTolerance;
     this.minimumHeight = minimumHeight;
     this.minimumTimeSpan = minimumTimeSpan;
     this.dataFile = dataFile;
     this.allScanNumbers = allScanNumbers;
-    this.numberOfBins = numberOfBins;
 
     // We use LinkedHashSet to maintain a reproducible ordering. If we use
     // plain HashSet, the resulting peak list row IDs will have different
@@ -58,29 +56,29 @@ public class HighestDataPointConnectorIMS {
 
   }
 
-  public void addScan(int scanNumber, DataPoint mzValues[]) {
+  public void addScan(int scanNumber, IMSDataPoint mzValues[]) {
 
     // Sort m/z peaks by descending intensity
     Arrays.sort(mzValues,
-        new DataPointSorter(SortingProperty.Intensity, SortingDirection.Descending));
+        new IMSDataPointSorter(SortingProperty.Intensity, SortingDirection.Descending));
 
     // Set of already connected mobilograms in each iteration
     Set<Mobilogram> connectedmobilograms = new LinkedHashSet<Mobilogram>();
 
     // TODO: these two nested cycles should be optimized for speed
-    for (DataPoint mzMobilogram : mzValues) {
+    for (IMSDataPoint mzMobilogram : mzValues) {
 
       // Search for best mobilogram, which has highest last data point
-      Mobilogram bestmobilogram = null;
+      Mobilogram bestMobilogram = null;
 
-      for (Mobilogram testChrom : buildingMobilograms) {
+      for (Mobilogram testMobilogram : buildingMobilograms) {
 
-        DataPoint lastMzMobilogram = testChrom.getLastMzMobilogram();
+        IMSDataPoint lastMzMobilogram = testMobilogram.getLastMzMobilogram();
         Range<Double> toleranceRange = mzTolerance.getToleranceRange(lastMzMobilogram.getMZ());
         if (toleranceRange.contains(mzMobilogram.getMZ())) {
-          if ((bestmobilogram == null) || (testChrom.getLastMzMobilogram()
-              .getIntensity() > bestmobilogram.getLastMzMobilogram().getIntensity())) {
-            bestmobilogram = testChrom;
+          if ((bestMobilogram == null) || (testMobilogram.getLastMzMobilogram()
+              .getIntensity() > bestMobilogram.getLastMzMobilogram().getIntensity())) {
+            bestMobilogram = testMobilogram;
           }
         }
 
@@ -89,45 +87,45 @@ public class HighestDataPointConnectorIMS {
       // If we found best mobilogram, check if it is already connected.
       // In such case, we may discard this mass and continue. If we
       // haven't found a mobilogram, we may create a new one.
-      if (bestmobilogram != null) {
-        if (connectedmobilograms.contains(bestmobilogram)) {
+      if (bestMobilogram != null) {
+        if (connectedmobilograms.contains(bestMobilogram)) {
           continue;
         }
       } else {
-        bestmobilogram = new Mobilogram(dataFile, allScanNumbers, numberOfBins);
+        bestMobilogram = new Mobilogram(dataFile, allScanNumbers);
       }
 
       // Add this mzMobilogram to the mobilogram
-      bestmobilogram.addMzMobilogram(scanNumber, mzMobilogram);
+      bestMobilogram.addMzMobilogram(scanNumber, mzMobilogram);
 
       // Move the mobilogram to the set of connected mobilograms
-      connectedmobilograms.add(bestmobilogram);
+      connectedmobilograms.add(bestMobilogram);
 
     }
 
     // Process those mobilograms which were not connected to any m/z peak
-    for (Mobilogram testChrom : buildingMobilograms) {
+    for (Mobilogram testMobilogram : buildingMobilograms) {
 
       // Skip those which were connected
-      if (connectedmobilograms.contains(testChrom)) {
+      if (connectedmobilograms.contains(testMobilogram)) {
         continue;
       }
 
       // Check if we just finished a long-enough segment
-      if (testChrom.getBuildingSegmentLength() >= minimumTimeSpan) {
-        testChrom.commitBuildingSegment();
+      if (testMobilogram.getBuildingSegmentLength() >= minimumTimeSpan) {
+        testMobilogram.commitBuildingSegment();
 
         // Move the mobilogram to the set of connected mobilograms
-        connectedmobilograms.add(testChrom);
+        connectedmobilograms.add(testMobilogram);
         continue;
       }
 
       // Check if we have any committed segments in the mobilogram
-      if (testChrom.getNumberOfCommittedSegments() > 0) {
-        testChrom.removeBuildingSegment();
+      if (testMobilogram.getNumberOfCommittedSegments() > 0) {
+        testMobilogram.removeBuildingSegment();
 
         // Move the mobilogram to the set of connected mobilograms
-        connectedmobilograms.add(testChrom);
+        connectedmobilograms.add(testMobilogram);
         continue;
       }
 

@@ -23,7 +23,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.text.NumberFormat;
-
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JFrame;
@@ -33,17 +32,18 @@ import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
-
+import com.google.common.collect.Range;
+import net.sf.mzmine.datamodel.MobilogramList;
+import net.sf.mzmine.datamodel.MobilogramListRow;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.datamodel.RawDataFile;
+import net.sf.mzmine.datamodel.impl.SimpleMobilogramList;
 import net.sf.mzmine.datamodel.impl.SimplePeakList;
 import net.sf.mzmine.desktop.impl.WindowsMenu;
 import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.WindowSettingsParameter;
-
-import com.google.common.collect.Range;
 
 class InfoVisualizerWindow extends JFrame {
 
@@ -179,6 +179,133 @@ class InfoVisualizerWindow extends JFrame {
     rtRange = peakList.getRowsRTRange();
     for (PeakListRow row : rows) {
       if (row.getPreferredPeakIdentity() != null)
+        numOfIdentities++;
+    }
+
+  }
+
+  InfoVisualizerWindow(MobilogramList mobilogramList) {
+
+    super("Peak list information");
+
+    // this.setTitle(mobilogramList.getName() + " information");
+
+    setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+    // setBackground(Color.white);
+
+    this.getInfoRange(mobilogramList);
+
+    if (mobilogramList.getNumberOfRows() == 0) {
+      mzRange = Range.singleton(0.0);
+      rtRange = Range.singleton(0.0);
+    }
+
+    // Raw data file list
+    JList<RawDataFile> rawDataFileList = new JList<RawDataFile>(mobilogramList.getRawDataFiles());
+    rawDataFileList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    rawDataFileList.setLayoutOrientation(JList.VERTICAL);
+    JScrollPane rawlistScroller = new JScrollPane(rawDataFileList);
+    rawlistScroller.setPreferredSize(new Dimension(250, 60));
+    rawlistScroller.setAlignmentX(LEFT_ALIGNMENT);
+    JPanel rawPanel = new JPanel();
+    rawPanel.setLayout(new BoxLayout(rawPanel, BoxLayout.Y_AXIS));
+    JLabel label = new JLabel("List of raw data files");
+    // label.setLabelFor(rawDataFileList);
+    rawPanel.add(label);
+    rawPanel.add(rawlistScroller);
+    rawPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+    // Applied methods list
+    AppliedMethodList appliedMethodList = new AppliedMethodList(mobilogramList.getAppliedMethods());
+    appliedMethodList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+    appliedMethodList.setLayoutOrientation(JList.VERTICAL);
+    JScrollPane methodlistScroller = new JScrollPane(appliedMethodList);
+    methodlistScroller.setPreferredSize(new Dimension(250, 80));
+    methodlistScroller.setAlignmentX(LEFT_ALIGNMENT);
+
+    JPanel methodPanel = new JPanel();
+    methodPanel.setLayout(new BoxLayout(methodPanel, BoxLayout.Y_AXIS));
+    // JLabel label = new JLabel("List of applied methods");
+    // label.setLabelFor(processInfoList);
+    methodPanel.add(new JLabel("List of applied methods"));
+    methodPanel.add(methodlistScroller);
+    methodPanel.setBorder(BorderFactory.createEmptyBorder(1, 1, 1, 1));
+
+    // Panels
+    JPanel pnlGrid = new JPanel();
+    pnlGrid.setLayout(new GridBagLayout());
+    GridBagConstraints c = new GridBagConstraints();
+
+    c.fill = GridBagConstraints.HORIZONTAL;
+    c.insets = new Insets(10, 10, 10, 10);
+    c.gridwidth = 1;
+    c.weightx = 1.0; // Use all horizontal space
+
+    c.gridx = 0;
+    c.gridy = 0;
+    pnlGrid.add(new JLabel(
+        "<html>Name: <font color=\"blue\">" + mobilogramList.getName() + "</font></html>"), c);
+    c.gridx = 0;
+    c.gridy = 1;
+    pnlGrid.add(new JLabel("<html>Created (yyyy/MM/dd HH:mm:ss): <font color=\"blue\">"
+        + ((SimpleMobilogramList) mobilogramList).getDateCreated() + "</font></html>"), c);
+    c.gridx = 0;
+    c.gridy = 2;
+    pnlGrid.add(rawPanel, c);
+    c.gridx = 0;
+    c.gridy = 3;
+    pnlGrid.add(
+        new JLabel("<html>Number of rows: <font color=\"blue\">" + numOfRows + "</font></html>"),
+        c);
+    c.gridx = 0;
+    c.gridy = 4;
+    String text =
+        mzFormat.format(mzRange.lowerEndpoint()) + " - " + mzFormat.format(mzRange.upperEndpoint());
+    pnlGrid.add(new JLabel("<html>m/z range: <font color=\"blue\">" + text + "</font></html>"), c);
+    c.gridx = 0;
+    c.gridy = 5;
+    text =
+        rtFormat.format(rtRange.lowerEndpoint()) + " - " + rtFormat.format(rtRange.upperEndpoint());
+    pnlGrid.add(new JLabel("<html>RT range: <font color=\"blue\">" + text + "</font> min</html>"),
+        c);
+    c.gridx = 0;
+    c.gridy = 6;
+    pnlGrid.add(new JLabel("<html>Number of identified peaks: <font color=\"blue\">"
+        + numOfIdentities + "</font></html>"), c);
+    c.gridx = 0;
+    c.gridy = 7;
+    pnlGrid.add(methodPanel, c);
+
+    add(pnlGrid);
+    setResizable(false);
+
+    // Add the Windows menu
+    JMenuBar menuBar = new JMenuBar();
+    menuBar.add(new WindowsMenu());
+    setJMenuBar(menuBar);
+
+    pack();
+
+    // get the window settings parameter
+    ParameterSet paramSet =
+        MZmineCore.getConfiguration().getModuleParameters(InfoVisualizerModule.class);
+    WindowSettingsParameter settings =
+        paramSet.getParameter(InfoVisualizerParameters.windowSettings);
+
+    // update the window and listen for changes
+    settings.applySettingsToWindow(this);
+    this.addComponentListener(settings);
+
+  }
+
+  void getInfoRange(MobilogramList mobilogramList) {
+    MobilogramListRow[] rows = mobilogramList.getRows();
+    numOfRows = rows.length;
+
+    mzRange = mobilogramList.getRowsMZRange();
+    rtRange = mobilogramList.getRowsRTRange();
+    for (MobilogramListRow row : rows) {
+      if (row.getPreferredMobilogramIdentity() != null)
         numOfIdentities++;
     }
 

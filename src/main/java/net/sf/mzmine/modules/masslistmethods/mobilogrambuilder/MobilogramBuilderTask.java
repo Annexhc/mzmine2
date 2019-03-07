@@ -20,7 +20,7 @@ package net.sf.mzmine.modules.masslistmethods.mobilogrambuilder;
 
 import java.util.Arrays;
 import java.util.logging.Logger;
-import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.IMSFeature;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassList;
@@ -54,7 +54,6 @@ public class MobilogramBuilderTask extends AbstractTask {
   private String suffix, massListName;
   private MZTolerance mzTolerance;
   private double minimumTimeSpan, minimumHeight;
-  private int minimumMobilitySpan;
 
   private SimpleMobilogramList newMobilogramList;
 
@@ -73,8 +72,6 @@ public class MobilogramBuilderTask extends AbstractTask {
     this.mzTolerance = parameters.getParameter(MobilogramBuilderParameters.mzTolerance).getValue();
     this.minimumTimeSpan =
         parameters.getParameter(MobilogramBuilderParameters.minimumTimeSpan).getValue();
-    this.minimumMobilitySpan =
-        parameters.getParameter(MobilogramBuilderParameters.minimumMobilitySpan).getValue();
     this.minimumHeight =
         parameters.getParameter(MobilogramBuilderParameters.minimumHeight).getValue();
 
@@ -114,7 +111,10 @@ public class MobilogramBuilderTask extends AbstractTask {
 
     logger.info("Started mobilogram builder IMS on " + dataFile);
     scans = scanSelection.getMatchingScans(dataFile);
-
+    // for (int i = 1601; i < dataFile.getNumOfScans(); i++) {
+    // dataFile.getScan(i).getMobility();
+    // }
+    System.out.println("Mobility range: " + dataFile.getDataMobilityRange(1));
     // toDo combined Scans!!!
 
     int allScanNumbers[] = scanSelection.getMatchingScanNumbers(dataFile);
@@ -138,35 +138,34 @@ public class MobilogramBuilderTask extends AbstractTask {
     // Create new peak list
     newMobilogramList = new SimpleMobilogramList(dataFile + " " + suffix, dataFile);
 
-    int numberofBins = getNumberOfBins(scans);
 
     Mobilogram[] mobilograms;
-    HighestDataPointConnectorIMS massConnector = new HighestDataPointConnectorIMS(dataFile,
-        allScanNumbers, minimumTimeSpan, minimumHeight, mzTolerance, numberofBins);
+    HighestIMSDataPointConnector massConnector = new HighestIMSDataPointConnector(dataFile,
+        allScanNumbers, minimumTimeSpan, minimumHeight, mzTolerance);
 
-    for (int i = 0; i < scans.length - numberofBins; i++) {
 
+    for (Scan scan : scans) {
       if (isCanceled())
         return;
 
-      MassList massList = scans[i + numberofBins].getMassList(massListName);
+      MassList massList = scan.getMassList(massListName);
       if (massList == null) {
         setStatus(TaskStatus.ERROR);
-        setErrorMessage("Scan " + dataFile + " #" + scans[i + numberofBins].getScanNumber()
+        setErrorMessage("Scan " + dataFile + " #" + scan.getScanNumber()
             + " does not have a mass list " + massListName);
         return;
       }
 
-      DataPoint mzValues[] = massList.getDataPoints();
+      IMSDataPoint mzIMSValues[] = massList.getIMSDataPoints();
 
-      if (mzValues == null) {
+      if (mzIMSValues == null) {
         setStatus(TaskStatus.ERROR);
         setErrorMessage("Mass list " + massListName + " does not contain m/z values for scan #"
-            + scans[i].getScanNumber() + " of file " + dataFile);
+            + scan.getScanNumber() + " of file " + dataFile);
         return;
       }
 
-      massConnector.addScan(scans[i + numberofBins].getScanNumber(), mzValues);
+      massConnector.addScan(scan.getScanNumber(), mzIMSValues);
       processedScans++;
     }
 
@@ -190,18 +189,5 @@ public class MobilogramBuilderTask extends AbstractTask {
 
     logger.info("Finished mobilogram builder on " + dataFile);
 
-  }
-
-  private int getNumberOfBins(Scan scans[]) {
-    int numberOfBins = 0;
-    double scanRetentionTime = scans[0].getRetentionTime();
-    for (int i = 0; i < scans.length; i++) {
-      if (scanRetentionTime == scans[i].getRetentionTime()) {
-        numberOfBins++;
-      } else {
-        break;
-      }
-    }
-    return numberOfBins;
   }
 }

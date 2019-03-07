@@ -16,27 +16,24 @@
  * USA
  */
 
-package net.sf.mzmine.datamodel;
-
-import javax.annotation.Nonnull;
+package net.sf.mzmine.modules.visualization.mobilogramlisttable;
 
 /**
- * This class represent detected masses (ions) in one mass spectrum. Each ion is represented by a
- * DataPoint
+ *
  */
-public interface MassList {
+public enum MobilogramShapeNormalization {
 
-  @Nonnull
-  public String getName();
+  MOBILOGRAMMAX("Mobilogram maximum"), ROWMAX("Row maximum"), GLOBALMAX("Global maximum");
 
-  @Nonnull
-  public Scan getScan();
+  private final String displayName;
 
-  @Nonnull
-  public DataPoint[] getDataPoints();
+  MobilogramShapeNormalization(final String displayName) {
+    this.displayName = displayName;
+  }
 
-  @Nonnull
-  public IMSDataPoint[] getIMSDataPoints();
-
+  @Override
+  public String toString() {
+    return displayName;
+  }
 
 }

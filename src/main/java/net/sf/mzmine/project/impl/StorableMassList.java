@@ -20,10 +20,9 @@ package net.sf.mzmine.project.impl;
 
 import java.io.IOException;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
 import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.MassList;
 import net.sf.mzmine.datamodel.Scan;
 
@@ -70,6 +69,18 @@ public class StorableMassList implements MassList {
     } catch (IOException e) {
       logger.severe("Could not read data from temporary file " + e.toString());
       return new DataPoint[0];
+    }
+  }
+
+  @Override
+  public @Nonnull IMSDataPoint[] getIMSDataPoints() {
+    try {
+      IMSDataPoint result[] = rawDataFile.readIMSDataPoints(storageID);
+      return result;
+
+    } catch (IOException e) {
+      logger.severe("Could not read data from temporary file " + e.toString());
+      return new IMSDataPoint[0];
     }
   }
 

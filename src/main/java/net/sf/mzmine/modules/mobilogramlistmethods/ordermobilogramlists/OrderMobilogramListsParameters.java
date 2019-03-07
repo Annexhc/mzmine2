@@ -16,27 +16,18 @@
  * USA
  */
 
-package net.sf.mzmine.datamodel;
+package net.sf.mzmine.modules.mobilogramlistmethods.ordermobilogramlists;
 
-import javax.annotation.Nonnull;
+import net.sf.mzmine.parameters.Parameter;
+import net.sf.mzmine.parameters.impl.SimpleParameterSet;
+import net.sf.mzmine.parameters.parametertypes.selectors.MobilogramListsParameter;
 
-/**
- * This class represent detected masses (ions) in one mass spectrum. Each ion is represented by a
- * DataPoint
- */
-public interface MassList {
+public class OrderMobilogramListsParameters extends SimpleParameterSet {
 
-  @Nonnull
-  public String getName();
+  public static final MobilogramListsParameter mobilogramLists = new MobilogramListsParameter();
 
-  @Nonnull
-  public Scan getScan();
-
-  @Nonnull
-  public DataPoint[] getDataPoints();
-
-  @Nonnull
-  public IMSDataPoint[] getIMSDataPoints();
-
+  public OrderMobilogramListsParameters() {
+    super(new Parameter[] {mobilogramLists});
+  }
 
 }

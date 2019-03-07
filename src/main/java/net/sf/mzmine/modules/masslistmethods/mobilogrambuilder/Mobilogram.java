@@ -25,7 +25,7 @@ import java.util.Vector;
 import javax.annotation.Nonnull;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
-import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.IMSFeature;
 import net.sf.mzmine.datamodel.IsotopePattern;
 import net.sf.mzmine.datamodel.RawDataFile;
@@ -46,24 +46,27 @@ public class Mobilogram implements IMSFeature {
   private RawDataFile dataFile;
 
   // Data points of the mobilogram (map of scan number -> m/z peak)
-  private Hashtable<Integer, DataPoint> dataPointsMap;
+  private Hashtable<Integer, IMSDataPoint> dataPointsMap;
 
   // mobilogram m/z, RT, height, area, ccs,
-  private double mz, rt, height, area, ccs;
-  private int numberOfBins, mobility;
+  private double mz, rt, height, area, mobility, ccs;
   private Double fwhm = null, tf = null, af = null;
 
   // Top intensity scan, fragment scan
   private int representativeScan = -1, fragmentScan = -1;
 
+  // All MS2 fragment scan numbers
+  private int[] allMS2FragmentScanNumbers = new int[] {};
+
   // Ranges of raw data points
-  private Range<Double> rawDataPointsIntensityRange, rawDataPointsMZRange, rawDataPointsRTRange;
+  private Range<Double> rawIMSDataPointsIntensityRange, rawIMSDataPointsMZRange,
+      rawIMSDataPointsRTRange;
 
   // A set of scan numbers of a segment which is currently being connected
   private Vector<Integer> buildingSegment;
 
   // Keep track of last added data point
-  private DataPoint lastMzMobilogram;
+  private IMSDataPoint lastMzMobilogram;
 
   // Number of connected segments, which have been committed by
   // commitBuildingSegment()
@@ -74,9 +77,10 @@ public class Mobilogram implements IMSFeature {
   private IsotopePattern isotopePattern;
   private int charge = 0;
 
-  // Victor Trevino
   private double mzSum = 0;
   private int mzN = 0;
+  private double mobilitySum = 0;
+  private double mobilityN = 0;
 
   private final int scanNumbers[];
 
@@ -88,14 +92,13 @@ public class Mobilogram implements IMSFeature {
   /**
    * Initializes this mobilogram
    */
-  public Mobilogram(RawDataFile dataFile, int scanNumbers[], int numberOfBins) {
+  public Mobilogram(RawDataFile dataFile, int scanNumbers[]) {
     this.dataFile = dataFile;
     this.scanNumbers = scanNumbers;
 
-    rawDataPointsRTRange = dataFile.getDataRTRange(1);
-    this.numberOfBins = numberOfBins;
+    rawIMSDataPointsRTRange = dataFile.getDataRTRange(1);
 
-    dataPointsMap = new Hashtable<Integer, DataPoint>();
+    dataPointsMap = new Hashtable<Integer, IMSDataPoint>();
     buildingSegment = new Vector<Integer>(128);
   }
 
@@ -105,26 +108,28 @@ public class Mobilogram implements IMSFeature {
    * 
    * @param mzValue
    */
-  public void addMzMobilogram(int scanNumber, DataPoint mzValue) {
-    dataPointsMap.put(scanNumber, mzValue);
-    lastMzMobilogram = mzValue;
-    mzSum += mzValue.getMZ();
+  public void addMzMobilogram(int scanNumber, IMSDataPoint iMSDataPoint) {
+    dataPointsMap.put(scanNumber, iMSDataPoint);
+    lastMzMobilogram = iMSDataPoint;
+    mzSum += iMSDataPoint.getMZ();
     mzN++;
     mz = mzSum / mzN;
-    mobility = 1000;
+    mobilitySum += iMSDataPoint.getMobility();
+    mobilityN++;
+    mobility = mobilitySum / mobilityN;
     buildingSegment.add(scanNumber);
 
   }
 
   @Override
-  public DataPoint getDataPoint(int scanNumber) {
+  public IMSDataPoint getIMSDataPoint(int scanNumber) {
     return dataPointsMap.get(scanNumber);
   }
 
   /**
    * Returns m/z value of last added data point
    */
-  public DataPoint getLastMzMobilogram() {
+  public IMSDataPoint getLastMzMobilogram() {
     return lastMzMobilogram;
   }
 
@@ -164,18 +169,17 @@ public class Mobilogram implements IMSFeature {
 
   @Override
   public double getMobility() {
-    // algorithm ToDo
     return mobility;
   }
-
-  public int getNumberOfBins() {
-    return numberOfBins;
-  }
-
 
   @Override
   public int getMostIntenseFragmentScanNumber() {
     return fragmentScan;
+  }
+
+  @Override
+  public int[] getAllMS2FragmentScanNumbers() {
+    return allMS2FragmentScanNumbers;
   }
 
   @Override
@@ -189,18 +193,18 @@ public class Mobilogram implements IMSFeature {
   }
 
   @Override
-  public @Nonnull Range<Double> getRawDataPointsIntensityRange() {
-    return rawDataPointsIntensityRange;
+  public @Nonnull Range<Double> getRawIMSDataPointsIntensityRange() {
+    return rawIMSDataPointsIntensityRange;
   }
 
   @Override
-  public @Nonnull Range<Double> getRawDataPointsMZRange() {
-    return rawDataPointsMZRange;
+  public @Nonnull Range<Double> getRawIMSDataPointsMZRange() {
+    return rawIMSDataPointsMZRange;
   }
 
   @Override
-  public @Nonnull Range<Double> getRawDataPointsRTRange() {
-    return rawDataPointsRTRange;
+  public @Nonnull Range<Double> getRawIMSDataPointsRTRange() {
+    return rawIMSDataPointsRTRange;
   }
 
   @Override
@@ -244,26 +248,28 @@ public class Mobilogram implements IMSFeature {
     height = Double.MIN_VALUE;
     for (int i = 0; i < allScanNumbers.length; i++) {
 
-      DataPoint mzMobilogram = dataPointsMap.get(allScanNumbers[i]);
+      IMSDataPoint mzMobilogram = dataPointsMap.get(allScanNumbers[i]);
 
-      // Replace the MzMobilogram instance with an instance of SimpleDataPoint,
+      // Replace the MzMobilogram instance with an instance of SimpleIMSDataPoint,
       // to reduce the memory usage. After we finish this mobilogram, we
       // don't need the additional data provided by the MzMobilogram
 
       dataPointsMap.put(allScanNumbers[i], mzMobilogram);
 
       if (i == 0) {
-        rawDataPointsIntensityRange = Range.singleton(mzMobilogram.getIntensity());
-        rawDataPointsMZRange = Range.singleton(mzMobilogram.getMZ());
+        rawIMSDataPointsIntensityRange = Range.singleton(mzMobilogram.getIntensity());
+        rawIMSDataPointsMZRange = Range.singleton(mzMobilogram.getMZ());
       } else {
-        rawDataPointsIntensityRange =
-            rawDataPointsIntensityRange.span(Range.singleton(mzMobilogram.getIntensity()));
-        rawDataPointsMZRange = rawDataPointsMZRange.span(Range.singleton(mzMobilogram.getMZ()));
+        rawIMSDataPointsIntensityRange =
+            rawIMSDataPointsIntensityRange.span(Range.singleton(mzMobilogram.getIntensity()));
+        rawIMSDataPointsMZRange =
+            rawIMSDataPointsMZRange.span(Range.singleton(mzMobilogram.getMZ()));
       }
 
       if (height < mzMobilogram.getIntensity()) {
         height = mzMobilogram.getIntensity();
         rt = dataFile.getScan(allScanNumbers[i]).getRetentionTime();
+        mobility = dataFile.getScan(allScanNumbers[i]).getMobility();
         representativeScan = allScanNumbers[i];
       }
     }
@@ -280,8 +286,8 @@ public class Mobilogram implements IMSFeature {
     }
 
     // Update fragment scan
-    fragmentScan =
-        ScanUtils.findBestFragmentScan(dataFile, dataFile.getDataRTRange(1), rawDataPointsMZRange);
+    fragmentScan = ScanUtils.findBestFragmentScan(dataFile, dataFile.getDataRTRange(1),
+        rawIMSDataPointsMZRange);
 
     if (fragmentScan > 0) {
       Scan fragmentScanObject = dataFile.getScan(fragmentScan);
@@ -290,19 +296,19 @@ public class Mobilogram implements IMSFeature {
         this.charge = precursorCharge;
     }
 
-    rawDataPointsRTRange = null;
+    rawIMSDataPointsRTRange = null;
 
     for (int scanNum : allScanNumbers) {
       double scanRt = dataFile.getScan(scanNum).getRetentionTime();
-      DataPoint dp = getDataPoint(scanNum);
+      IMSDataPoint dp = getIMSDataPoint(scanNum);
 
       if ((dp == null) || (dp.getIntensity() == 0.0))
         continue;
 
-      if (rawDataPointsRTRange == null)
-        rawDataPointsRTRange = Range.singleton(scanRt);
+      if (rawIMSDataPointsRTRange == null)
+        rawIMSDataPointsRTRange = Range.singleton(scanRt);
       else
-        rawDataPointsRTRange = rawDataPointsRTRange.span(Range.singleton(scanRt));
+        rawIMSDataPointsRTRange = rawIMSDataPointsRTRange.span(Range.singleton(scanRt));
     }
 
     // Discard the fields we don't need anymore
@@ -336,8 +342,8 @@ public class Mobilogram implements IMSFeature {
     numOfCommittedSegments++;
   }
 
-  public void addDataPointsFromMobilogram(Mobilogram ch) {
-    for (Entry<Integer, DataPoint> dp : ch.dataPointsMap.entrySet()) {
+  public void addIMSDataPointsFromMobilogram(Mobilogram mobilogram) {
+    for (Entry<Integer, IMSDataPoint> dp : mobilogram.dataPointsMap.entrySet()) {
       addMzMobilogram(dp.getKey(), dp.getValue());
     }
   }

@@ -329,13 +329,13 @@ public class MainWindow extends JFrame implements MZmineModule, Desktop, WindowL
 
   @Override
   public void addMobilogramListTreeListener(TreeModelListener listener) {
-    TreeModel model = getMainPanel().getPeakListTree().getModel();
+    TreeModel model = getMainPanel().getMobilogramListTree().getModel();
     model.addTreeModelListener(listener);
   }
 
   @Override
   public void removeMobilogramListTreeListener(TreeModelListener listener) {
-    TreeModel model = getMainPanel().getPeakListTree().getModel();
+    TreeModel model = getMainPanel().getMobilogramListTree().getModel();
     model.removeTreeModelListener(listener);
   }
 

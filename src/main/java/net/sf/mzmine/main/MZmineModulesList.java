@@ -21,6 +21,7 @@ package net.sf.mzmine.main;
 import net.sf.mzmine.modules.batchmode.BatchModeModule;
 import net.sf.mzmine.modules.masslistmethods.ADAPchromatogrambuilder.ADAPChromatogramBuilderModule;
 import net.sf.mzmine.modules.masslistmethods.chromatogrambuilder.ChromatogramBuilderModule;
+import net.sf.mzmine.modules.masslistmethods.mobilogrambuilder.MobilogramBuilderModule;
 import net.sf.mzmine.modules.masslistmethods.shoulderpeaksfilter.ShoulderPeaksFilterModule;
 import net.sf.mzmine.modules.peaklistmethods.alignment.hierarchical.HierarAlignerGcModule;
 import net.sf.mzmine.modules.peaklistmethods.alignment.join.JoinAlignerModule;
@@ -104,12 +105,13 @@ import net.sf.mzmine.modules.visualization.histogram.HistogramVisualizerModule;
 import net.sf.mzmine.modules.visualization.infovisualizer.InfoVisualizerModule;
 import net.sf.mzmine.modules.visualization.intensityplot.IntensityPlotModule;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.KendrickMassPlotModule;
+import net.sf.mzmine.modules.visualization.mobilogramlisttable.MobilogramListTableModule;
 import net.sf.mzmine.modules.visualization.mzhistogram.MZDistributionHistoModule;
 import net.sf.mzmine.modules.visualization.neutralloss.NeutralLossVisualizerModule;
-import net.sf.mzmine.modules.visualization.productionfilter.ProductIonFilterVisualizerModule;
 import net.sf.mzmine.modules.visualization.peaklisttable.PeakListTableModule;
 import net.sf.mzmine.modules.visualization.peaklisttable.export.IsotopePatternExportModule;
 import net.sf.mzmine.modules.visualization.peaklisttable.export.MSMSExportModule;
+import net.sf.mzmine.modules.visualization.productionfilter.ProductIonFilterVisualizerModule;
 import net.sf.mzmine.modules.visualization.scatterplot.ScatterPlotVisualizerModule;
 import net.sf.mzmine.modules.visualization.spectra.msms.MsMsVisualizerModule;
 import net.sf.mzmine.modules.visualization.spectra.simplespectra.SpectraVisualizerModule;
@@ -136,7 +138,8 @@ public class MZmineModulesList {
       // Raw data methods
       RawDataImportModule.class, RawDataExportModule.class, RawFileMergeModule.class,
       ExtractScansModule.class, MassDetectionModule.class, ShoulderPeaksFilterModule.class,
-      ChromatogramBuilderModule.class, ADAPChromatogramBuilderModule.class,
+      ChromatogramBuilderModule.class, MobilogramBuilderModule.class,
+      ADAPChromatogramBuilderModule.class,
       // Not ready for prime time: ADAP3DModule.class,
       GridMassModule.class, ManualPeakPickerModule.class, MsMsPeakPickerModule.class,
       ScanFiltersModule.class, CropFilterModule.class, BaselineCorrectionModule.class,
@@ -186,10 +189,11 @@ public class MZmineModulesList {
       // Visualizers
       TICVisualizerModule.class, SpectraVisualizerModule.class, TwoDVisualizerModule.class,
       ThreeDVisualizerModule.class, MsMsVisualizerModule.class, NeutralLossVisualizerModule.class,
-      MZDistributionHistoModule.class, PeakListTableModule.class, IsotopePatternExportModule.class,
-      MSMSExportModule.class, ScatterPlotVisualizerModule.class, HistogramVisualizerModule.class,
-      InfoVisualizerModule.class, IntensityPlotModule.class, KendrickMassPlotModule.class,
-      VanKrevelenDiagramModule.class, ProductIonFilterVisualizerModule.class,
+      MZDistributionHistoModule.class, PeakListTableModule.class, MobilogramListTableModule.class,
+      IsotopePatternExportModule.class, MSMSExportModule.class, ScatterPlotVisualizerModule.class,
+      HistogramVisualizerModule.class, InfoVisualizerModule.class, IntensityPlotModule.class,
+      KendrickMassPlotModule.class, VanKrevelenDiagramModule.class,
+      ProductIonFilterVisualizerModule.class,
 
       // Tools
       MzRangeMassCalculatorModule.class, MzRangeFormulaCalculatorModule.class,

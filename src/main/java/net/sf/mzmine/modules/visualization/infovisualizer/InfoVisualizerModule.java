@@ -19,7 +19,7 @@
 package net.sf.mzmine.modules.visualization.infovisualizer;
 
 import javax.annotation.Nonnull;
-
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.modules.MZmineModule;
 import net.sf.mzmine.parameters.ParameterSet;
@@ -35,6 +35,11 @@ public class InfoVisualizerModule implements MZmineModule {
 
   public static void showNewPeakListInfo(PeakList peakList) {
     InfoVisualizerWindow newWindow = new InfoVisualizerWindow(peakList);
+    newWindow.setVisible(true);
+  }
+
+  public static void showNewMobilogramListInfo(MobilogramList mobilogramList) {
+    InfoVisualizerWindow newWindow = new InfoVisualizerWindow(mobilogramList);
     newWindow.setVisible(true);
   }
 

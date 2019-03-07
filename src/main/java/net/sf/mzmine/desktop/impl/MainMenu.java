@@ -26,14 +26,13 @@ import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Logger;
-
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
-
 import net.sf.mzmine.datamodel.MZmineProject;
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.desktop.preferences.MZminePreferences;
@@ -44,6 +43,8 @@ import net.sf.mzmine.modules.MZmineModuleCategory;
 import net.sf.mzmine.modules.MZmineRunnableModule;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.ParameterSet;
+import net.sf.mzmine.parameters.parametertypes.selectors.MobilogramListsParameter;
+import net.sf.mzmine.parameters.parametertypes.selectors.MobilogramListsSelectionType;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsSelectionType;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
@@ -65,7 +66,8 @@ public class MainMenu extends JMenuBar implements ActionListener {
   private JMenu projectMenu, rawDataMenu, peakListMenu, visualizationMenu, helpMenu,
       rawDataFilteringMenu, peakDetectionMenu, gapFillingMenu, isotopesMenu,
       peakListPeakPickingMenu, peakListFilteringMenu, alignmentMenu, normalizationMenu,
-      identificationMenu, dataAnalysisMenu, peakListExportMenu, peakListSpectralDeconvolutionMenu, toolsMenu;
+      identificationMenu, dataAnalysisMenu, peakListExportMenu, peakListSpectralDeconvolutionMenu,
+      toolsMenu;
 
   private WindowsMenu windowsMenu;
 
@@ -186,11 +188,11 @@ public class MainMenu extends JMenuBar implements ActionListener {
     this.add(visualizationMenu);
 
     visualizationMenu.addSeparator();
-    
+
     /*
      * Tools menu
      */
-    
+
     toolsMenu = new JMenu("Tools");
     toolsMenu.setMnemonic(KeyEvent.VK_T);
     this.add(toolsMenu);
@@ -202,7 +204,7 @@ public class MainMenu extends JMenuBar implements ActionListener {
     windowsMenu = new WindowsMenu();
     windowsMenu.setMnemonic(KeyEvent.VK_W);
     this.add(windowsMenu);
-    
+
     /*
      * Help menu
      */
@@ -350,6 +352,16 @@ public class MainMenu extends JMenuBar implements ActionListener {
           if (p instanceof PeakListsParameter) {
             PeakListsParameter plp = (PeakListsParameter) p;
             plp.setValue(PeakListsSelectionType.GUI_SELECTED_PEAKLISTS);
+          }
+        }
+      }
+      MobilogramList selectedMobilogramLists[] =
+          MZmineCore.getDesktop().getSelectedMobilogramLists();
+      if (selectedMobilogramLists.length > 0) {
+        for (Parameter<?> p : moduleParameters.getParameters()) {
+          if (p instanceof MobilogramListsParameter) {
+            MobilogramListsParameter plp = (MobilogramListsParameter) p;
+            plp.setValue(MobilogramListsSelectionType.GUI_SELECTED_MOBILOGRAMLISTS);
           }
         }
       }

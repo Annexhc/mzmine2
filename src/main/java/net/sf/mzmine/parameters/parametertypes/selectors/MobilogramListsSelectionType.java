@@ -2,11 +2,11 @@ package net.sf.mzmine.parameters.parametertypes.selectors;
 
 public enum MobilogramListsSelectionType {
 
-  GUI_SELECTED_PEAKLISTS("As selected in main window"), //
-  ALL_PEAKLISTS("All peak lists"), //
-  SPECIFIC_PEAKLISTS("Specific peak lists"), //
+  GUI_SELECTED_MOBILOGRAMLISTS("As selected in main window"), //
+  ALL_MOBILOGRAMLISTS("All peak lists"), //
+  SPECIFIC_MOBILOGRAMLISTS("Specific mobilogram lists"), //
   NAME_PATTERN("Mobilogram list name pattern"), //
-  BATCH_LAST_PEAKLISTS("Those created by previous batch step");
+  BATCH_LAST_MOBILOGRAMLISTS("Those created by previous batch step");
 
   private final String stringValue;
 

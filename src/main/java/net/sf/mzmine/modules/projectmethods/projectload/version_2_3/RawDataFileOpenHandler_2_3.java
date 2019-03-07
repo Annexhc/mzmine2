@@ -24,11 +24,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.logging.Logger;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MassSpectrumType;
 import net.sf.mzmine.datamodel.PolarityType;
@@ -40,10 +41,6 @@ import net.sf.mzmine.modules.projectmethods.projectload.RawDataFileOpenHandler;
 import net.sf.mzmine.project.impl.RawDataFileImpl;
 import net.sf.mzmine.project.impl.StorableScan;
 import net.sf.mzmine.util.ScanUtils;
-
-import org.xml.sax.Attributes;
-import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
 public class RawDataFileOpenHandler_2_3 extends DefaultHandler implements RawDataFileOpenHandler {
 
@@ -133,7 +130,7 @@ public class RawDataFileOpenHandler_2_3 extends DefaultHandler implements RawDat
 
     if (qName.equals(RawDataElementName_2_3.MASS_LIST.getElementName())) {
       String name = attrs.getValue(RawDataElementName_2_3.NAME.getElementName());
-      SimpleMassList newML = new SimpleMassList(name, null, null);
+      SimpleMassList newML = new SimpleMassList(name, null, new DataPoint[] {null});
       currentMassLists.add(newML);
     }
   }

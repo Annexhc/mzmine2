@@ -19,8 +19,8 @@
 package net.sf.mzmine.datamodel.impl;
 
 import javax.annotation.Nonnull;
-
 import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.MassList;
 import net.sf.mzmine.datamodel.Scan;
 
@@ -32,11 +32,20 @@ public class SimpleMassList implements MassList {
   private String name;
   private Scan scan;
   private DataPoint mzPeaks[];
+  private IMSDataPoint mzIMSPeaks[];
 
   public SimpleMassList(String name, Scan scan, DataPoint mzPeaks[]) {
     this.name = name;
     this.scan = scan;
     this.mzPeaks = mzPeaks;
+    this.mzIMSPeaks = null;
+  }
+
+  public SimpleMassList(String name, Scan scan, IMSDataPoint mzIMSPeaks[]) {
+    this.name = name;
+    this.scan = scan;
+    this.mzIMSPeaks = mzIMSPeaks;
+    this.mzPeaks = null;
   }
 
   @Override
@@ -58,8 +67,17 @@ public class SimpleMassList implements MassList {
     return mzPeaks;
   }
 
+  @Override
+  public @Nonnull IMSDataPoint[] getIMSDataPoints() {
+    return mzIMSPeaks;
+  }
+
   public void setDataPoints(DataPoint mzPeaks[]) {
     this.mzPeaks = mzPeaks;
+  }
+
+  public void setIMSDataPoints(IMSDataPoint mzIMSPeaks[]) {
+    this.mzIMSPeaks = mzIMSPeaks;
   }
 
   @Override

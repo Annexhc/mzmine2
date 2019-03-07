@@ -48,6 +48,7 @@ public class StorableScan implements Scan {
   private double precursorMZ;
   private int precursorCharge;
   private double retentionTime;
+  private double mobility;
   private Range<Double> mzRange;
   private DataPoint basePeak;
   private Double totalIonCurrent;
@@ -75,6 +76,7 @@ public class StorableScan implements Scan {
     this.scanNumber = originalScan.getScanNumber();
     this.msLevel = originalScan.getMSLevel();
     this.retentionTime = originalScan.getRetentionTime();
+    this.mobility = originalScan.getMobility();
     this.precursorMZ = originalScan.getPrecursorMZ();
     this.precursorCharge = originalScan.getPrecursorCharge();
     this.fragmentScans = originalScan.getFragmentScanNumbers();
@@ -425,8 +427,7 @@ public class StorableScan implements Scan {
 
   @Override
   public double getMobility() {
-    // TODO Auto-generated method stub
-    return 0;
+    return mobility;
   }
 
 }

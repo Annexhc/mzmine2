@@ -16,27 +16,19 @@
  * USA
  */
 
-package net.sf.mzmine.datamodel;
+package net.sf.mzmine.modules.visualization.mobilogramlisttable.export;
 
-import javax.annotation.Nonnull;
+import net.sf.mzmine.parameters.Parameter;
+import net.sf.mzmine.parameters.impl.SimpleParameterSet;
+import net.sf.mzmine.parameters.parametertypes.filenames.FileNameParameter;
 
-/**
- * This class represent detected masses (ions) in one mass spectrum. Each ion is represented by a
- * DataPoint
- */
-public interface MassList {
+public class IsotopePatternExportParameters extends SimpleParameterSet {
 
-  @Nonnull
-  public String getName();
+  public static final FileNameParameter outputFile =
+      new FileNameParameter("Output file", "Please set the path and name of the output text file");
 
-  @Nonnull
-  public Scan getScan();
-
-  @Nonnull
-  public DataPoint[] getDataPoints();
-
-  @Nonnull
-  public IMSDataPoint[] getIMSDataPoints();
-
+  public IsotopePatternExportParameters() {
+    super(new Parameter[] {outputFile});
+  }
 
 }

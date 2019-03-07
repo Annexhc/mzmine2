@@ -19,9 +19,8 @@
 package net.sf.mzmine.modules.visualization.infovisualizer;
 
 import java.awt.event.MouseEvent;
-
 import javax.swing.JList;
-
+import net.sf.mzmine.datamodel.MobilogramList.MobilogramListAppliedMethod;
 import net.sf.mzmine.datamodel.PeakList.PeakListAppliedMethod;
 
 public class AppliedMethodList extends JList<Object> {
@@ -33,6 +32,10 @@ public class AppliedMethodList extends JList<Object> {
   private String parameters;
 
   AppliedMethodList(PeakListAppliedMethod[] methods) {
+    super(methods);
+  }
+
+  AppliedMethodList(MobilogramListAppliedMethod[] methods) {
     super(methods);
   }
 

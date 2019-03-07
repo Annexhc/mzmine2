@@ -37,10 +37,12 @@ import javax.annotation.Nonnull;
 import com.google.common.collect.Range;
 import com.google.common.primitives.Ints;
 import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.RawDataFileWriter;
 import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
+import net.sf.mzmine.datamodel.impl.SimpleIMSDataPoint;
 
 /**
  * RawDataFile implementation. It provides storage of data points for scans and mass lists using the
@@ -376,6 +378,41 @@ public class RawDataFileImpl implements RawDataFile, RawDataFileWriter {
       float mz = floatBuffer.get();
       float intensity = floatBuffer.get();
       dataPoints[i] = new SimpleDataPoint(mz, intensity);
+    }
+
+    return dataPoints;
+
+  }
+
+  public synchronized IMSDataPoint[] readIMSDataPoints(int ID) throws IOException {
+
+    final Long currentOffset = dataPointsOffsets.get(ID);
+    final Integer numOfDataPoints = dataPointsLengths.get(ID);
+
+    if ((currentOffset == null) || (numOfDataPoints == null)) {
+      throw new IllegalArgumentException("Unknown storage ID " + ID);
+    }
+
+    final int numOfBytes = numOfDataPoints * 2 * 4;
+
+    if (buffer.capacity() < numOfBytes) {
+      buffer = ByteBuffer.allocate(numOfBytes * 2);
+    } else {
+      buffer.clear();
+    }
+
+    dataPointsFile.seek(currentOffset);
+    dataPointsFile.read(buffer.array(), 0, numOfBytes);
+
+    FloatBuffer floatBuffer = buffer.asFloatBuffer();
+
+    IMSDataPoint dataPoints[] = new IMSDataPoint[numOfDataPoints];
+
+    for (int i = 0; i < numOfDataPoints; i++) {
+      float mz = floatBuffer.get();
+      float intensity = floatBuffer.get();
+      float mobility = floatBuffer.get();
+      dataPoints[i] = new SimpleIMSDataPoint(mz, intensity, mobility);
     }
 
     return dataPoints;

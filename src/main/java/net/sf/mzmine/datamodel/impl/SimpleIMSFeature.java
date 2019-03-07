@@ -3,7 +3,7 @@ package net.sf.mzmine.datamodel.impl;
 import java.util.Arrays;
 import javax.annotation.Nonnull;
 import com.google.common.collect.Range;
-import net.sf.mzmine.datamodel.DataPoint;
+import net.sf.mzmine.datamodel.IMSDataPoint;
 import net.sf.mzmine.datamodel.IMSFeature;
 import net.sf.mzmine.datamodel.IsotopePattern;
 import net.sf.mzmine.datamodel.RawDataFile;
@@ -18,7 +18,7 @@ public class SimpleIMSFeature implements IMSFeature {
   // Scan numbers
   private int scanNumbers[];
 
-  private DataPoint dataPointsPerScan[];
+  private IMSDataPoint dataPointsPerScan[];
 
   // M/Z, RT, Height and Area, FWHM, Tailing factor, Asymmetry factor
   private double mz, rt, mobility, ccs, height, area;
@@ -33,6 +33,9 @@ public class SimpleIMSFeature implements IMSFeature {
   // Number of most intense fragment scan
   private int fragmentScanNumber;
 
+  // Numbers of all MS2 fragment scans
+  private int[] allMS2FragmentScanNumbers;
+
   // Isotope pattern. Null by default but can be set later by deisotoping
   // method.
   private IsotopePattern isotopePattern;
@@ -43,9 +46,10 @@ public class SimpleIMSFeature implements IMSFeature {
    * 
    */
   public SimpleIMSFeature(RawDataFile dataFile, double MZ, double RT, double mobility, double ccs,
-      double height, double area, int[] scanNumbers, DataPoint[] dataPointsPerScan,
+      double height, double area, int[] scanNumbers, IMSDataPoint[] dataPointsPerScan,
       IMSFeatureStatus mobilogramStatus, int representativeScan, int fragmentScanNumber,
-      Range<Double> rtRange, Range<Double> mzRange, Range<Double> intensityRange) {
+      int[] allMS2FragmentScanNumbers, Range<Double> rtRange, Range<Double> mzRange,
+      Range<Double> intensityRange) {
 
     if (dataPointsPerScan.length == 0) {
       throw new IllegalArgumentException(
@@ -63,6 +67,7 @@ public class SimpleIMSFeature implements IMSFeature {
     this.mobilogramStatus = mobilogramStatus;
     this.representativeScan = representativeScan;
     this.fragmentScanNumber = fragmentScanNumber;
+    this.allMS2FragmentScanNumbers = allMS2FragmentScanNumbers;
     this.rtRange = rtRange;
     this.mzRange = mzRange;
     this.intensityRange = intensityRange;
@@ -90,16 +95,16 @@ public class SimpleIMSFeature implements IMSFeature {
     this.af = p.getAsymmetryFactor();
 
 
-    this.rtRange = p.getRawDataPointsRTRange();
-    this.mzRange = p.getRawDataPointsMZRange();
-    this.intensityRange = p.getRawDataPointsIntensityRange();
+    this.rtRange = p.getRawIMSDataPointsRTRange();
+    this.mzRange = p.getRawIMSDataPointsMZRange();
+    this.intensityRange = p.getRawIMSDataPointsIntensityRange();
 
     this.scanNumbers = p.getScanNumbers();
 
-    this.dataPointsPerScan = new DataPoint[scanNumbers.length];
+    this.dataPointsPerScan = new IMSDataPoint[scanNumbers.length];
 
     for (int i = 0; i < scanNumbers.length; i++) {
-      dataPointsPerScan[i] = p.getDataPoint(scanNumbers[i]);
+      dataPointsPerScan[i] = p.getIMSDataPoint(scanNumbers[i]);
 
     }
 
@@ -107,6 +112,7 @@ public class SimpleIMSFeature implements IMSFeature {
 
     this.representativeScan = p.getRepresentativeScanNumber();
     this.fragmentScanNumber = p.getMostIntenseFragmentScanNumber();
+    this.allMS2FragmentScanNumbers = p.getAllMS2FragmentScanNumbers();
 
   }
 
@@ -230,7 +236,7 @@ public class SimpleIMSFeature implements IMSFeature {
    * This method returns a representative datapoint of this mobilogram in a given scan
    */
   @Override
-  public DataPoint getDataPoint(int scanNumber) {
+  public IMSDataPoint getIMSDataPoint(int scanNumber) {
     int index = Arrays.binarySearch(scanNumbers, scanNumber);
     if (index < 0)
       return null;
@@ -264,7 +270,7 @@ public class SimpleIMSFeature implements IMSFeature {
    * @see net.sf.mzmine.datamodel.IMSFeature#getRawDataPointsIntensityRange()
    */
   @Override
-  public @Nonnull Range<Double> getRawDataPointsIntensityRange() {
+  public @Nonnull Range<Double> getRawIMSDataPointsIntensityRange() {
     return intensityRange;
   }
 
@@ -272,7 +278,7 @@ public class SimpleIMSFeature implements IMSFeature {
    * @see net.sf.mzmine.datamodel.IMSFeature#getRawDataPointsMZRange()
    */
   @Override
-  public @Nonnull Range<Double> getRawDataPointsMZRange() {
+  public @Nonnull Range<Double> getRawIMSDataPointsMZRange() {
     return mzRange;
   }
 
@@ -280,7 +286,7 @@ public class SimpleIMSFeature implements IMSFeature {
    * @see net.sf.mzmine.datamodel.IMSFeature#getRawDataPointsRTRange()
    */
   @Override
-  public @Nonnull Range<Double> getRawDataPointsRTRange() {
+  public @Nonnull Range<Double> getRawIMSDataPointsRTRange() {
     return rtRange;
   }
 
@@ -295,6 +301,11 @@ public class SimpleIMSFeature implements IMSFeature {
   @Override
   public int getMostIntenseFragmentScanNumber() {
     return fragmentScanNumber;
+  }
+
+  @Override
+  public int[] getAllMS2FragmentScanNumbers() {
+    return allMS2FragmentScanNumbers;
   }
 
   @Override
@@ -390,8 +401,7 @@ public class SimpleIMSFeature implements IMSFeature {
 
   @Override
   public SimpleMobilogramInformation getMobilogramInformation() {
-    // TODO Auto-generated method stub
-    return null;
+    return mobilogramInfo;
   }
 
   @Override

@@ -67,7 +67,7 @@ public class MobilogramListsComponent extends JPanel implements ActionListener {
       MobilogramListsSelectionType type =
           (MobilogramListsSelectionType) typeCombo.getSelectedItem();
 
-      if (type == MobilogramListsSelectionType.SPECIFIC_PEAKLISTS) {
+      if (type == MobilogramListsSelectionType.SPECIFIC_MOBILOGRAMLISTS) {
         final MultiChoiceParameter<MobilogramList> plsParameter =
             new MultiChoiceParameter<MobilogramList>("Select peak lists", "Select peak lists",
                 MZmineCore.getProjectManager().getCurrentProject().getMobilogramLists(),
@@ -103,7 +103,7 @@ public class MobilogramListsComponent extends JPanel implements ActionListener {
           (MobilogramListsSelectionType) typeCombo.getSelectedItem();
       currentValue.setSelectionType(type);
       detailsButton.setEnabled((type == MobilogramListsSelectionType.NAME_PATTERN)
-          || (type == MobilogramListsSelectionType.SPECIFIC_PEAKLISTS));
+          || (type == MobilogramListsSelectionType.SPECIFIC_MOBILOGRAMLISTS));
     }
 
     updateNumMobilogramLists();
@@ -116,7 +116,8 @@ public class MobilogramListsComponent extends JPanel implements ActionListener {
   }
 
   private void updateNumMobilogramLists() {
-    if (currentValue.getSelectionType() == MobilogramListsSelectionType.BATCH_LAST_PEAKLISTS) {
+    if (currentValue
+        .getSelectionType() == MobilogramListsSelectionType.BATCH_LAST_MOBILOGRAMLISTS) {
       numMobilogramListsLabel.setText("");
       numMobilogramListsLabel.setToolTipText("");
     } else {
