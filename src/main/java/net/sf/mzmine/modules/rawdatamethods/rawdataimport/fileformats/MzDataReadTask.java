@@ -25,14 +25,11 @@ import java.nio.ByteOrder;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.logging.Logger;
-
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -308,7 +305,7 @@ public class MzDataReadTask extends AbstractTask {
         // Auto-detect whether this scan is centroided
         MassSpectrumType spectrumType = ScanUtils.detectSpectrumType(dataPoints);
 
-        buildingScan = new SimpleScan(null, scanNumber, msLevel, retentionTime, precursorMz,
+        buildingScan = new SimpleScan(null, scanNumber, msLevel, retentionTime, 0.0, precursorMz,
             precursorCharge, null, dataPoints, spectrumType, polarity, "", null);
 
         /*

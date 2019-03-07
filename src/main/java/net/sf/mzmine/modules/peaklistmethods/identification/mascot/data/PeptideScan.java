@@ -21,9 +21,9 @@ package net.sf.mzmine.modules.peaklistmethods.identification.mascot.data;
 import java.util.Arrays;
 import java.util.TreeSet;
 import java.util.Vector;
-
 import javax.annotation.Nonnull;
-
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MassList;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -33,9 +33,6 @@ import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.util.PeptideSorter;
 import net.sf.mzmine.util.ScanUtils;
 import net.sf.mzmine.util.SortingDirection;
-
-import com.google.common.collect.Range;
-import com.google.common.primitives.Ints;
 
 public class PeptideScan implements Scan {
 
@@ -416,6 +413,12 @@ public class PeptideScan implements Scan {
   public @Nonnull Range<Double> getScanningMZRange() {
     // TODO Auto-generated method stub
     return Range.all();
+  }
+
+  @Override
+  public double getMobility() {
+    // TODO Auto-generated method stub
+    return 0;
   }
 
 }

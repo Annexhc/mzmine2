@@ -110,9 +110,9 @@ class CasmiImportTask extends AbstractTask {
 
       dataFileWriter = MZmineCore.createNewFile(casmiProblemName + " raw data");
       double precursorMz = firstDataPoint.getMZ();
-      Scan msScan = new SimpleScan(null, msScanNumber, 1, 1.0, 0, 0, new int[] {2},
+      Scan msScan = new SimpleScan(null, msScanNumber, 1, 1.0, 0.0, 0, 0, new int[] {2},
           msSpectrumDataPoints, MassSpectrumType.CENTROIDED, polarity, "", null);
-      Scan msMsScan = new SimpleScan(null, msMsScanNumber, 2, 1.1, precursorMz, 1, null,
+      Scan msMsScan = new SimpleScan(null, msMsScanNumber, 2, 1.1, 0.0, precursorMz, 1, null,
           msMsSpectrumDataPoints, MassSpectrumType.CENTROIDED, polarity, "", null);
       dataFileWriter.addScan(msScan);
       dataFileWriter.addScan(msMsScan);

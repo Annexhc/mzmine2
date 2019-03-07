@@ -23,10 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Vector;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
 import javax.swing.SwingUtilities;
-
+import com.google.common.collect.Range;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MassList;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -36,8 +35,6 @@ import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.desktop.impl.projecttree.RawDataTreeModel;
 import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.util.ScanUtils;
-
-import com.google.common.collect.Range;
 
 /**
  * Implementation of the Scan interface which stores raw data points in a temporary file, accessed
@@ -424,6 +421,12 @@ public class StorableScan implements Scan {
     if (scanMZRange == null)
       scanMZRange = getDataPointMZRange();
     return scanMZRange;
+  }
+
+  @Override
+  public double getMobility() {
+    // TODO Auto-generated method stub
+    return 0;
   }
 
 }

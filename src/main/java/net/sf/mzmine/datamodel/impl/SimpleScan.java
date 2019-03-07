@@ -20,9 +20,9 @@ package net.sf.mzmine.datamodel.impl;
 
 import java.util.TreeSet;
 import java.util.Vector;
-
 import javax.annotation.Nonnull;
-
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MassList;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -30,9 +30,6 @@ import net.sf.mzmine.datamodel.PolarityType;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.util.ScanUtils;
-
-import com.google.common.collect.Range;
-import com.google.common.primitives.Ints;
 
 /**
  * Simple implementation of the Scan interface.
@@ -47,6 +44,7 @@ public class SimpleScan implements Scan {
   private double precursorMZ;
   private int precursorCharge;
   private double retentionTime;
+  private double mobility;
   private Range<Double> mzRange;
   private DataPoint basePeak;
   private double totalIonCurrent;
@@ -60,7 +58,7 @@ public class SimpleScan implements Scan {
    */
   public SimpleScan(Scan sc) {
     this(sc.getDataFile(), sc.getScanNumber(), sc.getMSLevel(), sc.getRetentionTime(),
-        sc.getPrecursorMZ(), sc.getPrecursorCharge(), sc.getFragmentScanNumbers(),
+        sc.getMobility(), sc.getPrecursorMZ(), sc.getPrecursorCharge(), sc.getFragmentScanNumbers(),
         sc.getDataPoints(), sc.getSpectrumType(), sc.getPolarity(), sc.getScanDefinition(),
         sc.getScanningMZRange());
   }
@@ -69,15 +67,16 @@ public class SimpleScan implements Scan {
    * Constructor for creating scan with given data
    */
   public SimpleScan(RawDataFile dataFile, int scanNumber, int msLevel, double retentionTime,
-      double precursorMZ, int precursorCharge, int fragmentScans[], DataPoint[] dataPoints,
-      MassSpectrumType spectrumType, PolarityType polarity, String scanDefinition,
-      Range<Double> scanMZRange) {
+      double mobility, double precursorMZ, int precursorCharge, int fragmentScans[],
+      DataPoint[] dataPoints, MassSpectrumType spectrumType, PolarityType polarity,
+      String scanDefinition, Range<Double> scanMZRange) {
 
     // save scan data
     this.dataFile = dataFile;
     this.scanNumber = scanNumber;
     this.msLevel = msLevel;
     this.retentionTime = retentionTime;
+    this.mobility = mobility;
     this.precursorMZ = precursorMZ;
     this.fragmentScans = fragmentScans;
     this.spectrumType = spectrumType;
@@ -244,6 +243,19 @@ public class SimpleScan implements Scan {
    */
   public void setRetentionTime(double retentionTime) {
     this.retentionTime = retentionTime;
+  }
+
+  /**
+   */
+  public double getMobility() {
+    return mobility;
+  }
+
+  /**
+   * @param mobility The mobility to set.
+   */
+  public void setMobility(double mobility) {
+    this.mobility = mobility;
   }
 
   /**

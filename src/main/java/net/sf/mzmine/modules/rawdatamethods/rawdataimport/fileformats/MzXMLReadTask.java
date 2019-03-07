@@ -27,18 +27,14 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 import java.util.zip.DataFormatException;
-
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.Duration;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
 import com.google.common.base.Strings;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -237,7 +233,7 @@ public class MzXMLReadTask extends AbstractTask {
         msLevelTree++;
         parentTreeValue[msLevel] = scanNumber;
 
-        buildingScan = new SimpleScan(null, scanNumber, msLevel, retentionTime, 0, 0, null,
+        buildingScan = new SimpleScan(null, scanNumber, msLevel, retentionTime, 0.0, 0, 0, null,
             new DataPoint[0], null, polarity, scanId, null);
 
       }

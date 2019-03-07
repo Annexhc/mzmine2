@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -128,6 +127,7 @@ public class MzMLReadTask extends AbstractTask {
         // Extract scan data
         int msLevel = extractMSLevel(spectrum);
         double retentionTime = extractRetentionTime(spectrum);
+        double mobility = extractMobility(spectrum);
         PolarityType polarity = extractPolarity(spectrum);
         int parentScan = extractParentScanNumber(spectrum);
         double precursorMz = extractPrecursorMz(spectrum);
@@ -138,8 +138,9 @@ public class MzMLReadTask extends AbstractTask {
         // Auto-detect whether this scan is centroided
         MassSpectrumType spectrumType = ScanUtils.detectSpectrumType(dataPoints);
 
-        SimpleScan scan = new SimpleScan(null, scanNumber, msLevel, retentionTime, precursorMz,
-            precursorCharge, null, dataPoints, spectrumType, polarity, scanDefinition, null);
+        SimpleScan scan =
+            new SimpleScan(null, scanNumber, msLevel, retentionTime, mobility, precursorMz,
+                precursorCharge, null, dataPoints, spectrumType, polarity, scanDefinition, null);
 
         for (SimpleScan s : parentStack) {
           if (s.getScanNumber() == parentScan) {
@@ -269,6 +270,50 @@ public class MzMLReadTask extends AbstractTask {
           return retentionTime;
 
         }
+      }
+    }
+
+    return 0;
+  }
+
+  /**
+   * <cvParam cvRef="MS" accession="MS:1002476" name="ion mobility drift time" value=
+   * "0.217002108693" unitCvRef="UO" unitAccession="UO:0000028" unitName="millisecond"/>
+   * 
+   * @param spectrum
+   * @return
+   */
+
+  private double extractMobility(Spectrum spectrum) {
+
+    ScanList scanListElement = spectrum.getScanList();
+    if (scanListElement == null)
+      return 0;
+    List<Scan> scanElements = scanListElement.getScan();
+    if (scanElements == null)
+      return 0;
+
+    for (Scan scan : scanElements) {
+      List<CVParam> cvParams = scan.getCvParam();
+      if (cvParams == null)
+        continue;
+
+      for (CVParam param : cvParams) {
+        String accession = param.getAccession();
+        String unitAccession = param.getUnitAccession();
+        String value = param.getValue();
+        if ((accession == null) || (value == null))
+          continue;
+
+        // UO:0000028 unitAcession for mobility in Waters files converted to mzML
+        double mobility;
+        if ((unitAccession == null) || (unitAccession.equals("UO:0000028"))) {
+          mobility = Double.parseDouble(value);
+        } else {
+          mobility = Double.parseDouble(value) / 60d;
+        }
+        return mobility;
+
       }
     }
 

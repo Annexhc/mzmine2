@@ -27,10 +27,8 @@ import java.nio.ByteOrder;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import com.google.common.base.Strings;
 import com.google.common.collect.Range;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -339,8 +337,9 @@ public class NativeFileReadTask extends AbstractTask {
         // Auto-detect whether this scan is centroided
         MassSpectrumType spectrumType = ScanUtils.detectSpectrumType(dataPoints);
 
-        SimpleScan newScan = new SimpleScan(null, scanNumber, msLevel, retentionTime, precursorMZ,
-            precursorCharge, null, dataPoints, spectrumType, polarity, scanId, mzRange);
+        SimpleScan newScan =
+            new SimpleScan(null, scanNumber, msLevel, retentionTime, 0.0, precursorMZ,
+                precursorCharge, null, dataPoints, spectrumType, polarity, scanId, mzRange);
         newMZmineFile.addScan(newScan);
 
         parsedScans++;

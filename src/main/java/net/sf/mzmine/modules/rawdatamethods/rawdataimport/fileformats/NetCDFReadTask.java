@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.util.Hashtable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MassSpectrumType;
@@ -388,7 +387,7 @@ public class NetCDFReadTask extends AbstractTask {
     // An empty scan needs special attention..
     if (scanLength[0] == 0) {
       scanNum++;
-      return new SimpleScan(null, scanNum, 1, retentionTime.doubleValue(), 0, 0, null,
+      return new SimpleScan(null, scanNum, 1, retentionTime.doubleValue(), 0.0, 0, 0, null,
           new DataPoint[0], MassSpectrumType.CENTROIDED, PolarityType.UNKNOWN, "", null);
     }
 
@@ -432,8 +431,8 @@ public class NetCDFReadTask extends AbstractTask {
     // Auto-detect whether this scan is centroided
     MassSpectrumType spectrumType = ScanUtils.detectSpectrumType(dataPoints);
 
-    SimpleScan buildingScan = new SimpleScan(null, scanNum, 1, retentionTime.doubleValue(), 0, 0,
-        null, dataPoints, spectrumType, polarity, scanDefinition, null);
+    SimpleScan buildingScan = new SimpleScan(null, scanNum, 1, retentionTime.doubleValue(), 0.0, 0,
+        0, null, dataPoints, spectrumType, polarity, scanDefinition, null);
 
     return buildingScan;
 

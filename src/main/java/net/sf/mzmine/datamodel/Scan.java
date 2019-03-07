@@ -20,7 +20,6 @@ package net.sf.mzmine.datamodel;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
 import com.google.common.collect.Range;
 
 /**
@@ -58,6 +57,12 @@ public interface Scan extends MassSpectrum {
    * @return Retention time of this scan in minutes
    */
   public double getRetentionTime();
+
+  /**
+   * 
+   * @return mobility of this scan
+   */
+  public double getMobility();
 
   /**
    * 

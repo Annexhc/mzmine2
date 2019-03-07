@@ -19,9 +19,7 @@
 package net.sf.mzmine.modules.rawdatamethods.filtering.scanfilters.mean;
 
 import java.util.Vector;
-
 import javax.annotation.Nonnull;
-
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MassSpectrumType;
 import net.sf.mzmine.datamodel.Scan;
@@ -93,7 +91,7 @@ public class MeanFilter implements ScanFilter {
 
     // Create filtered scan
     Scan newScan = new SimpleScan(sc.getDataFile(), sc.getScanNumber(), sc.getMSLevel(),
-        sc.getRetentionTime(), sc.getPrecursorMZ(), sc.getPrecursorCharge(),
+        sc.getRetentionTime(), sc.getMobility(), sc.getPrecursorMZ(), sc.getPrecursorCharge(),
         sc.getFragmentScanNumbers(), newDataPoints, MassSpectrumType.CENTROIDED, sc.getPolarity(),
         sc.getScanDefinition(), sc.getScanningMZRange());
 
