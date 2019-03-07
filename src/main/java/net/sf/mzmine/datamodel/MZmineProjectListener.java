@@ -27,4 +27,6 @@ public interface MZmineProjectListener {
 
   void peakListAdded(PeakList newPeakList);
 
+  void mobilogramListAdded(MobilogramList newMobilogramList);
+
 }

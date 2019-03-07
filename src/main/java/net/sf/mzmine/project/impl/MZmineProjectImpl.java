@@ -24,14 +24,14 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.LinkedList;
 import java.util.Vector;
-
 import javax.swing.SwingUtilities;
-
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MZmineProjectListener;
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.desktop.impl.MainWindow;
+import net.sf.mzmine.desktop.impl.projecttree.MobilogramListTreeModel;
 import net.sf.mzmine.desktop.impl.projecttree.PeakListTreeModel;
 import net.sf.mzmine.desktop.impl.projecttree.ProjectTree;
 import net.sf.mzmine.desktop.impl.projecttree.RawDataTreeModel;
@@ -46,6 +46,7 @@ public class MZmineProjectImpl implements MZmineProject {
   private Hashtable<UserParameter<?, ?>, Hashtable<RawDataFile, Object>> projectParametersAndValues;
 
   private PeakListTreeModel peakListTreeModel;
+  private MobilogramListTreeModel mobilogramListTreeModel;
   private RawDataTreeModel rawDataTreeModel;
 
   private File projectFile;
@@ -56,6 +57,7 @@ public class MZmineProjectImpl implements MZmineProject {
   public MZmineProjectImpl() {
 
     this.peakListTreeModel = new PeakListTreeModel(this);
+    this.mobilogramListTreeModel = new MobilogramListTreeModel(this);
     this.rawDataTreeModel = new RawDataTreeModel(this);
 
     projectParametersAndValues =
@@ -78,6 +80,8 @@ public class MZmineProjectImpl implements MZmineProject {
 
         ProjectTree peakListTree = mainWindow.getMainPanel().getPeakListTree();
         peakListTree.setModel(peakListTreeModel);
+        ProjectTree mobilogramListTree = mainWindow.getMainPanel().getMobilogramListTree();
+        mobilogramListTree.setModel(mobilogramListTreeModel);
         ProjectTree rawDataTree = mainWindow.getMainPanel().getRawDataTree();
         rawDataTree.setModel(rawDataTreeModel);
 
@@ -243,6 +247,70 @@ public class MZmineProjectImpl implements MZmineProject {
 
   }
 
+  @Override
+  public MobilogramList[] getMobilogramLists() {
+    return mobilogramListTreeModel.getMobilogramLists();
+  }
+
+  @Override
+  public void addMobilogramList(final MobilogramList mobilogramList) {
+
+    assert mobilogramList != null;
+
+    Runnable swingCode = new Runnable() {
+      @Override
+      public void run() {
+        mobilogramListTreeModel.addObject(mobilogramList);
+      }
+    };
+    try {
+      if (SwingUtilities.isEventDispatchThread())
+        swingCode.run();
+      else
+        SwingUtilities.invokeAndWait(swingCode);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
+    // Notify listeners
+    for (MZmineProjectListener listener : listeners) {
+      listener.mobilogramListAdded(mobilogramList);
+    }
+  }
+
+  @Override
+  public void removeMobilogramList(final MobilogramList mobilogramList) {
+
+    assert mobilogramList != null;
+
+    Runnable swingCode = new Runnable() {
+      @Override
+      public void run() {
+        mobilogramListTreeModel.removeObject(mobilogramList);
+      }
+    };
+    try {
+      if (SwingUtilities.isEventDispatchThread())
+        swingCode.run();
+      else
+        SwingUtilities.invokeAndWait(swingCode);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public MobilogramList[] getMobilogramLists(RawDataFile file) {
+    MobilogramList[] currentMobilogramLists = getMobilogramLists();
+    Vector<MobilogramList> result = new Vector<MobilogramList>();
+    for (MobilogramList mobilogramList : currentMobilogramLists) {
+      if (mobilogramList.hasRawDataFile(file))
+        result.add(mobilogramList);
+    }
+    return result.toArray(new MobilogramList[0]);
+
+  }
+
   public File getProjectFile() {
     return projectFile;
   }
@@ -270,11 +338,16 @@ public class MZmineProjectImpl implements MZmineProject {
   @Override
   public void notifyObjectChanged(Object object, boolean structureChanged) {
     peakListTreeModel.notifyObjectChanged(object, structureChanged);
+    mobilogramListTreeModel.notifyObjectChanged(object, structureChanged);
     rawDataTreeModel.notifyObjectChanged(object, structureChanged);
   }
 
   public PeakListTreeModel getPeakListTreeModel() {
     return peakListTreeModel;
+  }
+
+  public MobilogramListTreeModel getMobilogramListTreeModel() {
+    return mobilogramListTreeModel;
   }
 
   public RawDataTreeModel getRawDataTreeModel() {

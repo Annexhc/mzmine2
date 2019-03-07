@@ -19,7 +19,6 @@
 package net.sf.mzmine.datamodel;
 
 import javax.annotation.Nonnull;
-
 import com.google.common.collect.Range;
 
 public interface RawDataFile {
@@ -92,10 +91,16 @@ public interface RawDataFile {
   public Range<Double> getDataRTRange();
 
   @Nonnull
+  public Range<Double> getDataMobilityRange();
+
+  @Nonnull
   public Range<Double> getDataMZRange(int msLevel);
 
   @Nonnull
   public Range<Double> getDataRTRange(int msLevel);
+
+  @Nonnull
+  public Range<Double> getDataMobilityRange(int msLevel);
 
   public double getDataMaxBasePeakIntensity(int msLevel);
 

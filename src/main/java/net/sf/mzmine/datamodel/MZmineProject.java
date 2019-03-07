@@ -19,7 +19,6 @@
 package net.sf.mzmine.datamodel;
 
 import java.io.File;
-
 import net.sf.mzmine.parameters.UserParameter;
 
 /**
@@ -111,9 +110,19 @@ public interface MZmineProject {
   public void addPeakList(PeakList peaklist);
 
   /**
+   * Adds a mobilogram list to the project
+   */
+  public void addMobilogramList(MobilogramList mobilogramlist);
+
+  /**
    * Removes a peak list from the project
    */
   public void removePeakList(PeakList peaklist);
+
+  /**
+   * Removes a mobilogram list from the project
+   */
+  public void removeMobilogramList(MobilogramList mobilogramlist);
 
   /**
    * Returns all peak lists of the project
@@ -124,6 +133,16 @@ public interface MZmineProject {
    * Returns all peak lists which contain given data file
    */
   public PeakList[] getPeakLists(RawDataFile file);
+
+  /**
+   * Returns all mobilogram lists of the project
+   */
+  public MobilogramList[] getMobilogramLists();
+
+  /**
+   * Returns all mobilogram lists which contain given data file
+   */
+  public MobilogramList[] getMobilogramLists(RawDataFile file);
 
   public void notifyObjectChanged(Object object, boolean structureChanged);
 

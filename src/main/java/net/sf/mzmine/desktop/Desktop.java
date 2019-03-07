@@ -20,11 +20,10 @@ package net.sf.mzmine.desktop;
 
 import java.awt.Color;
 import java.awt.Window;
-
 import javax.annotation.Nonnull;
 import javax.swing.JFrame;
 import javax.swing.event.TreeModelListener;
-
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.modules.MZmineModule;
@@ -109,13 +108,24 @@ public interface Desktop extends MZmineModule {
    */
   public PeakList[] getSelectedPeakLists();
 
+  /**
+   * Returns array of currently selected mobilogram lists in GUI
+   * 
+   * @return Array of selected mobilogram lists
+   */
+  public MobilogramList[] getSelectedMobilogramLists();
+
   public void addRawDataTreeListener(TreeModelListener listener);
 
   public void addPeakListTreeListener(TreeModelListener listener);
 
+  public void addMobilogramListTreeListener(TreeModelListener listener);
+
   public void removeRawDataTreeListener(TreeModelListener listener);
 
   public void removePeakListTreeListener(TreeModelListener listener);
+
+  public void removeMobilogramListTreeListener(TreeModelListener listener);
 
   @Nonnull
   public ExitCode exitMZmine();

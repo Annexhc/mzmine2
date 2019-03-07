@@ -33,17 +33,14 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
-
+import com.google.common.collect.Range;
+import com.google.common.primitives.Ints;
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.RawDataFileWriter;
 import net.sf.mzmine.datamodel.Scan;
 import net.sf.mzmine.datamodel.impl.SimpleDataPoint;
-
-import com.google.common.collect.Range;
-import com.google.common.primitives.Ints;
 
 /**
  * RawDataFile implementation. It provides storage of data points for scans and mass lists using the
@@ -62,7 +59,7 @@ public class RawDataFileImpl implements RawDataFile, RawDataFileWriter {
   // Name of this raw data file - may be changed by the user
   private String dataFileName;
 
-  private final Hashtable<Integer, Range<Double>> dataMZRange, dataRTRange;
+  private final Hashtable<Integer, Range<Double>> dataMZRange, dataRTRange, dataMobilityRange;
   private final Hashtable<Integer, Double> dataMaxBasePeakIntensity, dataMaxTIC;
   private final Hashtable<Integer, int[]> scanNumbersCache;
 
@@ -87,6 +84,7 @@ public class RawDataFileImpl implements RawDataFile, RawDataFileWriter {
     scanNumbersCache = new Hashtable<Integer, int[]>();
     dataMZRange = new Hashtable<Integer, Range<Double>>();
     dataRTRange = new Hashtable<Integer, Range<Double>>();
+    dataMobilityRange = new Hashtable<Integer, Range<Double>>();
     dataMaxBasePeakIntensity = new Hashtable<Integer, Double>();
     dataMaxTIC = new Hashtable<Integer, Double>();
     scans = new Hashtable<Integer, StorableScan>();
@@ -488,12 +486,51 @@ public class RawDataFileImpl implements RawDataFile, RawDataFileWriter {
 
   }
 
+  public @Nonnull Range<Double> getDataMobilityRange() {
+    return getDataMobilityRange(0);
+  }
+
+  public @Nonnull Range<Double> getDataMobilityRange(int msLevel) {
+
+    // check if we have this value already cached
+    Range<Double> mobilityRange = dataMobilityRange.get(msLevel);
+    if (mobilityRange != null)
+      return mobilityRange;
+
+    // find the value
+    for (Scan scan : scans.values()) {
+
+      // ignore scans of other ms levels
+      if ((msLevel != 0) && (scan.getMSLevel() != msLevel))
+        continue;
+
+      if (mobilityRange == null)
+        mobilityRange = Range.singleton(scan.getRetentionTime());
+      else
+        mobilityRange = mobilityRange.span(Range.singleton(scan.getRetentionTime()));
+
+    }
+
+    // cache the value
+    if (mobilityRange != null)
+      dataMobilityRange.put(msLevel, mobilityRange);
+    else
+      mobilityRange = Range.singleton(0.0);
+
+    return mobilityRange;
+
+  }
+
   public void setRTRange(int msLevel, Range<Double> rtRange) {
     dataRTRange.put(msLevel, rtRange);
   }
 
   public void setMZRange(int msLevel, Range<Double> mzRange) {
     dataMZRange.put(msLevel, mzRange);
+  }
+
+  public void setMobilityRange(int msLevel, Range<Double> mobilityRange) {
+    dataMobilityRange.put(msLevel, mobilityRange);
   }
 
   public int getNumOfScans(int msLevel) {

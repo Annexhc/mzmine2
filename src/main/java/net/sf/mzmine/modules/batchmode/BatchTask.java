@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MZmineProjectListener;
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.main.MZmineCore;
@@ -31,6 +32,7 @@ import net.sf.mzmine.modules.MZmineProcessingModule;
 import net.sf.mzmine.modules.MZmineProcessingStep;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.ParameterSet;
+import net.sf.mzmine.parameters.parametertypes.selectors.MobilogramListsParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
 import net.sf.mzmine.taskcontrol.AbstractTask;
@@ -53,6 +55,7 @@ public class BatchTask extends AbstractTask {
 
   private final List<RawDataFile> createdDataFiles, previousCreatedDataFiles;
   private final List<PeakList> createdPeakLists, previousCreatedPeakLists;
+  private final List<MobilogramList> createdMobilogramLists, previousCreatedMobilogramLists;
 
   BatchTask(MZmineProject project, ParameterSet parameters) {
     this.project = project;
@@ -60,8 +63,10 @@ public class BatchTask extends AbstractTask {
     totalSteps = queue.size();
     createdDataFiles = new ArrayList<>();
     createdPeakLists = new ArrayList<>();
+    createdMobilogramLists = new ArrayList<>();
     previousCreatedDataFiles = new ArrayList<>();
     previousCreatedPeakLists = new ArrayList<>();
+    previousCreatedMobilogramLists = new ArrayList<>();
   }
 
   @Override
@@ -80,6 +85,11 @@ public class BatchTask extends AbstractTask {
       @Override
       public void dataFileAdded(RawDataFile newFile) {
         createdDataFiles.add(newFile);
+      }
+
+      @Override
+      public void mobilogramListAdded(MobilogramList newMobilogramList) {
+        createdMobilogramLists.add(newMobilogramList);
       }
     };
     project.addProjectListener(listener);
@@ -126,6 +136,8 @@ public class BatchTask extends AbstractTask {
       createdDataFiles.addAll(previousCreatedDataFiles);
     if (createdPeakLists.isEmpty())
       createdPeakLists.addAll(previousCreatedPeakLists);
+    if (createdMobilogramLists.isEmpty())
+      createdMobilogramLists.addAll(previousCreatedMobilogramLists);
 
     // Update the RawDataFilesParameter parameters to reflect the current
     // state of the batch
@@ -144,6 +156,16 @@ public class BatchTask extends AbstractTask {
         PeakListsParameter rdp = (PeakListsParameter) p;
         PeakList createdPls[] = createdPeakLists.toArray(new PeakList[0]);
         rdp.getValue().setBatchLastPeakLists(createdPls);
+      }
+    }
+
+    // Update the MobilogramListsParameter parameters to reflect the current
+    // state of the batch
+    for (Parameter<?> p : batchStepParameters.getParameters()) {
+      if (p instanceof MobilogramListsParameter) {
+        MobilogramListsParameter rdp = (MobilogramListsParameter) p;
+        MobilogramList createdPls[] = createdMobilogramLists.toArray(new MobilogramList[0]);
+        rdp.getValue().setBatchLastMobilogramLists(createdPls);
       }
     }
 

@@ -21,11 +21,10 @@ package net.sf.mzmine.desktop.impl;
 import java.awt.Color;
 import java.awt.Window;
 import java.util.logging.Logger;
-
 import javax.annotation.Nonnull;
 import javax.swing.JFrame;
 import javax.swing.event.TreeModelListener;
-
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.desktop.Desktop;
@@ -88,6 +87,11 @@ public class HeadLessDesktop implements Desktop {
   }
 
   @Override
+  public MobilogramList[] getSelectedMobilogramLists() {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
   public @Nonnull Class<? extends ParameterSet> getParameterSetClass() {
     return SimpleParameterSet.class;
   }
@@ -123,6 +127,18 @@ public class HeadLessDesktop implements Desktop {
 
   @Override
   public void removePeakListTreeListener(TreeModelListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void addMobilogramListTreeListener(TreeModelListener listener) {
+    // TODO Auto-generated method stub
+
+  }
+
+  @Override
+  public void removeMobilogramListTreeListener(TreeModelListener listener) {
     // TODO Auto-generated method stub
 
   }

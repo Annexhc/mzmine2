@@ -20,11 +20,9 @@ package net.sf.mzmine.desktop.impl;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
-
 import net.sf.mzmine.desktop.impl.projecttree.ProjectTree;
 
 /**
@@ -37,7 +35,7 @@ public class MainPanel extends JPanel {
    * 
    */
   private static final long serialVersionUID = 1L;
-  private ProjectTree rawDataTree, peakListTree;
+  private ProjectTree rawDataTree, peakListTree, mobilogramListTree;
   private TaskProgressTable taskTable;
 
   /**
@@ -49,13 +47,19 @@ public class MainPanel extends JPanel {
     // Initialize item selector
     rawDataTree = new ProjectTree();
     peakListTree = new ProjectTree();
+    mobilogramListTree = new ProjectTree();
 
     JScrollPane rawDataTreeScroll = new JScrollPane(rawDataTree);
     JScrollPane peakListTreeScroll = new JScrollPane(peakListTree);
+    JScrollPane mobilogramListTreeScroll = new JScrollPane(mobilogramListTree);
 
     JSplitPane split = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+    JSplitPane split2 = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
     split.add(rawDataTreeScroll);
-    split.add(peakListTreeScroll);
+    split.add(split2);
+    split2.add(peakListTreeScroll);
+    split2.add(mobilogramListTreeScroll);
+    split2.setResizeWeight(0.5);
     split.setResizeWeight(0.5);
 
     split.setMinimumSize(new Dimension(200, 200));
@@ -73,6 +77,10 @@ public class MainPanel extends JPanel {
 
   public ProjectTree getPeakListTree() {
     return peakListTree;
+  }
+
+  public ProjectTree getMobilogramListTree() {
+    return mobilogramListTree;
   }
 
   public TaskProgressTable getTaskTable() {

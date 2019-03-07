@@ -39,6 +39,7 @@ import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
+import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.desktop.Desktop;
@@ -192,6 +193,11 @@ public class MainWindow extends JFrame implements MZmineModule, Desktop, WindowL
     return mainPanel.getPeakListTree().getSelectedObjects(PeakList.class);
   }
 
+  @Override
+  public MobilogramList[] getSelectedMobilogramLists() {
+    return mainPanel.getMobilogramListTree().getSelectedObjects(MobilogramList.class);
+  }
+
   public void initModule() {
 
     assert SwingUtilities.isEventDispatchThread();
@@ -317,6 +323,18 @@ public class MainWindow extends JFrame implements MZmineModule, Desktop, WindowL
 
   @Override
   public void removePeakListTreeListener(TreeModelListener listener) {
+    TreeModel model = getMainPanel().getPeakListTree().getModel();
+    model.removeTreeModelListener(listener);
+  }
+
+  @Override
+  public void addMobilogramListTreeListener(TreeModelListener listener) {
+    TreeModel model = getMainPanel().getPeakListTree().getModel();
+    model.addTreeModelListener(listener);
+  }
+
+  @Override
+  public void removeMobilogramListTreeListener(TreeModelListener listener) {
     TreeModel model = getMainPanel().getPeakListTree().getModel();
     model.removeTreeModelListener(listener);
   }

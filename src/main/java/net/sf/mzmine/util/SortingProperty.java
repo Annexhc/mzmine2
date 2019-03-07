@@ -20,6 +20,6 @@ package net.sf.mzmine.util;
 
 public enum SortingProperty {
 
-  MZ, RT, Intensity, ID, Height, Area
+  MZ, RT, Intensity, ID, Height, Area, Ccs, Mobility
 
 }
