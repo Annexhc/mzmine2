@@ -217,6 +217,7 @@ public class KendrickMassPlotTask extends AbstractTask {
           new KendrickMassPlotToolTipGenerator(xAxisLabel, yAxisLabel, zAxisLabel, rows);
       renderer.setSeriesToolTipGenerator(0, tooltipGenerator);
       plot.setRenderer(renderer);
+
       // set item label generator
       NameItemLabelGenerator generator = new NameItemLabelGenerator(rows);
       renderer.setDefaultItemLabelGenerator(generator);

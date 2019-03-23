@@ -21,6 +21,7 @@ package net.sf.mzmine.chartbasics.chartutils;
 import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.data.xy.XYDataset;
 import net.sf.mzmine.datamodel.PeakListRow;
+import net.sf.mzmine.main.MZmineCore;
 
 /**
  * Item label generator for XYPlots adds the name of a feature in form of a label
@@ -43,7 +44,17 @@ public class NameItemLabelGenerator implements XYItemLabelGenerator {
     if (rows[item].getPreferredPeakIdentity() != null) {
       label = rows[item].getPreferredPeakIdentity().getName();
     } else {
-      return null;
+      // get charge
+      int charge = 1;
+      if (rows[item].getRowCharge() == 0) {
+        charge = 1;
+      } else {
+        charge = rows[item].getRowCharge();
+      }
+      label = "m/z: "
+          + String.valueOf(
+              MZmineCore.getConfiguration().getMZFormat().format(rows[item].getAverageMZ()))
+          + " charge: " + charge;
     }
     return label;
   }

@@ -23,6 +23,7 @@ import java.awt.GridLayout;
 import java.awt.Label;
 import java.util.HashMap;
 import java.util.Map;
+import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
@@ -119,8 +120,8 @@ public class FeatureSummaryWindow extends JFrame {
     pane.add(window.getTicPlot());
     pane.add(window.getToolBar());
     pane.setResizeWeight(1);
-    pane.setEnabled(false);
-    pane.setDividerSize(0);
+    pane.setDividerSize(1);
+    pane.setBorder(BorderFactory.createLineBorder(Color.black));
     return pane;
   }
 
