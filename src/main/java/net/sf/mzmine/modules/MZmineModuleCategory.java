@@ -28,6 +28,7 @@ public enum MZmineModuleCategory {
   GAPFILLING("Gap filling"), //
   ISOTOPES("Isotopes"), //
   PEAKLIST("Peak list methods"), //
+  MOBILOGRAMLIST("Mobilogram list methods"), //
   PEAKLISTPICKING("Peak list processing"), //
   SPECTRALDECONVOLUTION("Spectral deconvolution"), //
   PEAKLISTFILTERING("Peak list filtering"), //
@@ -48,6 +49,7 @@ public enum MZmineModuleCategory {
     this.name = name;
   }
 
+  @Override
   public String toString() {
     return name;
   }

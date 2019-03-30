@@ -63,8 +63,8 @@ public class MainMenu extends JMenuBar implements ActionListener {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
-  private JMenu projectMenu, rawDataMenu, peakListMenu, visualizationMenu, helpMenu,
-      rawDataFilteringMenu, peakDetectionMenu, gapFillingMenu, isotopesMenu,
+  private JMenu projectMenu, rawDataMenu, peakListMenu, mobilogramListMenu, visualizationMenu,
+      helpMenu, rawDataFilteringMenu, peakDetectionMenu, gapFillingMenu, isotopesMenu,
       peakListPeakPickingMenu, peakListFilteringMenu, alignmentMenu, normalizationMenu,
       identificationMenu, dataAnalysisMenu, peakListExportMenu, peakListSpectralDeconvolutionMenu,
       toolsMenu;
@@ -75,7 +75,8 @@ public class MainMenu extends JMenuBar implements ActionListener {
       projectLoadParameters, projectExit, showAbout, checkUpdate;
 
   private int projectIOMenuIndex = 0, projectMenuIndex = 1, rawDataMenuIndex = 0,
-      peakListMenuIndex = 0, visualizationMenuIndex = 0, exportMenuIndex = 0;
+      peakListMenuIndex = 0, mobilogramListMenuIndex = 0, visualizationMenuIndex = 0,
+      exportMenuIndex = 0;
 
   private Map<JMenuItem, MZmineRunnableModule> moduleMenuItems =
       new Hashtable<JMenuItem, MZmineRunnableModule>();
@@ -180,6 +181,15 @@ public class MainMenu extends JMenuBar implements ActionListener {
     peakListExportMenu.addSeparator();
 
     /*
+     * Mobilogram list methods menu
+     */
+
+    mobilogramListMenu = new JMenu("Mobilogram list methods");
+    mobilogramListMenu.setMnemonic(KeyEvent.VK_M);
+    this.add(mobilogramListMenu);
+
+
+    /*
      * Visualization menu
      */
 
@@ -238,6 +248,10 @@ public class MainMenu extends JMenuBar implements ActionListener {
       case PEAKLIST:
         peakListMenu.add(newItem, peakListMenuIndex);
         peakListMenuIndex++;
+        break;
+      case MOBILOGRAMLIST:
+        mobilogramListMenu.add(newItem, mobilogramListMenuIndex);
+        mobilogramListMenuIndex++;
         break;
       case RAWDATAFILTERING:
         rawDataFilteringMenu.add(newItem);
@@ -327,6 +341,7 @@ public class MainMenu extends JMenuBar implements ActionListener {
   /**
    * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
    */
+  @Override
   public void actionPerformed(ActionEvent e) {
 
     Object src = e.getSource();

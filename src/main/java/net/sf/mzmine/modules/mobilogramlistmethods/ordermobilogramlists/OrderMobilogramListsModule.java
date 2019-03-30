@@ -42,15 +42,15 @@ import net.sf.mzmine.taskcontrol.Task;
 import net.sf.mzmine.util.ExitCode;
 
 /**
- * This is a very simple module which reorders peak lists alphabetically
+ * This is a very simple module which reorders mobilogram lists alphabetically
  * 
  */
 public class OrderMobilogramListsModule implements MZmineProcessingModule {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());
 
-  private static final String MODULE_NAME = "Order peak lists";
-  private static final String MODULE_DESCRIPTION = "Order selected peak lists alphabetically";
+  private static final String MODULE_NAME = "Order mobilogram lists";
+  private static final String MODULE_DESCRIPTION = "Order selected mobilogram lists alphabetically";
 
   @Override
   public @Nonnull String getName() {
@@ -67,7 +67,7 @@ public class OrderMobilogramListsModule implements MZmineProcessingModule {
   public ExitCode runModule(@Nonnull MZmineProject project, @Nonnull ParameterSet parameters,
       @Nonnull Collection<Task> tasks) {
 
-    List<MobilogramList> peakLists =
+    List<MobilogramList> mobilogramLists =
         Arrays.asList(parameters.getParameter(OrderMobilogramListsParameters.mobilogramLists)
             .getValue().getMatchingMobilogramLists());
 
@@ -83,18 +83,18 @@ public class OrderMobilogramListsModule implements MZmineProcessingModule {
 
     if (model == null)
       throw new MSDKRuntimeException(
-          "Cannot find peak list tree model for sorting. Different MZmine project impl?");
+          "Cannot find mobilogram list tree model for sorting. Different MZmine project impl?");
 
     final DefaultMutableTreeNode rootNode = model.getRoot();
 
-    // Get all tree nodes that represent selected peak lists, and remove
+    // Get all tree nodes that represent selected mobilogram lists, and remove
     // them from
     final ArrayList<DefaultMutableTreeNode> selectedNodes = new ArrayList<DefaultMutableTreeNode>();
 
     for (int row = 0; row < rootNode.getChildCount(); row++) {
       DefaultMutableTreeNode selectedNode = (DefaultMutableTreeNode) rootNode.getChildAt(row);
       Object selectedObject = selectedNode.getUserObject();
-      if (peakLists.contains(selectedObject)) {
+      if (mobilogramLists.contains(selectedObject)) {
         selectedNodes.add(selectedNode);
       }
     }
@@ -110,7 +110,7 @@ public class OrderMobilogramListsModule implements MZmineProcessingModule {
       return ExitCode.ERROR;
     int insertPosition = Collections.min(positions);
 
-    // Sort the peak lists by name
+    // Sort the mobilogram lists by name
     Collections.sort(selectedNodes, new Comparator<DefaultMutableTreeNode>() {
       @Override
       public int compare(DefaultMutableTreeNode o1, DefaultMutableTreeNode o2) {
@@ -130,7 +130,7 @@ public class OrderMobilogramListsModule implements MZmineProcessingModule {
 
   @Override
   public @Nonnull MZmineModuleCategory getModuleCategory() {
-    return MZmineModuleCategory.PEAKLIST;
+    return MZmineModuleCategory.MOBILOGRAMLIST;
   }
 
   @Override

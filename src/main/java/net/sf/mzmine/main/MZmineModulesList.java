@@ -23,6 +23,7 @@ import net.sf.mzmine.modules.masslistmethods.ADAPchromatogrambuilder.ADAPChromat
 import net.sf.mzmine.modules.masslistmethods.chromatogrambuilder.ChromatogramBuilderModule;
 import net.sf.mzmine.modules.masslistmethods.mobilogrambuilder.MobilogramBuilderModule;
 import net.sf.mzmine.modules.masslistmethods.shoulderpeaksfilter.ShoulderPeaksFilterModule;
+import net.sf.mzmine.modules.mobilogramlistmethods.ordermobilogramlists.OrderMobilogramListsModule;
 import net.sf.mzmine.modules.peaklistmethods.alignment.hierarchical.HierarAlignerGcModule;
 import net.sf.mzmine.modules.peaklistmethods.alignment.join.JoinAlignerModule;
 import net.sf.mzmine.modules.peaklistmethods.alignment.ransac.RansacAlignerModule;
@@ -197,7 +198,10 @@ public class MZmineModulesList {
 
       // Tools
       MzRangeMassCalculatorModule.class, MzRangeFormulaCalculatorModule.class,
-      IsotopePatternPreviewModule.class
+      IsotopePatternPreviewModule.class,
+
+      // Mobilogram methods
+      OrderMobilogramListsModule.class
 
   };
 }

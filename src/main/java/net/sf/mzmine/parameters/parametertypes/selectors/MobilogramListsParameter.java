@@ -47,11 +47,12 @@ public class MobilogramListsParameter
     this.value = newValue;
   }
 
-  public void setValue(MobilogramListsSelectionType selectionType, MobilogramList peakLists[]) {
+  public void setValue(MobilogramListsSelectionType selectionType,
+      MobilogramList mobilogramLists[]) {
     if (value == null)
       value = new MobilogramListsSelection();
     value.setSelectionType(selectionType);
-    value.setSpecificMobilogramLists(peakLists);
+    value.setSpecificMobilogramLists(mobilogramLists);
   }
 
   public void setValue(MobilogramListsSelectionType selectionType) {
@@ -87,11 +88,11 @@ public class MobilogramListsParameter
       matchingMobilogramLists = value.getMatchingMobilogramLists();
 
     if (matchingMobilogramLists.length < minCount) {
-      errorMessages.add("At least " + minCount + " peak lists  must be selected");
+      errorMessages.add("At least " + minCount + " mobilogram lists  must be selected");
       return false;
     }
     if (matchingMobilogramLists.length > maxCount) {
-      errorMessages.add("Maximum " + maxCount + " peak lists may be selected");
+      errorMessages.add("Maximum " + maxCount + " mobilogram lists may be selected");
       return false;
     }
     return true;
@@ -113,7 +114,7 @@ public class MobilogramListsParameter
 
     ArrayList<Object> newValues = new ArrayList<Object>();
 
-    NodeList items = xmlElement.getElementsByTagName("specific_peak_list");
+    NodeList items = xmlElement.getElementsByTagName("specific_mobilogram_list");
     for (int i = 0; i < items.getLength(); i++) {
       String itemString = items.item(i).getTextContent();
       for (MobilogramList df : currentDataMobilogramLists) {
@@ -144,7 +145,7 @@ public class MobilogramListsParameter
 
     if (value.getSpecificMobilogramLists() != null) {
       for (MobilogramList item : value.getSpecificMobilogramLists()) {
-        Element newElement = parentDocument.createElement("specific_peak_list");
+        Element newElement = parentDocument.createElement("specific_mobilogram_list");
         newElement.setTextContent(item.getName());
         xmlElement.appendChild(newElement);
       }

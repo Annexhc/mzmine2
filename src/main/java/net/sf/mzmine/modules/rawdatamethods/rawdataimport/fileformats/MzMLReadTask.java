@@ -88,6 +88,7 @@ public class MzMLReadTask extends AbstractTask {
   /**
    * @see net.sf.mzmine.taskcontrol.Task#getFinishedPercentage()
    */
+  @Override
   public double getFinishedPercentage() {
     return totalScans == 0 ? 0 : (double) parsedScans / totalScans;
   }
@@ -95,6 +96,7 @@ public class MzMLReadTask extends AbstractTask {
   /**
    * @see java.lang.Runnable#run()
    */
+  @Override
   public void run() {
 
     setStatus(TaskStatus.PROCESSING);
@@ -169,7 +171,6 @@ public class MzMLReadTask extends AbstractTask {
 
       finalRawDataFile = newMZmineFile.finishWriting();
       project.addFile(finalRawDataFile);
-      System.out.println("mobility Range: " + finalRawDataFile.getDataMobilityRange());
     } catch (Throwable e) {
       e.printStackTrace();
       setStatus(TaskStatus.ERROR);
@@ -502,6 +503,7 @@ public class MzMLReadTask extends AbstractTask {
     return spectrum.getId();
   }
 
+  @Override
   public String getTaskDescription() {
     return "Opening file " + file;
   }

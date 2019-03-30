@@ -114,7 +114,6 @@ public class MobilogramBuilderTask extends AbstractTask {
     // for (int i = 1601; i < dataFile.getNumOfScans(); i++) {
     // dataFile.getScan(i).getMobility();
     // }
-    System.out.println("Mobility range: " + dataFile.getDataMobilityRange(1));
     // toDo combined Scans!!!
 
     int allScanNumbers[] = scanSelection.getMatchingScanNumbers(dataFile);
