@@ -20,6 +20,7 @@ package net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils;
 
 import org.jfree.chart.labels.XYItemLabelGenerator;
 import org.jfree.data.xy.XYDataset;
+import net.sf.mzmine.datamodel.MobilogramListRow;
 import net.sf.mzmine.datamodel.PeakListRow;
 
 /**
@@ -29,10 +30,15 @@ import net.sf.mzmine.datamodel.PeakListRow;
  */
 public class NameItemLabelGenerator implements XYItemLabelGenerator {
 
-  private PeakListRow rows[];
+  private PeakListRow peakListRows[];
+  private MobilogramListRow mobilogramListRows[];
 
   public NameItemLabelGenerator(PeakListRow rows[]) {
-    this.rows = rows;
+    this.peakListRows = rows;
+  }
+
+  public NameItemLabelGenerator(MobilogramListRow rows[]) {
+    this.mobilogramListRows = rows;
   }
 
   @Override
@@ -40,8 +46,10 @@ public class NameItemLabelGenerator implements XYItemLabelGenerator {
 
     // Create label
     String label = null;
-    if (rows[item].getPreferredPeakIdentity() != null) {
-      label = rows[item].getPreferredPeakIdentity().getName();
+    if (peakListRows[item].getPreferredPeakIdentity() != null) {
+      label = peakListRows[item].getPreferredPeakIdentity().getName();
+    } else if (mobilogramListRows[item].getPreferredMobilogramIdentity() != null) {
+      label = mobilogramListRows[item].getPreferredMobilogramIdentity().getName();
     } else {
       return null;
     }

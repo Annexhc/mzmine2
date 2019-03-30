@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.kendrickmassplot.peaklist;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -48,7 +48,7 @@ import net.sf.mzmine.chartbasics.gui.swing.EChartPanel;
 import net.sf.mzmine.datamodel.PeakList;
 import net.sf.mzmine.datamodel.PeakListRow;
 import net.sf.mzmine.modules.visualization.intensityplot.IntensityPlotParameters;
-import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.KendrickMassPlotToolTipGenerator;
+import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.KendrickMassPlotPeakListToolTipGenerator;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.NameItemLabelGenerator;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizePaintScales;
 import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizeRenderer;
@@ -206,8 +206,8 @@ public class KendrickMassPlotTask extends AbstractTask {
       XYBlockPixelSizeRenderer renderer = new XYBlockPixelSizeRenderer();
 
       // set tooltip generator
-      KendrickMassPlotToolTipGenerator tooltipGenerator =
-          new KendrickMassPlotToolTipGenerator(xAxisLabel, yAxisLabel, zAxisLabel, rows);
+      KendrickMassPlotPeakListToolTipGenerator tooltipGenerator =
+          new KendrickMassPlotPeakListToolTipGenerator(xAxisLabel, yAxisLabel, zAxisLabel, rows);
       renderer.setSeriesToolTipGenerator(0, tooltipGenerator);
       plot.setRenderer(renderer);
       // set item label generator
@@ -292,8 +292,8 @@ public class KendrickMassPlotTask extends AbstractTask {
     // Set paint scale
     renderer.setPaintScale(scale);
 
-    KendrickMassPlotToolTipGenerator tooltipGenerator =
-        new KendrickMassPlotToolTipGenerator(xAxisLabel, yAxisLabel, zAxisLabel, rows);
+    KendrickMassPlotPeakListToolTipGenerator tooltipGenerator =
+        new KendrickMassPlotPeakListToolTipGenerator(xAxisLabel, yAxisLabel, zAxisLabel, rows);
     renderer.setSeriesToolTipGenerator(0, tooltipGenerator);
 
     // set item label generator

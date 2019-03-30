@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.kendrickmassplot.mobilogramlist;
 
 import java.util.Collection;
 import javax.annotation.Nonnull;
@@ -32,7 +32,7 @@ import net.sf.mzmine.util.ExitCode;
  * 
  * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-public class KendrickMassPlotModule implements MZmineProcessingModule {
+public class KendrickMassPlotMobilogramListModule implements MZmineProcessingModule {
 
   private static final String MODULE_NAME = "Kendrick mass plot";
   private static final String MODULE_DESCRIPTION = "Kendrick mass plot.";
@@ -60,7 +60,7 @@ public class KendrickMassPlotModule implements MZmineProcessingModule {
 
   @Override
   public @Nonnull MZmineModuleCategory getModuleCategory() {
-    return MZmineModuleCategory.VISUALIZATIONPEAKLIST;
+    return MZmineModuleCategory.VISUALIZATIONMOBILOGRAMLIST;
   }
 
   @Override

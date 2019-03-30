@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.kendrickmassplot.peaklist;
 
 import org.jfree.data.xy.AbstractXYDataset;
 import net.sf.mzmine.datamodel.PeakList;

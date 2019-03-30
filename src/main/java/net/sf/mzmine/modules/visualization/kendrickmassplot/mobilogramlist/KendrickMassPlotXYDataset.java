@@ -16,40 +16,38 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.kendrickmassplot.mobilogramlist;
 
-import org.jfree.data.xy.AbstractXYZDataset;
-import net.sf.mzmine.datamodel.PeakList;
-import net.sf.mzmine.datamodel.PeakListRow;
+import org.jfree.data.xy.AbstractXYDataset;
+import net.sf.mzmine.datamodel.MobilogramList;
+import net.sf.mzmine.datamodel.MobilogramListRow;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.util.FormulaUtils;
 
 /**
- * XYZDataset for Kendrick mass plots
+ * XYDataset for Kendrick mass plots
  * 
  * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
+class KendrickMassPlotXYDataset extends AbstractXYDataset {
 
   private static final long serialVersionUID = 1L;
 
-  private PeakListRow selectedRows[];
+  private MobilogramListRow selectedRows[];
   private String xAxisKMBase;
-  private String zAxisKMBase;
   private String customYAxisKMBase;
   private String customXAxisKMBase;
-  private String customZAxisKMBase;
   private double[] xValues;
   private double[] yValues;
-  private double[] zValues;
 
-  public KendrickMassPlotXYZDataset(ParameterSet parameters) {
+  public KendrickMassPlotXYDataset(ParameterSet parameters) {
 
-    PeakList peakList = parameters.getParameter(KendrickMassPlotParameters.peakList).getValue()
-        .getMatchingPeakLists()[0];
+    MobilogramList mobilogramList =
+        parameters.getParameter(KendrickMassPlotParameters.mobilogramList).getValue()
+            .getMatchingMobilogramLists()[0];
 
-    this.selectedRows =
-        parameters.getParameter(KendrickMassPlotParameters.selectedRows).getMatchingRows(peakList);
+    this.selectedRows = parameters.getParameter(KendrickMassPlotParameters.selectedRows)
+        .getMatchingRows(mobilogramList);
 
     this.customYAxisKMBase =
         parameters.getParameter(KendrickMassPlotParameters.yAxisCustomKendrickMassBase).getValue();
@@ -61,15 +59,6 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
               .getEmbeddedParameter().getValue();
     } else {
       this.xAxisKMBase = parameters.getParameter(KendrickMassPlotParameters.xAxisValues).getValue();
-    }
-
-    if (parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase)
-        .getValue() == true) {
-      this.customZAxisKMBase =
-          parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase)
-              .getEmbeddedParameter().getValue();
-    } else {
-      this.zAxisKMBase = parameters.getParameter(KendrickMassPlotParameters.zAxisValues).getValue();
     }
 
     // Calc xValues
@@ -87,6 +76,14 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
         if (xAxisKMBase.equals("m/z")) {
           xValues[i] = selectedRows[i].getAverageMZ();
         }
+        // plot mobility values as x axis
+        if (xAxisKMBase.equals("Mobility")) {
+          xValues[i] = selectedRows[i].getAverageMobility();
+        }
+        // plot rt values as x axis
+        if (xAxisKMBase.equals("Retention time")) {
+          xValues[i] = selectedRows[i].getAverageRT();
+        }
         // plot Kendrick masses as x axis
         else if (xAxisKMBase.equals("KM")) {
           xValues[i] = selectedRows[i].getAverageMZ() * getKendrickMassFactor(customYAxisKMBase);
@@ -101,37 +98,7 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
           ((int) (selectedRows[i].getAverageMZ() * getKendrickMassFactor(customYAxisKMBase)) + 1)
               - selectedRows[i].getAverageMZ() * getKendrickMassFactor(customYAxisKMBase);
     }
-
-    // Calc zValues
-    zValues = new double[selectedRows.length];
-    if (parameters.getParameter(KendrickMassPlotParameters.zAxisCustomKendrickMassBase)
-        .getValue() == true) {
-      for (int i = 0; i < selectedRows.length; i++) {
-        zValues[i] =
-            ((int) (selectedRows[i].getAverageMZ() * getKendrickMassFactor(customZAxisKMBase)) + 1)
-                - selectedRows[i].getAverageMZ() * getKendrickMassFactor(customZAxisKMBase);
-      }
-    } else
-      for (int i = 0; i < selectedRows.length; i++) {
-        // plot selected feature characteristic as z Axis
-        if (zAxisKMBase.equals("Retention time")) {
-          zValues[i] = selectedRows[i].getAverageRT();
-        } else if (zAxisKMBase.equals("Intensity")) {
-          zValues[i] = selectedRows[i].getAverageHeight();
-        } else if (zAxisKMBase.equals("Area")) {
-          zValues[i] = selectedRows[i].getAverageArea();
-        } else if (zAxisKMBase.equals("Tailing factor")) {
-          zValues[i] = selectedRows[i].getBestPeak().getTailingFactor();
-        } else if (zAxisKMBase.equals("Asymmetry factor")) {
-          zValues[i] = selectedRows[i].getBestPeak().getAsymmetryFactor();
-        } else if (zAxisKMBase.equals("FWHM")) {
-          zValues[i] = selectedRows[i].getBestPeak().getFWHM();
-        } else if (zAxisKMBase.equals("m/z")) {
-          zValues[i] = selectedRows[i].getBestPeak().getMZ();
-        }
-      }
   }
-
 
   @Override
   public int getItemCount(int series) {
@@ -149,11 +116,6 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
   }
 
   @Override
-  public Number getZ(int series, int item) {
-    return zValues[item];
-  }
-
-  @Override
   public int getSeriesCount() {
     return 1;
   }
@@ -163,13 +125,20 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
   }
 
   @Override
-  public Comparable getSeriesKey(int series) {
+  public Comparable<?> getSeriesKey(int series) {
     return getRowKey(series);
+  }
+
+  public double[] getxValues() {
+    return xValues;
+  }
+
+  public double[] getyValues() {
+    return yValues;
   }
 
   private double getKendrickMassFactor(String formula) {
     double exactMassFormula = FormulaUtils.calculateExactMass(formula);
     return ((int) (exactMassFormula + 0.5d)) / exactMassFormula;
   }
-
 }

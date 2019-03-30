@@ -16,7 +16,7 @@
  * USA
  */
 
-package net.sf.mzmine.modules.visualization.kendrickmassplot;
+package net.sf.mzmine.modules.visualization.kendrickmassplot.mobilogramlist;
 
 import java.awt.Color;
 import java.awt.Insets;

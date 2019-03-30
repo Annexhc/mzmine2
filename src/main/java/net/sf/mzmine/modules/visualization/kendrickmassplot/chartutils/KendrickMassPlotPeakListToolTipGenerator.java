@@ -31,28 +31,29 @@ import net.sf.mzmine.datamodel.PeakListRow;
  * 
  * @author Ansgar Korf (ansgar.korf@uni-muenster.de)
  */
-public class KendrickMassPlotToolTipGenerator implements XYZToolTipGenerator, PublicCloneable {
+public class KendrickMassPlotPeakListToolTipGenerator
+    implements XYZToolTipGenerator, PublicCloneable {
 
   private String xAxisLabel, yAxisLabel, zAxisLabel;
   private NumberFormat numberFormatX = new DecimalFormat("####0.0000");
   private NumberFormat numberFormatY = new DecimalFormat("0.000");
-  private PeakListRow rows[];
+  private PeakListRow peakListRows[];
   private String featureIdentity;
 
-  public KendrickMassPlotToolTipGenerator(String xAxisLabel, String yAxisLabel, String zAxisLabel,
-      PeakListRow rows[]) {
+  public KendrickMassPlotPeakListToolTipGenerator(String xAxisLabel, String yAxisLabel,
+      String zAxisLabel, PeakListRow rows[]) {
     super();
     this.xAxisLabel = xAxisLabel;
     this.yAxisLabel = yAxisLabel;
     this.zAxisLabel = zAxisLabel;
-    this.rows = rows;
+    this.peakListRows = rows;
 
   }
 
   @Override
   public String generateToolTip(XYZDataset dataset, int series, int item) {
-    if (rows[item].getPreferredPeakIdentity() != null) {
-      featureIdentity = rows[item].getPreferredPeakIdentity().getName();
+    if (peakListRows[item].getPreferredPeakIdentity() != null) {
+      featureIdentity = peakListRows[item].getPreferredPeakIdentity().getName();
       return String.valueOf(featureIdentity + "\n" + xAxisLabel + ": "
           + numberFormatX.format(dataset.getXValue(series, item)) + " " + yAxisLabel + ": "
           + numberFormatY.format(dataset.getYValue(series, item)) + " " + zAxisLabel + ": "
@@ -67,8 +68,8 @@ public class KendrickMassPlotToolTipGenerator implements XYZToolTipGenerator, Pu
 
   @Override
   public String generateToolTip(XYDataset dataset, int series, int item) {
-    if (rows[item].getPreferredPeakIdentity() != null) {
-      featureIdentity = rows[item].getPreferredPeakIdentity().getName();
+    if (peakListRows[item].getPreferredPeakIdentity() != null) {
+      featureIdentity = peakListRows[item].getPreferredPeakIdentity().getName();
       return String.valueOf(featureIdentity + "\n" + xAxisLabel + ": "
           + numberFormatX.format(dataset.getXValue(series, item)) + " " + yAxisLabel + ": "
           + numberFormatY.format(dataset.getYValue(series, item)));
