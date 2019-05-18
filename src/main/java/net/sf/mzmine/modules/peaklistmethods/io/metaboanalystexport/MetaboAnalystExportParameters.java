@@ -19,12 +19,8 @@
 package net.sf.mzmine.modules.peaklistmethods.io.metaboanalystexport;
 
 import java.awt.Window;
-
-import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.parameters.Parameter;
-import net.sf.mzmine.parameters.UserParameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
-import net.sf.mzmine.parameters.parametertypes.ComboParameter;
 import net.sf.mzmine.parameters.parametertypes.filenames.FileNameParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.PeakListsParameter;
 import net.sf.mzmine.util.ExitCode;
@@ -39,21 +35,12 @@ public class MetaboAnalystExportParameters extends SimpleParameterSet {
           + "If the file already exists, it will be overwritten.",
       "csv");
 
-  public static final ComboParameter<UserParameter<?, ?>> groupParameter =
-      new ComboParameter<UserParameter<?, ?>>("Grouping parameter",
-          "Project parameter that will be used to obtain group information to each sample (e.g. control vs disease). Please set parameters in the Project/Set sample parameters menu.",
-          new UserParameter[0]);
-
   public MetaboAnalystExportParameters() {
-    super(new Parameter[] {peakLists, filename, groupParameter});
+    super(new Parameter[] {peakLists, filename});
   }
 
   @Override
   public ExitCode showSetupDialog(Window parent, boolean valueCheckRequired) {
-
-    UserParameter<?, ?> projectParams[] =
-        MZmineCore.getProjectManager().getCurrentProject().getParameters();
-    getParameter(MetaboAnalystExportParameters.groupParameter).setChoices(projectParams);
 
     return super.showSetupDialog(parent, valueCheckRequired);
   }
