@@ -20,7 +20,7 @@ package net.sf.mzmine.modules.peaklistmethods.normalization.rtnormalizer;
 
 import java.util.Vector;
 import java.util.logging.Logger;
-
+import com.google.common.collect.Range;
 import net.sf.mzmine.datamodel.Feature;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.PeakIdentity;
@@ -38,8 +38,6 @@ import net.sf.mzmine.parameters.parametertypes.tolerances.RTTolerance;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
 import net.sf.mzmine.util.PeakUtils;
-
-import com.google.common.collect.Range;
 
 class RTNormalizerTask extends AbstractTask {
 
@@ -73,16 +71,19 @@ class RTNormalizerTask extends AbstractTask {
 
   }
 
+  @Override
   public double getFinishedPercentage() {
     if (totalRows == 0)
       return 0f;
     return (double) processedRows / (double) totalRows;
   }
 
+  @Override
   public String getTaskDescription() {
     return "Retention time normalization of " + originalPeakLists.length + " peak lists";
   }
 
+  @Override
   public void run() {
 
     setStatus(TaskStatus.PROCESSING);
@@ -149,7 +150,8 @@ class RTNormalizerTask extends AbstractTask {
 
         // Save reference to matching peak in this peak list
         goodStandardCandidate[i] = matchingRows[0];
-
+        logger.info("Found a good standard for RT normalization: " + candidate + " in peak list: "
+            + originalPeakLists[i].getName());
       }
 
       // If we found a match of same peak in all peaklists, mark it as a
@@ -172,7 +174,7 @@ class RTNormalizerTask extends AbstractTask {
       double rtAverage = 0;
       for (PeakListRow row : goodStandards.get(i))
         rtAverage += row.getAverageRT();
-      rtAverage /= (double) originalPeakLists.length;
+      rtAverage /= originalPeakLists.length;
       averagedRTs[i] = rtAverage;
     }
 
