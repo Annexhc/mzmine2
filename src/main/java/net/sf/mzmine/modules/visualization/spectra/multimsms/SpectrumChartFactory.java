@@ -162,7 +162,7 @@ public class SpectrumChartFactory {
     PseudoSpectraRenderer renderer2 = new PseudoSpectraRenderer(Color.BLACK, false);
 
     // create subplot 1...
-    final NumberAxis rangeAxis1 = new NumberAxis("rel. intensity [%]");
+    final NumberAxis rangeAxis1 = new NumberAxis("Query [%]");
     final XYPlot subplot1 = new XYPlot(data, null, rangeAxis1, renderer1);
     subplot1.setRangeAxisLocation(AxisLocation.BOTTOM_OR_LEFT);
     rangeAxis1.setNumberFormatOverride(intensityFormat);
@@ -170,7 +170,7 @@ public class SpectrumChartFactory {
     rangeAxis1.setAutoRangeStickyZero(true);
 
     // create subplot 2...
-    final NumberAxis rangeAxis2 = new NumberAxis("rel. intensity [%]");
+    final NumberAxis rangeAxis2 = new NumberAxis("Library [%]");
     rangeAxis2.setNumberFormatOverride(intensityFormat);
     rangeAxis2.setAutoRangeIncludesZero(true);
     rangeAxis2.setAutoRangeStickyZero(true);
