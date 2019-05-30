@@ -40,8 +40,7 @@ import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.modules.projectmethods.projectload.RawDataFileOpenHandler;
 import net.sf.mzmine.project.impl.RawDataFileImpl;
 import net.sf.mzmine.project.impl.StorableScan;
-import net.sf.mzmine.util.ScanUtils;
-
+import net.sf.mzmine.util.scans.ScanUtils;
 public class RawDataFileOpenHandler_2_3 extends DefaultHandler implements RawDataFileOpenHandler {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());

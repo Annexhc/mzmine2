@@ -111,7 +111,13 @@ class MobilogramShapeCellRenderer implements TableCellRenderer {
       double min = copyZValues[minScaleIndex];
       double max = copyZValues[maxScaleIndex];
       LookupPaintScale scale = null;
-      scale = new LookupPaintScale(min, max, new Color(244, 66, 223));
+      if (min < max) {
+        scale = new LookupPaintScale(min, max, new Color(244, 66, 223));
+      } else {
+        min = 0;
+        max = 1;
+        scale = new LookupPaintScale(min, max, new Color(244, 66, 223));
+      }
       Paint[] contourColors = XYBlockPixelSizePaintScales.getFullRainBowScaleLowerBound();
       double[] scaleValues = new double[contourColors.length];
       double delta = (max - min) / (contourColors.length - 1);

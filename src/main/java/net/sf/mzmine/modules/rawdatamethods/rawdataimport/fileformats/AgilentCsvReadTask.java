@@ -20,7 +20,7 @@ package net.sf.mzmine.modules.rawdatamethods.rawdataimport.fileformats;
 
 import java.io.File;
 import java.util.Scanner;
-import com.google.common.collect.Range;
+
 import net.sf.mzmine.datamodel.DataPoint;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.PolarityType;
@@ -31,7 +31,8 @@ import net.sf.mzmine.datamodel.impl.SimpleScan;
 import net.sf.mzmine.project.impl.RawDataFileImpl;
 import net.sf.mzmine.taskcontrol.AbstractTask;
 import net.sf.mzmine.taskcontrol.TaskStatus;
-import net.sf.mzmine.util.ScanUtils;
+import net.sf.mzmine.util.scans.ScanUtils;
+import com.google.common.collect.Range;
 
 public class AgilentCsvReadTask extends AbstractTask {
 

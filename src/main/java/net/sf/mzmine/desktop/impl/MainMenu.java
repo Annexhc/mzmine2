@@ -24,6 +24,7 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
@@ -31,6 +32,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import net.sf.mzmine.datamodel.MZmineProject;
 import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.PeakList;
@@ -41,6 +43,7 @@ import net.sf.mzmine.main.NewVersionCheck;
 import net.sf.mzmine.main.NewVersionCheck.CheckType;
 import net.sf.mzmine.modules.MZmineModuleCategory;
 import net.sf.mzmine.modules.MZmineRunnableModule;
+import net.sf.mzmine.modules.projectmethods.projectload.ProjectOpeningTask;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.selectors.MobilogramListsParameter;
@@ -69,6 +72,8 @@ public class MainMenu extends JMenuBar implements ActionListener {
       identificationMenu, dataAnalysisMenu, peakListExportMenu, peakListSpectralDeconvolutionMenu,
       toolsMenu;
 
+  private JMenu lastProjectsSub;
+
   private WindowsMenu windowsMenu;
 
   private JMenuItem projectSampleParameters, projectPreferences, projectSaveParameters,
@@ -81,6 +86,8 @@ public class MainMenu extends JMenuBar implements ActionListener {
   private Map<JMenuItem, MZmineRunnableModule> moduleMenuItems =
       new Hashtable<JMenuItem, MZmineRunnableModule>();
 
+  private List<File> lastProjects;
+
   MainMenu() {
 
     /*
@@ -89,6 +96,12 @@ public class MainMenu extends JMenuBar implements ActionListener {
     projectMenu = new JMenu("Project");
     projectMenu.setMnemonic(KeyEvent.VK_P);
     add(projectMenu);
+
+    lastProjectsSub = new JMenu("Open last project ...");
+    lastProjectsSub.setEnabled(false);
+    projectMenu.add(lastProjectsSub);
+    projectMenuIndex++;
+    projectIOMenuIndex++;
 
     // project IO items go here (e.g. project load, save)
 
@@ -320,7 +333,6 @@ public class MainMenu extends JMenuBar implements ActionListener {
   }
 
   public void addMenuItemForModule(MZmineRunnableModule module) {
-
     MZmineModuleCategory parentMenu = module.getModuleCategory();
     String menuItemText = module.getName();
     String menuItemToolTip = module.getDescription();
@@ -345,7 +357,37 @@ public class MainMenu extends JMenuBar implements ActionListener {
     moduleMenuItems.put(newItem, module);
 
     addMenuItem(parentMenu, newItem);
+  }
 
+  public void setLastProjects(List<File> list) {
+    lastProjects = list;
+
+    SwingUtilities.invokeLater(() -> {
+      lastProjectsSub.removeAll();
+
+      if (list == null || list.isEmpty()) {
+        lastProjectsSub.setEnabled(false);
+        return;
+      }
+      lastProjectsSub.setEnabled(true);
+
+      // add items to load last used projects directly
+      lastProjects.stream().map(File::getAbsolutePath).forEach(name -> {
+        JMenuItem item = new JMenuItem(name);
+        item.addActionListener(e -> {
+          JMenuItem c = (JMenuItem) e.getSource();
+          if (c != null) {
+            File f = new File(c.getText());
+            if (f.exists()) {
+              // load file
+              ProjectOpeningTask newTask = new ProjectOpeningTask(f);
+              MZmineCore.getTaskController().addTask(newTask);
+            }
+          }
+        });
+        lastProjectsSub.add(item);
+      });
+    });
   }
 
   /**
