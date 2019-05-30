@@ -39,6 +39,7 @@ public enum MZmineModuleCategory {
   PEAKLISTIMPORT("Peak list import"), //
   VISUALIZATIONRAWDATA("Visualization"), //
   VISUALIZATIONPEAKLIST("Visualization peak list"), //
+  VISUALIZATIONMOBILOGRAMLIST("Visualization mobilogram list"), //
   DATAANALYSIS("Data analysis"), //
   HELPSYSTEM("Help"), //
   TOOLS("Tools"); //

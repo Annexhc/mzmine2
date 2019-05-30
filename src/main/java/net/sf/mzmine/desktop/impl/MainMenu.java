@@ -75,8 +75,8 @@ public class MainMenu extends JMenuBar implements ActionListener {
       projectLoadParameters, projectExit, showAbout, checkUpdate;
 
   private int projectIOMenuIndex = 0, projectMenuIndex = 1, rawDataMenuIndex = 0,
-      peakListMenuIndex = 0, mobilogramListMenuIndex = 0, visualizationMenuIndex = 0,
-      exportMenuIndex = 0;
+      peakListMenuIndex = 0, mobilogramListMenuIndex = 0, visualizationRawMenuIndex = 1,
+      visualizationPeakMenuIndex = visualizationRawMenuIndex + 1, exportMenuIndex = 0;
 
   private Map<JMenuItem, MZmineRunnableModule> moduleMenuItems =
       new Hashtable<JMenuItem, MZmineRunnableModule>();
@@ -188,7 +188,6 @@ public class MainMenu extends JMenuBar implements ActionListener {
     mobilogramListMenu.setMnemonic(KeyEvent.VK_M);
     this.add(mobilogramListMenu);
 
-
     /*
      * Visualization menu
      */
@@ -197,7 +196,14 @@ public class MainMenu extends JMenuBar implements ActionListener {
     visualizationMenu.setMnemonic(KeyEvent.VK_V);
     this.add(visualizationMenu);
 
+    GUIUtils.addLabel(visualizationMenu, "Raw data visualization");
+    this.add(visualizationMenu);
+
     visualizationMenu.addSeparator();
+    GUIUtils.addLabel(visualizationMenu, "Peak dataTest visualization");
+
+    visualizationMenu.addSeparator();
+    GUIUtils.addLabel(visualizationMenu, "Mobilogram data visualization");
 
     /*
      * Tools menu
@@ -291,10 +297,14 @@ public class MainMenu extends JMenuBar implements ActionListener {
         peakListExportMenu.add(newItem);
         break;
       case VISUALIZATIONRAWDATA:
-        visualizationMenu.add(newItem, visualizationMenuIndex);
-        visualizationMenuIndex++;
+        visualizationMenu.add(newItem, visualizationRawMenuIndex);
+        visualizationRawMenuIndex++;
         break;
       case VISUALIZATIONPEAKLIST:
+        visualizationMenu.add(newItem, visualizationPeakMenuIndex + visualizationRawMenuIndex);
+        visualizationPeakMenuIndex++;
+        break;
+      case VISUALIZATIONMOBILOGRAMLIST:
         visualizationMenu.add(newItem);
         break;
       case DATAANALYSIS:
