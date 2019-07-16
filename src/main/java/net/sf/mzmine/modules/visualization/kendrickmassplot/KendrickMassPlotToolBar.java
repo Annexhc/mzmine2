@@ -25,6 +25,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -48,9 +49,15 @@ public class KendrickMassPlotToolBar extends JToolBar {
   static final Icon kmdIcon = new ImageIcon("icons/KMDIcon.png");
   static final Icon rkmIcon = new ImageIcon("icons/RKMIcon.png");
 
-  public JLabel yAxisDivisorLabel;
-  public JLabel xAxisDivisorLabel;
-  public JLabel zAxisDivisorLabel;
+  private JLabel yAxisDivisorLabel;
+  private JLabel xAxisDivisorLabel;
+  private JLabel zAxisDivisorLabel;
+
+  private JCheckBox yUseAutoChargeCheckBox;
+  private JCheckBox xUseAutoChargeCheckBox;
+  private JCheckBox zUseAutoChargeCheckBox;
+
+
 
   DecimalFormat shiftFormat = new DecimalFormat("0.##");
 
@@ -59,7 +66,9 @@ public class KendrickMassPlotToolBar extends JToolBar {
       int xAxisCharge, int yAxisCharge, int zAxisCharge, // charge
       int xAxisDivisor, int yAxisDivisor, int zAxisDivisor, // divisor
       boolean useCustomXAxis, boolean useCustomZAxis, // custom axis
-      boolean useXAxisRKM, boolean useYAxisRKM, boolean useZAxisRKM // RKM or KMD icon
+      boolean useXAxisRKM, boolean useYAxisRKM, boolean useZAxisRKM, // RKM or KMD icon
+      boolean yUseAutoCharge, boolean xUseAutoCharge, boolean zUseAutoCharge // auto charge
+                                                                             // correction
   ) {
 
     super(JToolBar.VERTICAL);
@@ -141,8 +150,14 @@ public class KendrickMassPlotToolBar extends JToolBar {
       componentsList.add(GUIUtils.addButton(this, null, rkmIcon, masterFrame, "TOGGLE_RKM_KMD_Y",
           "Toggle RKM (remainders of Kendrick masses) and KMD (Kendrick mass defect)"));
     }
+
+    // use auto charge detection
+    yUseAutoChargeCheckBox = GUIUtils.addCheckbox(this, "Auto charge detection", null, masterFrame,
+        "USE_AUTO_CHARGE_Y", "Automatic charge detection to cluster feature of the same compound");
+    yUseAutoChargeCheckBox.setSelected(yUseAutoCharge);
+    componentsList.add(yUseAutoChargeCheckBox);
     componentsList.add(GUIUtils.addLabel(this, null));
-    componentsList.add(GUIUtils.addLabel(this, null));
+
     // xAxis
     if (useCustomXAxis) {
 
@@ -284,6 +299,30 @@ public class KendrickMassPlotToolBar extends JToolBar {
 
   public void setzAxisDivisorLabel(JLabel zAxisDivisorLabel) {
     this.zAxisDivisorLabel = zAxisDivisorLabel;
+  }
+
+  public JCheckBox getyUseAutoCharge() {
+    return yUseAutoChargeCheckBox;
+  }
+
+  public void setyUseAutoCharge(JCheckBox yUseAutoCharge) {
+    this.yUseAutoChargeCheckBox = yUseAutoCharge;
+  }
+
+  public JCheckBox getxUseAutoCharge() {
+    return xUseAutoChargeCheckBox;
+  }
+
+  public void setxUseAutoCharge(JCheckBox xUseAutoCharge) {
+    this.xUseAutoChargeCheckBox = xUseAutoCharge;
+  }
+
+  public JCheckBox getzUseAutoCharge() {
+    return zUseAutoChargeCheckBox;
+  }
+
+  public void setzUseAutoCharge(JCheckBox zUseAutoCharge) {
+    this.zUseAutoChargeCheckBox = zUseAutoCharge;
   }
 
 }
