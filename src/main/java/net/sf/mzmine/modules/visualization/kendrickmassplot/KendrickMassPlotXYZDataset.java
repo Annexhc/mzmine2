@@ -96,6 +96,15 @@ class KendrickMassPlotXYZDataset extends AbstractXYZDataset {
         else if (xAxisKMBase.equals("KM")) {
           xValues[i] = selectedRows[i].getAverageMZ() * getKendrickMassFactor(customYAxisKMBase);
         }
+
+        // plot z*m/z values as x axis
+        else if (xAxisKMBase.equals("z*m/z")) {
+          int charge = 1;
+          if (selectedRows[i].getRowCharge() != 0) {
+            charge = selectedRows[i].getRowCharge();
+          }
+          xValues[i] = charge * selectedRows[i].getAverageMZ();
+        }
       }
     }
 

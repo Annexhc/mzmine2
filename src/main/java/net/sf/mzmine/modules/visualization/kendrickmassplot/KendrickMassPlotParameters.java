@@ -52,7 +52,7 @@ public class KendrickMassPlotParameters extends SimpleParameterSet {
           "Enter a sum formula for a Kendrick mass base, e.g. \"CH2\" ");
 
   public static final ComboParameter<String> xAxisValues = new ComboParameter<>("X-Axis",
-      "Select Kendrick mass (KM) or m/z", new String[] {"m/z", "KM"});
+      "Select Kendrick mass (KM) or m/z", new String[] {"m/z", "KM", "z*m/z"});
 
   public static final OptionalParameter<StringParameter> xAxisCustomKendrickMassBase =
       new OptionalParameter<>(new StringParameter("Kendrick mass base for x-Axis",
