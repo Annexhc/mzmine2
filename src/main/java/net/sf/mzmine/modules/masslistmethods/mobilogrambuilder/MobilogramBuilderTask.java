@@ -53,8 +53,9 @@ public class MobilogramBuilderTask extends AbstractTask {
   // User parameters
   private String suffix, massListName;
   private MZTolerance mzTolerance;
-  private double minimumTimeSpan, minimumHeight;
-
+  private double minimumTimeSpan;
+  private double minimumMobilitySpan;
+  private double minimumHeight;
   private SimpleMobilogramList newMobilogramList;
 
   /**
@@ -72,6 +73,8 @@ public class MobilogramBuilderTask extends AbstractTask {
     this.mzTolerance = parameters.getParameter(MobilogramBuilderParameters.mzTolerance).getValue();
     this.minimumTimeSpan =
         parameters.getParameter(MobilogramBuilderParameters.minimumTimeSpan).getValue();
+    this.minimumMobilitySpan =
+        parameters.getParameter(MobilogramBuilderParameters.minimumMobilitySpan).getValue();
     this.minimumHeight =
         parameters.getParameter(MobilogramBuilderParameters.minimumHeight).getValue();
 
@@ -134,13 +137,13 @@ public class MobilogramBuilderTask extends AbstractTask {
       prevRT = s.getRetentionTime();
     }
 
-    // Create new peak list
+    // Create new mobilogram list
     newMobilogramList = new SimpleMobilogramList(dataFile + " " + suffix, dataFile);
 
 
     Mobilogram[] mobilograms;
     HighestIMSDataPointConnector massConnector = new HighestIMSDataPointConnector(dataFile,
-        allScanNumbers, minimumTimeSpan, minimumHeight, mzTolerance);
+        allScanNumbers, minimumTimeSpan, minimumMobilitySpan, minimumHeight, mzTolerance);
 
 
     for (Scan scan : scans) {

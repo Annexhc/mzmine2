@@ -33,7 +33,9 @@ import net.sf.mzmine.util.SortingProperty;
 public class HighestIMSDataPointConnector {
 
   private final MZTolerance mzTolerance;
-  private final double minimumTimeSpan, minimumHeight;
+  private final double minimumTimeSpan;
+  private final double minimumHeight;
+  private final double minimumMobilitySpan;
   private final RawDataFile dataFile;
   private final int allScanNumbers[];
 
@@ -41,11 +43,13 @@ public class HighestIMSDataPointConnector {
   private Set<Mobilogram> buildingMobilograms;
 
   public HighestIMSDataPointConnector(RawDataFile dataFile, int allScanNumbers[],
-      double minimumTimeSpan, double minimumHeight, MZTolerance mzTolerance) {
+      double minimumTimeSpan, double minimumMobilitySpan, double minimumHeight,
+      MZTolerance mzTolerance) {
 
     this.mzTolerance = mzTolerance;
     this.minimumHeight = minimumHeight;
     this.minimumTimeSpan = minimumTimeSpan;
+    this.minimumMobilitySpan = minimumMobilitySpan;
     this.dataFile = dataFile;
     this.allScanNumbers = allScanNumbers;
 
@@ -57,7 +61,6 @@ public class HighestIMSDataPointConnector {
   }
 
   public void addScan(int scanNumber, IMSDataPoint mzValues[]) {
-
     // Sort m/z peaks by descending intensity
     Arrays.sort(mzValues,
         new IMSDataPointSorter(SortingProperty.Intensity, SortingDirection.Descending));
@@ -102,7 +105,6 @@ public class HighestIMSDataPointConnector {
       connectedmobilograms.add(bestMobilogram);
 
     }
-
     // Process those mobilograms which were not connected to any m/z peak
     for (Mobilogram testMobilogram : buildingMobilograms) {
 
@@ -112,7 +114,7 @@ public class HighestIMSDataPointConnector {
       }
 
       // Check if we just finished a long-enough segment
-      if (testMobilogram.getBuildingSegmentLength() >= minimumTimeSpan) {
+      if (testMobilogram.getMobilityBuildingSegmentLength() >= minimumMobilitySpan) {
         testMobilogram.commitBuildingSegment();
 
         // Move the mobilogram to the set of connected mobilograms

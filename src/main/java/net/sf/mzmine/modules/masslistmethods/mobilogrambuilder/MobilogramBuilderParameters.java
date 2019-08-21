@@ -22,7 +22,6 @@ import net.sf.mzmine.main.MZmineCore;
 import net.sf.mzmine.parameters.Parameter;
 import net.sf.mzmine.parameters.impl.SimpleParameterSet;
 import net.sf.mzmine.parameters.parametertypes.DoubleParameter;
-import net.sf.mzmine.parameters.parametertypes.IntegerParameter;
 import net.sf.mzmine.parameters.parametertypes.MassListParameter;
 import net.sf.mzmine.parameters.parametertypes.StringParameter;
 import net.sf.mzmine.parameters.parametertypes.selectors.RawDataFilesParameter;
@@ -45,7 +44,7 @@ public class MobilogramBuilderParameters extends SimpleParameterSet {
           + "is by studying the raw data and determining what is the typical time span of chromatographic peaks.",
       MZmineCore.getConfiguration().getRTFormat());
 
-  public static final IntegerParameter minimumMobilitySpan = new IntegerParameter(
+  public static final DoubleParameter minimumMobilitySpan = new DoubleParameter(
       "Min mobility span (scans)", "Minimum number of scans in mobility dimension");
 
   public static final DoubleParameter minimumHeight = new DoubleParameter("Min height",

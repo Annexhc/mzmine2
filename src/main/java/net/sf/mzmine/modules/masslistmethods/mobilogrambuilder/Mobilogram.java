@@ -244,7 +244,7 @@ public class Mobilogram implements IMSFeature {
     }
     mz = MathUtils.calcQuantile(allMzValues, 0.5f);
 
-    // Update raw data point ranges, height, rt and representative scan
+    // Update raw data point ranges, height, rt, mobility, and representative scan
     height = Double.MIN_VALUE;
     for (int i = 0; i < allScanNumbers.length; i++) {
 
@@ -274,6 +274,7 @@ public class Mobilogram implements IMSFeature {
       }
     }
 
+    // to do
     // Update area
     area = 0;
     for (int i = 1; i < allScanNumbers.length; i++) {
@@ -324,7 +325,18 @@ public class Mobilogram implements IMSFeature {
     int lastScan = buildingSegment.lastElement();
     double firstRT = dataFile.getScan(firstScan).getRetentionTime();
     double lastRT = dataFile.getScan(lastScan).getRetentionTime();
+    System.out.println(firstRT + " " + lastRT);
     return (lastRT - firstRT);
+  }
+
+  public double getMobilityBuildingSegmentLength() {
+    if (buildingSegment.size() < 2)
+      return 0;
+    int firstScan = buildingSegment.firstElement();
+    int lastScan = buildingSegment.lastElement();
+    double firstMobility = dataFile.getScan(firstScan).getMobility();
+    double lastMobility = dataFile.getScan(lastScan).getMobility();
+    return (lastMobility - firstMobility);
   }
 
   public int getNumberOfCommittedSegments() {
