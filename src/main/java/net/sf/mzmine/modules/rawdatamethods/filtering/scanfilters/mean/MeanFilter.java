@@ -36,9 +36,9 @@ public class MeanFilter implements ScanFilter {
     double windowLength =
         parameters.getParameter(MeanFilterParameters.oneSidedWindowLength).getValue();
 
-    if (sc.getMSLevel() != 1) {
-      return sc;
-    }
+
+    // changed to also allow MS2 if selected in ScanSelection
+
     Vector<Double> massWindow = new Vector<Double>();
     Vector<Double> intensityWindow = new Vector<Double>();
 
@@ -82,10 +82,10 @@ public class MeanFilter implements ScanFilter {
 
       elSum = 0;
       for (int j = 0; j < intensityWindow.size(); j++) {
-        elSum += ((Double) (intensityWindow.get(j))).doubleValue();
+        elSum += (intensityWindow.get(j)).doubleValue();
       }
 
-      newDataPoints[i] = new SimpleDataPoint(currentMass, elSum / (double) intensityWindow.size());
+      newDataPoints[i] = new SimpleDataPoint(currentMass, elSum / intensityWindow.size());
 
     }
 

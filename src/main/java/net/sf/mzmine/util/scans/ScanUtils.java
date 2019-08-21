@@ -884,6 +884,17 @@ public class ScanUtils {
   }
 
   /**
+   * below threshold: keep data points < noiseLevel
+   * 
+   * @param data
+   * @param noiseLevel
+   * @return
+   */
+  public static DataPoint[] getBelowThreshold(DataPoint[] data, double noiseLevel) {
+    return Stream.of(data).filter(dp -> dp.getIntensity() < noiseLevel).toArray(DataPoint[]::new);
+  }
+
+  /**
    * Number of signals >=noiseLevel
    * 
    * @param data
@@ -942,7 +953,7 @@ public class ScanUtils {
   }
 
   /**
-   * Selects best N MS/MS scans from a peak list row
+   * Selects best N MS/MS scans from a feature list row
    */
   public static @Nonnull Collection<Scan> selectBestMS2Scans(@Nonnull PeakListRow row,
       @Nonnull String massListName, @Nonnull Integer topN) throws MissingMassListException {

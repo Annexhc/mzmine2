@@ -44,10 +44,10 @@ import org.jfree.chart.ui.RectangleInsets;
 import org.jfree.data.xy.XYDataset;
 import org.jfree.data.xy.XYZDataset;
 import com.google.common.collect.Range;
+import net.sf.mzmine.chartbasics.chartutils.XYBlockPixelSizePaintScales;
 import net.sf.mzmine.datamodel.MobilogramList;
 import net.sf.mzmine.datamodel.RawDataFile;
 import net.sf.mzmine.datamodel.Scan;
-import net.sf.mzmine.modules.visualization.kendrickmassplot.chartutils.XYBlockPixelSizePaintScales;
 import net.sf.mzmine.parameters.ParameterSet;
 
 class MobilogramShapeCellRenderer implements TableCellRenderer {

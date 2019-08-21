@@ -38,6 +38,7 @@ import net.sf.mzmine.modules.visualization.spectra.simplespectra.SpectraPlot;
 import net.sf.mzmine.modules.visualization.spectra.simplespectra.datapointprocessing.isotopes.MassListDeisotoper;
 import net.sf.mzmine.modules.visualization.spectra.simplespectra.datapointprocessing.isotopes.MassListDeisotoperParameters;
 import net.sf.mzmine.modules.visualization.spectra.simplespectra.datasets.DataPointsDataSet;
+import net.sf.mzmine.modules.visualization.spectra.spectralmatchresults.SpectraIdentificationResultsWindow;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.parameters.parametertypes.tolerances.MZTolerance;
 import net.sf.mzmine.taskcontrol.AbstractTask;
@@ -59,6 +60,8 @@ import net.sf.mzmine.util.spectraldb.entry.SpectralDBPeakIdentity;
 public class SpectralMatchTask extends AbstractTask {
 
   private Logger logger = Logger.getLogger(this.getClass().getName());
+
+  public final static double[] DELTA_ISOTOPES = new double[] {1.0034, 1.0078, 2.0157, 1.9970};
 
   private static final int MAX_ERROR = 3;
   private int errorCounter = 0;
@@ -98,6 +101,11 @@ public class SpectralMatchTask extends AbstractTask {
   // crop to overlapping range (+- mzTol)
   private final boolean cropSpectraToOverlap;
 
+  // needs any signals within mzToleranceSpectra for
+  // 13C, H, 2H or Cl
+  private boolean needsIsotopePattern;
+  private int minMatchedIsoSignals;
+
   public SpectralMatchTask(ParameterSet parameters, int startEntry, List<SpectralDBEntry> list,
       SpectraPlot spectraPlot, Scan currentScan, SpectraIdentificationResultsWindow resultWindow) {
     this.startEntry = startEntry;
@@ -128,13 +136,22 @@ public class SpectralMatchTask extends AbstractTask {
         parameters.getParameter(SpectraIdentificationSpectralDatabaseParameters.usePrecursorMZ)
             .getEmbeddedParameter().getValue();
     simFunction =
-        parameters.getParameter(LocalSpectralDBSearchParameters.similarityFunction).getValue();
-    removeIsotopes =
-        parameters.getParameter(LocalSpectralDBSearchParameters.deisotoping).getValue();
-    deisotopeParam = parameters.getParameter(LocalSpectralDBSearchParameters.deisotoping)
-        .getEmbeddedParameters();
-    cropSpectraToOverlap =
-        parameters.getParameter(LocalSpectralDBSearchParameters.cropSpectraToOverlap).getValue();
+        parameters.getParameter(SpectraIdentificationSpectralDatabaseParameters.similarityFunction)
+            .getValue();
+    needsIsotopePattern =
+        parameters.getParameter(SpectraIdentificationSpectralDatabaseParameters.needsIsotopePattern)
+            .getValue();
+    minMatchedIsoSignals = !needsIsotopePattern ? 0
+        : parameters.getParameter(LocalSpectralDBSearchParameters.needsIsotopePattern)
+            .getEmbeddedParameter().getValue();
+    removeIsotopes = parameters
+        .getParameter(SpectraIdentificationSpectralDatabaseParameters.deisotoping).getValue();
+    deisotopeParam =
+        parameters.getParameter(SpectraIdentificationSpectralDatabaseParameters.deisotoping)
+            .getEmbeddedParameters();
+    cropSpectraToOverlap = parameters
+        .getParameter(SpectraIdentificationSpectralDatabaseParameters.cropSpectraToOverlap)
+        .getValue();
   }
 
   /**
@@ -190,7 +207,8 @@ public class SpectralMatchTask extends AbstractTask {
         }
 
         SpectralSimilarity sim = spectraDBMatch(spectraMassList, ident);
-        if (sim != null) {
+        if (sim != null && (!needsIsotopePattern
+            || checkForIsotopePattern(sim, mzToleranceSpectra, minMatchedIsoSignals))) {
           count++;
           // use SpectralDBPeakIdentity to store all results similar to peaklist method
           matches.add(new SpectralDBPeakIdentity(currentScan, massListName, ident, sim,
@@ -216,12 +234,55 @@ public class SpectralMatchTask extends AbstractTask {
       return;
     }
 
-    // Repaint the window to reflect the change in the peak list
+    // Repaint the window to reflect the change in the feature list
     repaintWindow();
 
     list = null;
     setStatus(TaskStatus.FINISHED);
   }
+
+
+  /**
+   * Checks for isotope pattern in matched signals within mzToleranceSpectra
+   * 
+   * @param sim
+   * @return
+   */
+  public static boolean checkForIsotopePattern(SpectralSimilarity sim,
+      MZTolerance mzToleranceSpectra, int minMatchedIsoSignals) {
+    // use mzToleranceSpectra
+    DataPoint[][] aligned = sim.getAlignedDataPoints();
+    aligned = ScanAlignment.removeUnaligned(aligned);
+
+    // find something in range of:
+    // 13C 1.0034
+    // H ( for M+ and M+H or -H -H2)
+    // 2H 1.0078 2.0157
+    // Cl 1.9970
+    // just check one
+
+    int matches = 0;
+    DataPoint[] lib = aligned[0];
+    for (int i = 0; i < lib.length - 1; i++) {
+      double a = lib[i].getMZ();
+      // each lib[i] can only have one match to each isotope dist
+      for (double dIso : DELTA_ISOTOPES) {
+        boolean matchedIso = false;
+        for (int k = i + 1; k < lib.length && !matchedIso; k++) {
+          double dmz = Math.abs(a - lib[k].getMZ());
+          // any match?
+          if (mzToleranceSpectra.checkWithinTolerance(dIso, dmz)) {
+            matchedIso = true;
+            matches++;
+            if (matches >= minMatchedIsoSignals)
+              return true;
+          }
+        }
+      }
+    }
+    return false;
+  }
+
 
   private void repaintWindow() {
     Desktop desktop = MZmineCore.getDesktop();

@@ -110,7 +110,7 @@ public class SimplePeakListRow implements PeakListRow {
   @Override
   public synchronized void addPeak(RawDataFile rawData, Feature peak) {
     if (peak == null)
-      throw new IllegalArgumentException("Cannot add null peak to a peak list row");
+      throw new IllegalArgumentException("Cannot add null feature to a feature list row");
 
     // ConcurrentHashMap is already synchronized
     peaks.put(rawData, peak);
@@ -282,7 +282,7 @@ public class SimplePeakListRow implements PeakListRow {
    * @see net.sf.mzmine.datamodel.PeakListRow#setPreferredPeakIdentity(net.sf.mzmine.datamodel.PeakIdentity)
    */
   @Override
-  public void setPreferredPeakIdentity(PeakIdentity identity) {
+  public synchronized void setPreferredPeakIdentity(PeakIdentity identity) {
 
     if (identity == null)
       return;

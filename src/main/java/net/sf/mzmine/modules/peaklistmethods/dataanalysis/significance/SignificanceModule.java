@@ -24,15 +24,15 @@ import javax.annotation.Nonnull;
 
 import net.sf.mzmine.datamodel.*;
 import net.sf.mzmine.modules.MZmineModuleCategory;
-import net.sf.mzmine.modules.MZmineRunnableModule;
+import net.sf.mzmine.modules.MZmineProcessingModule;
 import net.sf.mzmine.parameters.ParameterSet;
 import net.sf.mzmine.taskcontrol.Task;
 import net.sf.mzmine.util.ExitCode;
 
-public class SignificanceModule implements MZmineRunnableModule {
+public class SignificanceModule implements MZmineProcessingModule {
 
-    private static final String MODULE_NAME = "Student's t-test and fold-change";
-    private static final String MODULE_DESCRIPTION = "Calculates Student's t-test and log2 fold change of aligned peaks.";
+    private static final String MODULE_NAME = "One-way ANOVA Test";
+    private static final String MODULE_DESCRIPTION = "Calculates one-way ANOVA test on the intensities of aligned features.";
 
     @Override
     public @Nonnull String getName() {
