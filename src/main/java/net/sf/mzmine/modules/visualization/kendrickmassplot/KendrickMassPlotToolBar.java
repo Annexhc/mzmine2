@@ -25,9 +25,11 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 import javax.swing.JToolBar;
 import net.sf.mzmine.util.GUIUtils;
 
@@ -47,10 +49,27 @@ public class KendrickMassPlotToolBar extends JToolBar {
   static final Icon arrowDownIcon = new ImageIcon("icons/arrowdownicon.png");
   static final Icon kmdIcon = new ImageIcon("icons/KMDIcon.png");
   static final Icon rkmIcon = new ImageIcon("icons/RKMIcon.png");
+  // TODO create new icons
+  static final Icon autoChargeIconOn = new ImageIcon("icons/KMDIcon.png");
+  static final Icon autoChargeIconOff = new ImageIcon("icons/RKMIcon.png");
 
-  public JLabel yAxisDivisorLabel;
-  public JLabel xAxisDivisorLabel;
-  public JLabel zAxisDivisorLabel;
+  private JLabel yAxisDivisorLabel;
+  private JLabel xAxisDivisorLabel;
+  private JLabel zAxisDivisorLabel;
+  private JLabel yAxisChargeLabel;
+  private JLabel xAxisChargeLabel;
+  private JLabel zAxisChargeLabel;
+
+  private JButton chargeUpButtonY;
+  private JButton chargeUpButtonX;
+  private JButton chargeUpButtonZ;
+  private JButton chargeDownButtonY;
+  private JButton chargeDownButtonX;
+  private JButton chargeDownButtonZ;
+
+  private JTextField chargeCarrierYTextField;
+  private JTextField chargeCarrierXTextField;
+  private JTextField chargeCarrierZTextField;
 
   DecimalFormat shiftFormat = new DecimalFormat("0.##");
 
@@ -59,7 +78,8 @@ public class KendrickMassPlotToolBar extends JToolBar {
       int xAxisCharge, int yAxisCharge, int zAxisCharge, // charge
       int xAxisDivisor, int yAxisDivisor, int zAxisDivisor, // divisor
       boolean useCustomXAxis, boolean useCustomZAxis, // custom axis
-      boolean useXAxisRKM, boolean useYAxisRKM, boolean useZAxisRKM // RKM or KMD icon
+      boolean useXAxisRKM, boolean useYAxisRKM, boolean useZAxisRKM, // RKM or KMD icon
+      boolean useXAxisAutoCharge, boolean useYAxisAutoCharge, boolean useZAxisAutoCharge // Autocharge
   ) {
 
     super(JToolBar.VERTICAL);
@@ -98,7 +118,7 @@ public class KendrickMassPlotToolBar extends JToolBar {
 
     // yAxis components
 
-    // header
+    // headerKMD
     componentsList.add(GUIUtils.addLabel(this, "Y-Axis:"));
     componentsList.add(GUIUtils.addLabel(this, null));
     componentsList.add(GUIUtils.addLabel(this, null));
@@ -111,24 +131,27 @@ public class KendrickMassPlotToolBar extends JToolBar {
     // arrow up
     componentsList.add(
         GUIUtils.addButton(this, null, arrowUpIcon, masterFrame, "SHIFT_KMD_UP_Y", "Shift KMD up"));
-    componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
-        "CHANGE_CHARGE_UP_Y", "Increase charge"));
+    chargeUpButtonY = GUIUtils.addButton(this, null, arrowUpIcon, masterFrame, "CHANGE_CHARGE_UP_Y",
+        "Increase charge");
+    componentsList.add(chargeUpButtonY);
     componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
         "CHANGE_DIVISOR_UP_Y", "Increase divisor"));
 
     // arrow down
     componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
         "SHIFT_KMD_DOWN_Y", "Shift KMD down"));
-    componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
-        "CHANGE_CHARGE_DOWN_Y", "Decrease charge"));
+    chargeDownButtonY = GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+        "CHANGE_CHARGE_DOWN_Y", "Decrease charge");
+    componentsList.add(chargeDownButtonY);
     componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
         "CHANGE_DIVISOR_DOWN_Y", "Decrease divisor"));
 
     // current
     componentsList.add(GUIUtils.addLabel(this, //
         String.valueOf(shiftFormat.format(yAxisShift)), null, JLabel.CENTER, null));
-    componentsList.add(GUIUtils.addLabel(this, //
-        String.valueOf(shiftFormat.format(yAxisCharge)), null, JLabel.CENTER, null));
+    yAxisChargeLabel = GUIUtils.addLabel(this, //
+        String.valueOf(shiftFormat.format(yAxisCharge)), null, JLabel.CENTER, null);
+    componentsList.add(yAxisChargeLabel);
     yAxisDivisorLabel = GUIUtils.addLabel(this, //
         String.valueOf(shiftFormat.format(yAxisDivisor)), null, JLabel.CENTER, null);
     componentsList.add(yAxisDivisorLabel);
@@ -143,6 +166,28 @@ public class KendrickMassPlotToolBar extends JToolBar {
     }
     componentsList.add(GUIUtils.addLabel(this, null));
     componentsList.add(GUIUtils.addLabel(this, null));
+
+    // use auto charge for charge independent KMD plot
+    if (useYAxisAutoCharge == false) {
+      componentsList.add(GUIUtils.addButton(this, null, autoChargeIconOff, masterFrame,
+          "AUTO_CHARGE_Y", "Charge independent plot"));
+      yAxisChargeLabel.setEnabled(true);
+      chargeUpButtonY.setEnabled(true);
+      chargeDownButtonY.setEnabled(true);
+    } else {
+      componentsList.add(GUIUtils.addButton(this, null, autoChargeIconOn, masterFrame,
+          "AUTO_CHARGE_Y", "Charge independent plot"));
+      // deactivate charge label
+      yAxisChargeLabel.setText("Auto");
+      yAxisChargeLabel.setEnabled(false);
+      chargeUpButtonY.setEnabled(false);
+      chargeDownButtonY.setEnabled(false);
+    }
+
+    componentsList.add(GUIUtils.addLabel(this, "Charge carrier"));
+    chargeCarrierYTextField = GUIUtils.addTextField("");
+    componentsList.add(chargeCarrierYTextField);
+
     // xAxis
     if (useCustomXAxis) {
 
@@ -162,24 +207,27 @@ public class KendrickMassPlotToolBar extends JToolBar {
       // arrow up
       componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame, "SHIFT_KMD_UP_X",
           "Shift KMD up"));
-      componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
-          "CHANGE_CHARGE_UP_X", "Increase charge"));
+      chargeUpButtonX = GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_CHARGE_UP_X", "Increase charge");
+      componentsList.add(chargeUpButtonX);
       componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
           "CHANGE_DIVISOR_UP_X", "Increase divisor"));
 
       // arrow down
       componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
           "SHIFT_KMD_DOWN_X", "Shift KMD down"));
-      componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
-          "CHANGE_CHARGE_DOWN_X", "Decrease charge"));
+      chargeDownButtonX = GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_CHARGE_DOWN_X", "Decrease charge");
+      componentsList.add(chargeDownButtonX);
       componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
           "CHANGE_DIVISOR_DOWN_X", "Decrease divisor"));
 
       // current
       componentsList.add(GUIUtils.addLabel(this, //
           String.valueOf(shiftFormat.format(xAxisShift)), null, JLabel.CENTER, null));
-      componentsList.add(GUIUtils.addLabel(this, //
-          String.valueOf(shiftFormat.format(xAxisCharge)), null, JLabel.CENTER, null));
+      xAxisChargeLabel = GUIUtils.addLabel(this, //
+          String.valueOf(shiftFormat.format(xAxisCharge)), null, JLabel.CENTER, null);
+      componentsList.add(xAxisChargeLabel);
       xAxisDivisorLabel = GUIUtils.addLabel(this, //
           String.valueOf(shiftFormat.format(xAxisDivisor)), null, JLabel.CENTER, null);
       componentsList.add(xAxisDivisorLabel);
@@ -194,6 +242,27 @@ public class KendrickMassPlotToolBar extends JToolBar {
       }
       componentsList.add(GUIUtils.addLabel(this, null));
       componentsList.add(GUIUtils.addLabel(this, null));
+
+      // use auto charge for charge independent KMD plot
+      if (useXAxisAutoCharge == false) {
+        componentsList.add(GUIUtils.addButton(this, null, autoChargeIconOff, masterFrame,
+            "AUTO_CHARGE_X", "Charge independent plot"));
+        xAxisChargeLabel.setEnabled(true);
+        chargeUpButtonX.setEnabled(true);
+        chargeDownButtonX.setEnabled(true);
+      } else {
+        componentsList.add(GUIUtils.addButton(this, null, autoChargeIconOn, masterFrame,
+            "AUTO_CHARGE_X", "Charge independent plot"));
+        // deactivate charge label
+        xAxisChargeLabel.setText("Auto");
+        xAxisChargeLabel.setEnabled(false);
+        chargeUpButtonX.setEnabled(false);
+        chargeDownButtonX.setEnabled(false);
+      }
+
+      componentsList.add(GUIUtils.addLabel(this, "Charge carrier"));
+      chargeCarrierXTextField = GUIUtils.addTextField("");
+      componentsList.add(chargeCarrierXTextField);
     }
 
     // zAxis
@@ -215,24 +284,27 @@ public class KendrickMassPlotToolBar extends JToolBar {
       // arrow up
       componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame, "SHIFT_KMD_UP_Z",
           "Shift KMD up"));
-      componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
-          "CHANGE_CHARGE_UP_Z", "Increase charge"));
+      chargeUpButtonZ = GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_CHARGE_UP_Z", "Increase charge");
+      componentsList.add(chargeUpButtonZ);
       componentsList.add(GUIUtils.addButton(this, null, arrowUpIcon, masterFrame,
           "CHANGE_DIVISOR_UP_Z", "Increase divisor"));
 
       // arrow down
       componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
           "SHIFT_KMD_DOWN_Z", "Shift KMD down"));
-      componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
-          "CHANGE_CHARGE_DOWN_Z", "Decrease charge"));
+      chargeDownButtonZ = GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
+          "CHANGE_CHARGE_DOWN_Z", "Decrease charge");
+      componentsList.add(chargeDownButtonZ);
       componentsList.add(GUIUtils.addButton(this, null, arrowDownIcon, masterFrame,
           "CHANGE_DIVISOR_DOWN_Z", "Decrease divisor"));
 
       // current
       componentsList.add(GUIUtils.addLabel(this, //
           String.valueOf(shiftFormat.format(zAxisShift)), null, JLabel.CENTER, null));
-      componentsList.add(GUIUtils.addLabel(this, //
-          String.valueOf(shiftFormat.format(zAxisCharge)), null, JLabel.CENTER, null));
+      zAxisChargeLabel = GUIUtils.addLabel(this, //
+          String.valueOf(shiftFormat.format(zAxisCharge)), null, JLabel.CENTER, null);
+      componentsList.add(zAxisChargeLabel);
       zAxisDivisorLabel = GUIUtils.addLabel(this, //
           String.valueOf(shiftFormat.format(zAxisDivisor)), null, JLabel.CENTER, null);
       componentsList.add(zAxisDivisorLabel);
@@ -247,6 +319,27 @@ public class KendrickMassPlotToolBar extends JToolBar {
       }
       componentsList.add(GUIUtils.addLabel(this, null));
       componentsList.add(GUIUtils.addLabel(this, null));
+
+      // use auto charge for charge independent KMD plot
+      if (useZAxisAutoCharge == false) {
+        componentsList.add(GUIUtils.addButton(this, null, autoChargeIconOff, masterFrame,
+            "AUTO_CHARGE_Z", "Charge independent plot"));
+        zAxisChargeLabel.setEnabled(true);
+        chargeUpButtonZ.setEnabled(true);
+        chargeDownButtonZ.setEnabled(true);
+      } else {
+        componentsList.add(GUIUtils.addButton(this, null, autoChargeIconOn, masterFrame,
+            "AUTO_CHARGE_Z", "Charge independent plot"));
+        // deactivate charge label
+        zAxisChargeLabel.setText("Auto");
+        zAxisChargeLabel.setEnabled(false);
+        chargeUpButtonZ.setEnabled(false);
+        chargeDownButtonZ.setEnabled(false);
+      }
+
+      componentsList.add(GUIUtils.addLabel(this, "Charge carrier"));
+      chargeCarrierZTextField = GUIUtils.addTextField("");
+      componentsList.add(chargeCarrierZTextField);
     }
     JComponent[] components = new JComponent[componentsList.size()];
 
@@ -284,6 +377,30 @@ public class KendrickMassPlotToolBar extends JToolBar {
 
   public void setzAxisDivisorLabel(JLabel zAxisDivisorLabel) {
     this.zAxisDivisorLabel = zAxisDivisorLabel;
+  }
+
+  public JTextField getChargeCarrierYTextField() {
+    return chargeCarrierYTextField;
+  }
+
+  public void setChargeCarrierYTextField(JTextField chargeCarrierYTextField) {
+    this.chargeCarrierYTextField = chargeCarrierYTextField;
+  }
+
+  public JTextField getChargeCarrierXTextField() {
+    return chargeCarrierXTextField;
+  }
+
+  public void setChargeCarrierXTextField(JTextField chargeCarrierXTextField) {
+    this.chargeCarrierXTextField = chargeCarrierXTextField;
+  }
+
+  public JTextField getChargeCarrierZTextField() {
+    return chargeCarrierZTextField;
+  }
+
+  public void setChargeCarrierZTextField(JTextField chargeCarrierZTextField) {
+    this.chargeCarrierZTextField = chargeCarrierZTextField;
   }
 
 }

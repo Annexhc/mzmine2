@@ -38,6 +38,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
@@ -81,6 +82,7 @@ public class GUIUtils {
            */
       private static final long serialVersionUID = 1L;
 
+      @Override
       public void actionPerformed(ActionEvent event) {
         ActionEvent newEvent =
             new ActionEvent(event.getSource(), ActionEvent.ACTION_PERFORMED, actionCommand);
@@ -305,6 +307,18 @@ public class GUIUtils {
   public static JEditorPane addEditorPane(String text) {
     JEditorPane result = new JEditorPane("text/html", text);
     result.setEditable(false);
+    return result;
+  }
+
+  /**
+   * Add a new text field to a given component
+   * 
+   * @param component Component to add the label to
+   * @param text Text field text
+   * @return Created TextField
+   */
+  public static JTextField addTextField(String text) {
+    JTextField result = new JTextField(text);
     return result;
   }
 
@@ -542,11 +556,11 @@ public class GUIUtils {
       ActionListener listener, String actionCommand, String toolTip) {
     return addCheckbox(component, text, icon, listener, actionCommand, 0, toolTip, false);
   }
-  
+
   /**
    * 
-   *  Add a new checkbox to given component
-   *  
+   * Add a new checkbox to given component
+   * 
    * @param component Component to add the checkbox to
    * @param text Checkbox' text
    * @param listener Checkbox' listener or null
@@ -554,10 +568,10 @@ public class GUIUtils {
    * @param toolTip Checkbox' tool tip or null
    * @return
    */
-  public static JCheckBox addCheckbox(Container component, String text,
-      ActionListener listener, String actionCommand, String toolTip) {  
+  public static JCheckBox addCheckbox(Container component, String text, ActionListener listener,
+      String actionCommand, String toolTip) {
     return addCheckbox(component, text, null, listener, actionCommand, 0, toolTip, false);
   }
-  
-  
+
+
 }
